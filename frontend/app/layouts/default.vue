@@ -99,7 +99,7 @@
 
         <!-- Mobile Toggle -->
         <div class="md:hidden flex flex-1 justify-end">
-          <button class="text-brand-primary p-2">
+          <button @click="isMobileMenuOpen = true" class="text-brand-primary p-2">
             <Icon name="lucide:menu" size="24" />
           </button>
         </div>
@@ -136,11 +136,60 @@
         <Icon name="lucide:phone" size="20" />
         <span class="text-[10px] mt-1 font-medium">Contact</span>
       </NuxtLink>
-      <button class="flex flex-col items-center text-gray-500 hover:text-brand-primary">
-        <Icon name="lucide:more-horizontal" size="20" />
-        <span class="text-[10px] mt-1 font-medium">More</span>
+      <button @click="isMobileMenuOpen = true" class="flex flex-col items-center text-gray-500 hover:text-brand-primary">
+        <Icon name="lucide:menu" size="20" />
+        <span class="text-[10px] mt-1 font-medium">Menu</span>
       </button>
     </div>
+    
+    <!-- Mobile Menu Drawer (Side Panel) -->
+    <Transition name="slide-right">
+      <div v-if="isMobileMenuOpen" class="fixed inset-0 z-[100] flex md:hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="isMobileMenuOpen = false"></div>
+        
+        <!-- Drawer Panel -->
+        <div class="relative w-4/5 max-w-sm bg-white h-full flex flex-col shadow-2xl ml-auto overflow-y-auto">
+          <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-surface-light">
+            <span class="font-bold text-brand-primary text-lg">Menu</span>
+            <button @click="isMobileMenuOpen = false" class="p-2 text-gray-500 hover:text-brand-primary bg-white rounded-full shadow-sm">
+              <Icon name="lucide:x" size="20" />
+            </button>
+          </div>
+          
+          <nav class="flex flex-col p-4 gap-2">
+            <NuxtLink to="/" @click="isMobileMenuOpen = false" class="px-4 py-3 rounded-lg text-gray-800 hover:bg-brand-primary/5 hover:text-brand-primary font-medium transition-colors">Home</NuxtLink>
+            
+            <div class="border-t border-gray-100 my-2"></div>
+            <span class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 mt-2">About Us</span>
+            <NuxtLink to="/about/overview" @click="isMobileMenuOpen = false" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-brand-primary/5 hover:text-brand-primary transition-colors text-sm">Overview</NuxtLink>
+            <NuxtLink to="/about/careers" @click="isMobileMenuOpen = false" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-brand-primary/5 hover:text-brand-primary transition-colors text-sm">Careers</NuxtLink>
+            <NuxtLink to="/about/news-events" @click="isMobileMenuOpen = false" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-brand-primary/5 hover:text-brand-primary transition-colors text-sm">News & Events</NuxtLink>
+            
+            <div class="border-t border-gray-100 my-2"></div>
+            <span class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 mt-2">Our Products</span>
+            <NuxtLink to="/products/interior-paints" @click="isMobileMenuOpen = false" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-brand-primary/5 hover:text-brand-primary transition-colors text-sm">Interior Paints</NuxtLink>
+            <NuxtLink to="/products/exterior-paints" @click="isMobileMenuOpen = false" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-brand-primary/5 hover:text-brand-primary transition-colors text-sm">Exterior Paints</NuxtLink>
+            <NuxtLink to="/products/primers" @click="isMobileMenuOpen = false" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-brand-primary/5 hover:text-brand-primary transition-colors text-sm">Primers</NuxtLink>
+            <NuxtLink to="/products/wood-coatings" @click="isMobileMenuOpen = false" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-brand-primary/5 hover:text-brand-primary transition-colors text-sm">Wood Coatings</NuxtLink>
+            <NuxtLink to="/products/industrial-paints" @click="isMobileMenuOpen = false" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-brand-primary/5 hover:text-brand-primary transition-colors text-sm">Industrial Paints</NuxtLink>
+            <NuxtLink to="/products/waterproofing" @click="isMobileMenuOpen = false" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-brand-primary/5 hover:text-brand-primary transition-colors text-sm">Waterproofing</NuxtLink>
+            
+            <div class="border-t border-gray-100 my-2"></div>
+            <NuxtLink to="/dealer-locator" @click="isMobileMenuOpen = false" class="px-4 py-3 rounded-lg text-gray-800 hover:bg-brand-primary/5 hover:text-brand-primary font-medium transition-colors">Dealer Locator</NuxtLink>
+          </nav>
+          
+          <div class="mt-auto p-6 bg-surface-light border-t border-gray-100">
+            <button @click="isQuoteModalOpen = true; isMobileMenuOpen = false" class="w-full bg-brand-primary text-white font-bold py-3 rounded-xl shadow-lg hover:bg-brand-primary/90 transition-colors">
+              Get a Free Quote
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+    
+    <!-- Scroll to Top Button -->
+    <ScrollToTop />
   </div>
 </template>
 
@@ -149,6 +198,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 const isScrolled = ref(false)
 const isQuoteModalOpen = ref(false)
+const isMobileMenuOpen = ref(false)
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 50
@@ -164,3 +214,25 @@ onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
 })
 </script>
+
+<style scoped>
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.slide-right-enter-active .w-4\\/5,
+.slide-right-leave-active .w-4\\/5 {
+  transition: transform 0.3s ease-out;
+}
+
+.slide-right-enter-from,
+.slide-right-leave-to {
+  opacity: 0;
+}
+
+.slide-right-enter-from .w-4\\/5,
+.slide-right-leave-to .w-4\\/5 {
+  transform: translateX(100%);
+}
+</style>

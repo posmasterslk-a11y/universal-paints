@@ -11,10 +11,10 @@
         </p>
       </div>
 
-      <!-- Modern Overlay Cards Grid -->
-      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Modern Overlay Cards Grid / Mobile Slider -->
+      <div class="flex overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 pb-8 -mx-4 px-4 md:pb-0 md:mx-0 md:px-0 snap-x snap-mandatory hide-scrollbar">
         <div v-for="category in categories" :key="category.name" 
-             class="group relative h-[400px] rounded-2xl overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-500">
+             class="group relative h-[400px] w-[85vw] md:w-auto flex-none snap-center rounded-2xl overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-500">
           
           <!-- Background Image with Hover Scale -->
           <img :src="category.image" :alt="category.name" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out" />
@@ -45,6 +45,18 @@
     </div>
   </section>
 </template>
+
+<style scoped>
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+</style>
 
 <script setup>
 const categories = [
