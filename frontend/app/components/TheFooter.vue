@@ -1,5 +1,5 @@
 <template>
-  <footer class="bg-white text-gray-800 pt-20 pb-10 mt-auto border-t border-gray-100 relative">
+  <footer class="bg-white text-gray-800 pt-20 pb-24 md:pb-10 mt-auto border-t border-gray-100 relative">
     <!-- Optional: Subtle top border accent -->
     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-primary via-brand-accent1 to-brand-primary"></div>
     
