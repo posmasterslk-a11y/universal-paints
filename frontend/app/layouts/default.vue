@@ -149,7 +149,7 @@
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="isMobileMenuOpen = false"></div>
         
         <!-- Drawer Panel -->
-        <div class="relative w-4/5 max-w-sm bg-white h-full flex flex-col shadow-2xl ml-auto overflow-y-auto">
+        <div class="drawer-panel relative w-4/5 max-w-sm bg-white h-full flex flex-col shadow-2xl ml-auto overflow-y-auto">
           <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-surface-light">
             <span class="font-bold text-brand-primary text-lg">Menu</span>
             <button @click="isMobileMenuOpen = false" class="p-2 text-gray-500 hover:text-brand-primary bg-white rounded-full shadow-sm">
@@ -221,8 +221,8 @@ onUnmounted(() => {
   transition: opacity 0.3s ease;
 }
 
-.slide-right-enter-active .w-4\\/5,
-.slide-right-leave-active .w-4\\/5 {
+.slide-right-enter-active .drawer-panel,
+.slide-right-leave-active .drawer-panel {
   transition: transform 0.3s ease-out;
 }
 
@@ -231,8 +231,8 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-.slide-right-enter-from .w-4\\/5,
-.slide-right-leave-to .w-4\\/5 {
+.slide-right-enter-from .drawer-panel,
+.slide-right-leave-to .drawer-panel {
   transform: translateX(100%);
 }
 </style>

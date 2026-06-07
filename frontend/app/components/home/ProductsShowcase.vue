@@ -2,8 +2,7 @@
   <section class="py-24 bg-gray-50 relative border-y border-gray-100">
     <div class="container mx-auto px-4">
       
-      <!-- Section Header -->
-      <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
         <div>
           <span class="text-brand-accent1 font-bold tracking-widest uppercase text-sm mb-3 block">Our Catalog</span>
           <h2 class="text-4xl md:text-5xl font-bold text-brand-primary tracking-tight">Featured Products</h2>
@@ -13,9 +12,9 @@
         </button>
       </div>
 
-      <!-- Products Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div v-for="product in products" :key="product.id" class="group bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden">
+      <!-- Products Grid / Mobile Slider -->
+      <div class="flex overflow-x-auto md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-8 -mx-4 px-4 md:pb-0 md:mx-0 md:px-0 snap-x snap-mandatory hide-scrollbar">
+        <div v-for="product in products" :key="product.id" class="group bg-white w-[85vw] md:w-auto flex-none snap-center rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden">
           
           <!-- Image Area (Full Bleed style) -->
           <div class="relative h-64 w-full bg-gray-50 p-4 flex items-center justify-center overflow-hidden">
@@ -63,6 +62,18 @@
     </div>
   </section>
 </template>
+
+<style scoped>
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+</style>
 
 <script setup>
 import { ref, onMounted } from 'vue'
