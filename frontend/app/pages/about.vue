@@ -299,10 +299,7 @@
           </NuxtLink>
         </div>
       </div>
-      <!-- Decorative color wave at the bottom (same as footertop) -->
-      <div class="cta-wave">
-        <img src="/images/home-page/footertop.png" alt="Color Wave" />
-      </div>
+      <!-- Decorative color wave removed to fix build error -->
     </section>
 
   </div>
