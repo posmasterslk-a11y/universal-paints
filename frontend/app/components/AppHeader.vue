@@ -27,13 +27,50 @@
           Get a Quote
           <span class="arrow">→</span>
         </button>
+        <!-- Hamburger Menu Button -->
+        <button class="icon-btn menu-toggle-btn" @click="toggleMobileMenu">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+        </button>
       </div>
     </div>
   </header>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu-overlay" :class="{ 'is-open': isMobileMenuOpen }" @click="toggleMobileMenu"></div>
+
+  <!-- Mobile Drawer Menu -->
+  <div class="mobile-drawer" :class="{ 'is-open': isMobileMenuOpen }">
+    <div class="drawer-header">
+      <img src="/images/logo/Logo.webp" alt="Universal Paints Logo" class="drawer-logo" />
+      <button class="close-drawer-btn" @click="toggleMobileMenu">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+    <nav class="drawer-nav">
+      <ul>
+        <li><NuxtLink to="/" exact-active-class="active" @click="toggleMobileMenu">Home</NuxtLink></li>
+        <li><NuxtLink to="/shop" exact-active-class="active" @click="toggleMobileMenu">Shop</NuxtLink></li>
+        <li><NuxtLink to="/about" exact-active-class="active" @click="toggleMobileMenu">About Us</NuxtLink></li>
+        <li><NuxtLink to="/blog" exact-active-class="active" @click="toggleMobileMenu">Blog</NuxtLink></li>
+        <li><NuxtLink to="/contact" exact-active-class="active" @click="toggleMobileMenu">Contact Us</NuxtLink></li>
+      </ul>
+    </nav>
+    <div class="drawer-footer">
+      <div class="social-icons">
+        <a href="#" class="social-icon" aria-label="Facebook">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+        </a>
+        <a href="#" class="social-icon" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+        </a>
+      </div>
+      <p>&copy; 2024 Universal Paints</p>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
@@ -53,6 +90,24 @@ const cartItemsCount = computed(() => {
   return cart.value.reduce((total, item) => total + item.qty, 0);
 });
 
+const isMobileMenuOpen = ref(false);
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+  // Prevent scrolling when drawer is open
+  if (isMobileMenuOpen.value) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+};
+
+// Close menu when route changes
+watch(route, () => {
+  if (isMobileMenuOpen.value) {
+    toggleMobileMenu();
+  }
+});
+
 const isHomePage = computed(() => route.path === '/');
 const shouldBeLight = computed(() => !isHomePage.value || isScrolled.value);
 
@@ -66,6 +121,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
+  document.body.style.overflow = '';
 });
 </script>
 
@@ -209,10 +265,142 @@ onUnmounted(() => {
   font-size: 14px;
 }
 
+.menu-toggle-btn {
+  display: none; /* Hidden by default */
+}
+
+/* Mobile Drawer Menu */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.mobile-menu-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  left: -320px;
+  width: 300px;
+  height: 100%;
+  background-color: #ffffff;
+  z-index: 1100;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+.mobile-drawer.is-open {
+  transform: translateX(320px); /* slide in */
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.drawer-logo {
+  height: 40px;
+}
+.close-drawer-btn {
+  background: none;
+  border: none;
+  color: #333;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.close-drawer-btn:hover {
+  background-color: #f5f5f5;
+}
+.close-drawer-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.drawer-nav {
+  padding: 20px 0;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+.drawer-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.drawer-nav li {
+  border-bottom: 1px solid #f9f9f9;
+}
+.drawer-nav a {
+  display: block;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  text-decoration: none;
+  transition: color 0.2s, background-color 0.2s;
+}
+.drawer-nav a:hover, .drawer-nav a.active {
+  color: var(--primary-red);
+  background-color: #fdf2f2;
+}
+
+.drawer-footer {
+  padding: 20px;
+  border-top: 1px solid #f0f0f0;
+  background-color: #fcfcfc;
+}
+.social-icons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.social-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s, color 0.3s;
+}
+.social-icon:hover {
+  background-color: var(--primary-red);
+  color: white;
+}
+.drawer-footer p {
+  font-size: 13px;
+  color: #888;
+  margin: 0;
+}
+
 @media (max-width: 992px) {
   .header-content { justify-content: space-between; gap: 20px; padding: 0 20px; }
   .nav {
-    display: none; /* Add a mobile menu later if requested */
+    display: none;
+  }
+  .menu-toggle-btn {
+    display: flex; /* Show hamburger on mobile */
   }
 }
 @media (max-width: 576px) {
