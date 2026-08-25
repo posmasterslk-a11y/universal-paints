@@ -17,7 +17,7 @@ export default defineNuxtConfig({
         { hid: 'description', name: 'description', content: 'Universal Paints is a leading manufacturer and distributor of premium quality paints and coatings trusted by professionals and homeowners.' }
       ],
       link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/images/logo/Logo.png' },
+        { rel: 'icon', type: 'image/x-icon', href: '/images/logo/Logo.webp' },
         { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap' }
       ]
     }

@@ -3,7 +3,7 @@
     <div class="header-content">
       <div class="logo">
         <NuxtLink to="/">
-          <img :src="shouldBeLight ? '/images/logo/Logo.png' : '/images/logo/logo-white.png'" alt="Universal Paints Logo" />
+          <img :src="shouldBeLight ? '/images/logo/Logo.webp' : '/images/logo/logo-white.webp'" alt="Universal Paints Logo" />
         </NuxtLink>
       </div>
       <nav class="nav">

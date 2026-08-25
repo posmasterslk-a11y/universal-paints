@@ -3,7 +3,7 @@
     <!-- Hero Section -->
     <section class="about-hero">
       <div class="hero-bg">
-        <img src="/images/about-us-page/office.png" alt="Universal Paints Office" />
+        <img src="/images/about-us-page/office.webp" alt="Universal Paints Office" />
         <div class="hero-overlay"></div>
       </div>
       <div class="container hero-content">
@@ -111,7 +111,7 @@
         </div>
         
         <div class="story-middle">
-          <img src="/images/about-us-page/paint-bucket.png" alt="Paint Buckets" class="story-img" />
+          <img src="/images/about-us-page/paint-bucket.webp" alt="Paint Buckets" class="story-img" />
         </div>
 
         <div class="story-right">
@@ -216,10 +216,10 @@
         </div>
         <div class="mfg-right">
           <div class="mfg-images">
-            <img src="/images/about-us-page/factory-tanks.png" alt="Factory Tanks" class="mfg-img large-img" />
+            <img src="/images/about-us-page/factory-tanks.webp" alt="Factory Tanks" class="mfg-img large-img" />
             <div class="mfg-images-col">
-              <img src="/images/about-us-page/production-line.png" alt="Production Line" class="mfg-img" />
-              <img src="/images/about-us-page/lab-test.png" alt="Lab Testing" class="mfg-img" />
+              <img src="/images/about-us-page/production-line.webp" alt="Production Line" class="mfg-img" />
+              <img src="/images/about-us-page/lab-test.webp" alt="Lab Testing" class="mfg-img" />
             </div>
           </div>
         </div>
@@ -229,7 +229,7 @@
     <!-- Network Section -->
     <section class="network-section">
       <div class="network-bg">
-        <img src="/images/about-us-page/truck.png" alt="Universal Paints Delivery Truck" />
+        <img src="/images/about-us-page/truck.webp" alt="Universal Paints Delivery Truck" />
         <div class="network-overlay"></div>
       </div>
       <div class="container network-grid">

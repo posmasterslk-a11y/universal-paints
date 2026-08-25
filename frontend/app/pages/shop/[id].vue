@@ -157,7 +157,7 @@
               </ul>
             </div>
             <div class="desc-img-col">
-              <img src="/images/products/interior.jpg" alt="Interior Application" />
+              <img src="/images/products/interior.webp" alt="Interior Application" />
             </div>
           </div>
         </div>
@@ -169,7 +169,7 @@
       <h2 class="section-title text-center">Complete Your Painting System</h2>
       <div class="cross-sell-grid">
         <div class="cs-card">
-          <div class="cs-img"><img src="/images/contact-us-page/paint-bucket.png" alt="Primer" /></div>
+          <div class="cs-img"><img src="/images/contact-us-page/paint-bucket.webp" alt="Primer" /></div>
           <div class="cs-info">
             <h5>Surface Primer</h5>
             <p>Strong adhesion and better finish</p>
@@ -178,7 +178,7 @@
           </div>
         </div>
         <div class="cs-card">
-          <div class="cs-img"><img src="/images/contact-us-page/paint-bucket.png" alt="Putty" /></div>
+          <div class="cs-img"><img src="/images/contact-us-page/paint-bucket.webp" alt="Putty" /></div>
           <div class="cs-info">
             <h5>Wall Putty</h5>
             <p>Smoothens surface for perfect finish</p>

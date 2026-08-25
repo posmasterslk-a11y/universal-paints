@@ -85,7 +85,7 @@
         <div class="categories-grid">
           <div class="category-card">
             <div class="card-img">
-              <img src="/images/products/exterior.jpg" alt="Home" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="/images/products/exterior.webp" alt="Home" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div class="card-content">
               <div class="card-title-wrap">
@@ -97,7 +97,7 @@
           
           <div class="category-card">
             <div class="card-img">
-              <img src="/images/products/interior.jpg" alt="Office" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="/images/products/interior.webp" alt="Office" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div class="card-content">
               <div class="card-title-wrap">
@@ -109,7 +109,7 @@
           
           <div class="category-card">
             <div class="card-img">
-              <img src="/images/products/industrial.jpg" alt="Factory" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="/images/products/industrial.webp" alt="Factory" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div class="card-content">
               <div class="card-title-wrap">
@@ -121,7 +121,7 @@
           
           <div class="category-card">
             <div class="card-img">
-              <img src="/images/products/wood.jpg" alt="Wood" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="/images/products/wood.webp" alt="Wood" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div class="card-content">
               <div class="card-title-wrap">
@@ -148,7 +148,7 @@
           <div class="best-selling-card" v-for="product in bestSellingProducts" :key="product.id">
             <NuxtLink :to="`/shop/${product.id}`" style="text-decoration: none; color: inherit;">
               <div class="img-wrapper" style="--splash-color: #ff003c;">
-                <img :src="product.main_image || '/images/products/paint-bucket.jpg'" :alt="product.name" class="bucket-img" />
+                <img :src="product.main_image || '/images/products/paint-bucket.webp'" :alt="product.name" class="bucket-img" />
               </div>
               <h4 class="product-name" v-html="product.name.replace(' ', '<br/>')"></h4>
               <p class="product-sub">{{ product.subtitle || product.category }}</p>
@@ -167,7 +167,7 @@
     <!-- About Section -->
     <section class="about-section">
       <div class="about-image">
-        <img src="/images/home-page/ABOUT%20UNIVERSAL%20PAINTS.png" alt="About Universal Paints" style="width: 100%; height: 100%; object-fit: cover;" />
+        <img src="/images/home-page/ABOUT%20UNIVERSAL%20PAINTS.webp" alt="About Universal Paints" style="width: 100%; height: 100%; object-fit: cover;" />
       </div>
       <div class="about-content">
         <div class="section-subtitle">ABOUT UNIVERSAL PAINTS</div>
@@ -321,9 +321,9 @@ const openQuotePopup = () => {
 }
 
 const heroBackgrounds = [
-  '/images/home-page/dark-hero-bg1.png',
-  '/images/home-page/dark-hero-bg2.jpg',
-  '/images/home-page/dark-hero-bg3.png'
+  '/images/home-page/dark-hero-bg1.webp',
+  '/images/home-page/dark-hero-bg2.webp',
+  '/images/home-page/dark-hero-bg3.webp'
 ];
 const currentBgIndex = ref(0);
 let bgInterval;

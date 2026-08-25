@@ -3,7 +3,7 @@
     <div class="container footer-top">
       <div class="footer-brand">
         <!-- Assuming there's a white logo for dark background, otherwise using default -->
-        <img src="/images/logo/logo-white.png" alt="Universal Paints" class="footer-logo" />
+        <img src="/images/logo/logo-white.webp" alt="Universal Paints" class="footer-logo" />
         <p>Universal Paints is a leading manufacturer and distributor of premium quality paints and coatings that bring color, protection and beauty to life.</p>
         <div class="social-icons">
           <a href="#" class="social-icon" aria-label="Facebook">

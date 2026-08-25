@@ -3,7 +3,7 @@
     <!-- Hero Section -->
     <section class="shop-hero">
       <div class="hero-image-full">
-        <img src="/images/shop page/shop header.png" alt="Shop Premium Paints" />
+        <img src="/images/shop page/shop header.webp" alt="Shop Premium Paints" />
         <div class="hero-overlay"></div>
       </div>
       <div class="container hero-grid">

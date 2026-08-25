@@ -2,7 +2,7 @@
   <div class="contact-page">
     <section class="contact-hero">
       <div class="hero-image-full">
-        <img src="/images/contact-us-page/hero.png" alt="Contact Us Banner" />
+        <img src="/images/contact-us-page/hero.webp" alt="Contact Us Banner" />
         <div class="hero-overlay"></div>
       </div>
       <div class="container hero-grid">
@@ -183,7 +183,7 @@
       <div class="container">
         <div class="cta-card">
           <div class="cta-img-wrap">
-            <img src="/images/contact-us-page/paint-bucket.png" alt="Paint Buckets" class="cta-img" />
+            <img src="/images/contact-us-page/paint-bucket.webp" alt="Paint Buckets" class="cta-img" />
           </div>
           <div class="cta-content">
             <h3>Ready to Transform<br/>Your Space?</h3>
