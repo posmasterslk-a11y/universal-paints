@@ -196,5 +196,13 @@
     gap: 10px;
     text-align: center;
   }
+  .bottom-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .bottom-links .separator {
+    display: none;
+  }
 }
 </style>

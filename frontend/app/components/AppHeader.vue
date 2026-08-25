@@ -210,8 +210,15 @@ onUnmounted(() => {
 }
 
 @media (max-width: 992px) {
+  .header-content { justify-content: space-between; gap: 20px; padding: 0 20px; }
   .nav {
     display: none; /* Add a mobile menu later if requested */
   }
+}
+@media (max-width: 576px) {
+  .header-actions { gap: 8px; }
+  .btn-quote { padding: 8px 12px; font-size: 13px; }
+  .arrow { display: none; }
+  .logo img { height: 40px; }
 }
 </style>

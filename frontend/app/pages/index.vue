@@ -775,30 +775,42 @@ onUnmounted(() => {
 /* Responsive */
 @media (max-width: 1200px) {
   .hero-title { font-size: 48px; }
-  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .best-selling-grid { grid-template-columns: repeat(4, 1fr); }
+  .categories-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 992px) {
+  .hero { padding-top: 140px; padding-bottom: 160px; }
   .hero-content { grid-template-columns: 1fr; text-align: center; }
   .hero-desc { margin: 20px auto 40px; }
   .hero-actions { justify-content: center; }
-  .features-grid { grid-template-columns: repeat(2, 1fr); }
+  .features-grid { grid-template-columns: repeat(2, 1fr); margin-top: -80px; }
   .about-section { grid-template-columns: 1fr; }
   .about-image { min-height: 300px; }
   .network-content { grid-template-columns: 1fr; }
+  .map-container { transform: scale(1); margin-top: 20px; height: auto; }
+  .sl-map { width: 100%; height: auto; object-fit: contain; }
   .reasons-grid { grid-template-columns: repeat(2, 1fr); }
+  .best-selling-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .hero-title { font-size: 40px; }
+  .best-selling-grid { grid-template-columns: repeat(2, 1fr); }
+  .categories-grid { gap: 15px; }
 }
 @media (max-width: 576px) {
-  .hero-title { font-size: 36px; }
-  .features-grid { grid-template-columns: 1fr; }
-  .products-grid { grid-template-columns: 1fr; }
+  .hero-title { font-size: 32px; }
+  .hero-actions { flex-direction: column; width: 100%; }
+  .hero-actions .btn { width: 100%; justify-content: center; }
+  .features-grid { grid-template-columns: 1fr; margin-top: -60px; padding: 20px; }
+  .categories-grid { grid-template-columns: 1fr; }
+  .best-selling-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .reasons-grid { grid-template-columns: 1fr; }
-  .section-header { flex-direction: column; align-items: flex-start; gap: 20px; }
-}
-@media (max-width: 576px) {
-  .cta-buttons {
-    flex-direction: column;
-  }
+  .section-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .cta-buttons { flex-direction: column; width: 100%; }
+  .cta-buttons .btn { width: 100%; justify-content: center; }
+  .cta-content h2 { font-size: 24px; }
+  .about-content { padding: 40px 5%; }
 }
 
 /* CTA Section */
