@@ -478,7 +478,7 @@ const addToCart = () => {
 /* Tabs Section */
 .product-tabs-section { padding: 40px; }
 .tabs-nav { display: flex; border-bottom: 1px solid #E2E8F0; gap: 32px; margin-bottom: 30px; overflow-x: auto; }
-.tab-btn { background: none; border: none; padding: 0 0 16px 0; font-size: 15px; font-weight: 600; color: #475569; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.3s; }
+.tab-btn { background: none; border-top: none; border-left: none; border-right: none; padding: 0 0 16px 0; font-size: 15px; font-weight: 600; color: #475569; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.3s; }
 .tab-btn:hover { color: #0F172A; }
 .tab-btn.active { color: #E3000F; border-bottom-color: #E3000F; }
 
