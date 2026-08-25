@@ -278,26 +278,6 @@
         </div>
       </div>
     </section>
-    <!-- Call To Action (Bottom) -->
-    <section class="cta-section">
-      <!-- Wavy top border -->
-      <div class="custom-shape-divider-top">
-        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path>
-        </svg>
-      </div>
-
-      <div class="cta-content container">
-        <h2>Ready to Bring More Colour to Your World?</h2>
-        <p>Explore our premium range of paints and coatings.</p>
-        <div class="cta-buttons">
-          <NuxtLink to="/shop" class="btn btn-white">Explore Products</NuxtLink>
-          <button @click="openQuotePopup" class="btn btn-outline">
-            Get a Quote <span class="arrow">→</span>
-          </button>
-        </div>
-      </div>
-    </section>
   </div>
 </template>
 
@@ -813,90 +793,4 @@ onUnmounted(() => {
   .about-content { padding: 40px 5%; }
 }
 
-/* CTA Section */
-.cta-section {
-  position: relative;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  overflow: hidden;
-  margin-bottom: -20px; /* Pull the footer up to overlap and create a clean straight line */
-  padding: 50px 0 70px 0; /* Reduced height */
-  min-height: 180px;
-  background: linear-gradient(90deg, #1E3A8A 0%, #E3000F 25%, #F59E0B 50%, #EAB308 75%, #84CC16 100%);
-}
-.custom-shape-divider-top {
-    position: absolute;
-    top: -1px;
-    left: 0;
-    width: 100%;
-    overflow: hidden;
-    line-height: 0;
-    z-index: 1;
-}
-.custom-shape-divider-top svg {
-    position: relative;
-    display: block;
-    width: calc(100% + 1.3px);
-    height: 45px;
-}
-.custom-shape-divider-top .shape-fill {
-    fill: #FFFFFF; /* Matches the white background of the section above */
-}
-.cta-content {
-  position: relative;
-  z-index: 2;
-  color: white;
-  padding-top: 20px;
-}
-.cta-content h2 {
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 10px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-.cta-content p {
-  font-size: 18px;
-  margin-bottom: 30px;
-  font-weight: 500;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-.cta-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-.btn {
-  padding: 12px 28px;
-  border-radius: 30px;
-  font-weight: 600;
-  font-size: 16px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-}
-.btn-white {
-  background-color: white;
-  color: #E3000F;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-.btn-white:hover {
-  background-color: #f8f8f8;
-  transform: translateY(-2px);
-}
-.btn-outline {
-  background-color: transparent;
-  color: white;
-  border: 2px solid white;
-}
-.btn-outline:hover {
-  background-color: rgba(255,255,255,0.1);
-  transform: translateY(-2px);
-}
-.arrow {
-  margin-left: 8px;
-}
 </style>
