@@ -101,7 +101,7 @@
 
           <div class="actions-group">
             <div class="qty-selector">
-              <button class="qty-btn" @click="if(qty > 1) qty--">-</button>
+              <button class="qty-btn" @click="qty > 1 ? qty-- : null">-</button>
               <input type="text" class="qty-input" v-model="qty" readonly/>
               <button class="qty-btn" @click="qty++">+</button>
             </div>
@@ -457,7 +457,7 @@ const addToCart = () => {
 .actions-group { display: flex; gap: 16px; margin-bottom: 30px; }
 .qty-selector { display: flex; align-items: center; border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden; }
 .qty-btn { width: 40px; height: 48px; background: white; border: none; font-size: 18px; color: #475569; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-.qty-input { width: 40px; height: 48px; border: none; border-left: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; text-align: center; font-size: 16px; font-weight: 600; color: #0F172A; }
+.qty-input { width: 40px; height: 48px; border-top: none; border-bottom: none; border-left: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; text-align: center; font-size: 16px; font-weight: 600; color: #0F172A; }
 .btn { height: 48px; padding: 0 24px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; flex: 1; }
 .btn-red { background: #E3000F; color: white; border: none; box-shadow: 0 4px 12px rgba(227, 0, 15, 0.2); }
 .btn-outline-red { background: transparent; color: #E3000F; border: 1px solid #E3000F; }

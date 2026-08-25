@@ -289,9 +289,10 @@ const formatPrice = (price) => {
 .qty-selector input {
   width: 32px;
   height: 28px;
-  border-width: 0 1px;
-  border-style: solid;
-  border-color: transparent #E2E8F0;
+  border-top: none;
+  border-bottom: none;
+  border-left: 1px solid #E2E8F0;
+  border-right: 1px solid #E2E8F0;
   text-align: center;
   font-size: 13px;
   font-weight: 600;
