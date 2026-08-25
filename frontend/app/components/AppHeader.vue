@@ -90,7 +90,7 @@ const cartItemsCount = computed(() => {
   return cart.value.reduce((total, item) => total + item.qty, 0);
 });
 
-const isMobileMenuOpen = ref(false);
+const isMobileMenuOpen = useState('mobileMenuOpen', () => false);
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
   // Prevent scrolling when drawer is open
