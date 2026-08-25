@@ -308,7 +308,8 @@ useHead({
   title: 'Home - Universal Paints',
 })
 
-const { data: allProducts } = await useFetch('http://127.0.0.1:8002/api/products')
+const config = useRuntimeConfig()
+const { data: allProducts } = await useFetch(`${config.public.apiBase}/api/products`)
 const bestSellingProducts = computed(() => {
   if (!allProducts.value) return []
   return allProducts.value.filter(p => p.is_best_seller).slice(0, 6)

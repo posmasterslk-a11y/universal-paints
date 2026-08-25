@@ -262,7 +262,8 @@ import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const { data: product, pending, error } = await useFetch(`http://127.0.0.1:8002/api/products/${route.params.id}`)
+const config = useRuntimeConfig()
+const { data: product, pending, error } = await useFetch(`${config.public.apiBase}/api/products/${route.params.id}`)
 
 const selectedPack = ref('20L')
 const qty = ref(1)

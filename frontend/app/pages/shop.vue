@@ -223,7 +223,8 @@ const selectedFinish = ref('All')
 const selectedColor = ref('All')
 const priceRange = ref(15000)
 
-const { data: products, pending, error } = await useFetch('http://127.0.0.1:8002/api/products')
+const config = useRuntimeConfig()
+const { data: products, pending, error } = await useFetch(`${config.public.apiBase}/api/products`)
 </script>
 
 <style scoped>
