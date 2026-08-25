@@ -32,6 +32,12 @@ jobs:
         working-directory: ./frontend
         run: npm run build
 
+      - name: Prepare Restart Trigger for cPanel
+        working-directory: ./frontend
+        run: |
+          mkdir -p .output/tmp
+          touch .output/tmp/restart.txt
+
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
