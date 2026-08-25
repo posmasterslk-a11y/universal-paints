@@ -157,7 +157,7 @@
               </ul>
             </div>
             <div class="desc-img-col">
-              <img src="/images/home-page/interior.jpg" alt="Interior Application" />
+              <img src="/images/products/interior.jpg" alt="Interior Application" />
             </div>
           </div>
         </div>
