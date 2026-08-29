@@ -759,8 +759,18 @@ onUnmounted(() => {
   .categories-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 992px) {
-  .hero { padding-top: 140px; padding-bottom: 160px; }
-  .hero-content { grid-template-columns: 1fr; text-align: center; }
+  .hero { 
+    padding-top: 100px; 
+    padding-bottom: 40px; 
+    min-height: 75vh;
+    display: flex;
+    align-items: flex-end;
+  }
+  .hero-content { 
+    grid-template-columns: 1fr; 
+    text-align: center; 
+    width: 100%;
+  }
   .hero-text {
     background: rgba(0, 0, 0, 0.65);
     padding: 30px;
