@@ -762,12 +762,15 @@ onUnmounted(() => {
   .hero { padding-top: 140px; padding-bottom: 160px; }
   .hero-content { grid-template-columns: 1fr; text-align: center; }
   .hero-text {
-    background: rgba(0, 0, 0, 0.55);
-    padding: 40px 20px;
+    background: rgba(0, 0, 0, 0.65);
+    padding: 30px;
     border-radius: 16px;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     margin-top: 0;
+    position: relative;
+    z-index: 10;
   }
   .hero-desc { margin: 20px auto 40px; }
   .hero-actions { justify-content: center; }
