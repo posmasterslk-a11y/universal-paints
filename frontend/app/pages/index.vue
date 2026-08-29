@@ -761,6 +761,14 @@ onUnmounted(() => {
 @media (max-width: 992px) {
   .hero { padding-top: 140px; padding-bottom: 160px; }
   .hero-content { grid-template-columns: 1fr; text-align: center; }
+  .hero-text {
+    background: rgba(0, 0, 0, 0.55);
+    padding: 40px 20px;
+    border-radius: 16px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 0;
+  }
   .hero-desc { margin: 20px auto 40px; }
   .hero-actions { justify-content: center; }
   .features-grid { grid-template-columns: repeat(2, 1fr); margin-top: -80px; }
