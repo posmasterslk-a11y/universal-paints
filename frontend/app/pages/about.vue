@@ -99,12 +99,19 @@
         <div class="story-left">
           <div class="section-subtitle text-red text-xs font-bold uppercase mb-2">OUR STORY</div>
           <h2 class="section-title mb-6">A Legacy of Quality<br/>and Commitment</h2>
-          <p class="mb-4">
-            Universal Paints was founded with a simple mission – to deliver high quality paints that combine beauty, durability and protection.
-          </p>
-          <p class="mb-8">
-            Today, we are proud to be one of the most trusted paint manufacturers and distributors in the region, serving thousands of customers with dedication and integrity.
-          </p>
+          <div class="mb-6">
+            <h3 class="text-xl font-bold mb-2">Our Vision</h3>
+            <p>
+              Be the innovative and respected paint manufacturer in Sri Lanka with step towards people to a colourful world.
+            </p>
+          </div>
+          <div class="mb-8">
+            <h3 class="text-xl font-bold mb-2">Our Mission</h3>
+            <p class="mb-2">We are the most customer focused Quality concern preferred supplier of paint and related products in our market.</p>
+            <p class="mb-2">We manufacture our products using new technology adhering to highest quality standards.</p>
+            <p class="mb-2">Our people are innovative, productive, safety conscious and act as business owners.</p>
+            <p>We operate our business to fulfill the interest of our investors.</p>
+          </div>
           <NuxtLink to="#values" class="btn btn-primary">
             Our Journey <span class="arrow">→</span>
           </NuxtLink>

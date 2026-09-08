@@ -56,7 +56,7 @@
             </div>
             <div class="info-details">
               <h4>Call Us</h4>
-              <p>+94 11 234 5678<br/>+94 77 123 4567</p>
+              <p>038 229 9866</p>
             </div>
           </div>
           <!-- Card 2: Email -->
@@ -66,7 +66,7 @@
             </div>
             <div class="info-details">
               <h4>Email Us</h4>
-              <p>info@universalpaints.lk<br/>sales@universalpaints.lk</p>
+              <p>sales@universalpaints.lk</p>
             </div>
           </div>
           <!-- Card 3: Address -->
@@ -76,7 +76,7 @@
             </div>
             <div class="info-details">
               <h4>Our Address</h4>
-              <p>No. 123, Industrial Zone,<br/>Colombo, Sri Lanka.</p>
+              <p>No. 129/1, Old Galle Rd,<br/>Pallimulla, Panadura.</p>
             </div>
           </div>
           <!-- Card 4: Map -->
