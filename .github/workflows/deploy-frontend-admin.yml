@@ -39,4 +39,4 @@ jobs:
           username: ${{ secrets.BACKEND_FTP_USERNAME }}
           password: ${{ secrets.BACKEND_FTP_PASSWORD }}
           local-dir: ./frontend-admin/.output/public/
-          server-dir: ${{ secrets.BACKEND_FTP_TARGET_DIR }}admin/
+          server-dir: /public_html/admin/
