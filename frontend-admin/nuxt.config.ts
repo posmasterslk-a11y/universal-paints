@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     ],
   },
   app: {
+    baseURL: '/admin/',
     head: {
       title: 'Admin - Universal Paints',
       link: [
