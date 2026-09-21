@@ -267,7 +267,7 @@ const { data: products, pending, error } = await useFetch(`${config.public.apiBa
 .hero-image-full img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: right center;
 }
 .hero-overlay {
