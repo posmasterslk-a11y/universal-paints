@@ -33,6 +33,18 @@
           <!-- Background handles the image now -->
         </div>
       </div>
+      
+      <!-- Slider Navigation Dots -->
+      <div class="hero-slider-nav">
+        <button 
+          v-for="(_, index) in heroBackgrounds" 
+          :key="'dot-'+index"
+          class="slider-dot"
+          :class="{ active: currentBgIndex === index }"
+          @click="setHeroSlide(index)"
+          aria-label="Change slide"
+        ></button>
+      </div>
     </section>
 
     <!-- Features Section -->
@@ -308,6 +320,16 @@ const heroBackgrounds = [
 const currentBgIndex = ref(0);
 let bgInterval;
 
+const setHeroSlide = (index) => {
+  currentBgIndex.value = index;
+  if (bgInterval) {
+    clearInterval(bgInterval);
+    bgInterval = setInterval(() => {
+      currentBgIndex.value = (currentBgIndex.value + 1) % heroBackgrounds.length;
+    }, 5000);
+  }
+};
+
 onMounted(() => {
   bgInterval = setInterval(() => {
     currentBgIndex.value = (currentBgIndex.value + 1) % heroBackgrounds.length;
@@ -402,6 +424,36 @@ onUnmounted(() => {
   position: relative;
   display: flex;
   justify-content: flex-end;
+}
+
+/* Slider Dots */
+.hero-slider-nav {
+  position: absolute;
+  bottom: 120px; /* Aligned above the features section */
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  z-index: 5;
+}
+.slider-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+.slider-dot:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+.slider-dot.active {
+  background-color: transparent;
+  border-color: #E3000F; /* Red color matching primary btn */
+  transform: scale(1.3);
 }
 
 /* Features */

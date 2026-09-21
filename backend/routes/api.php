@@ -33,6 +33,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{order}', [OrderController::class, 'show']);
     Route::put('/orders/{order}/status', [OrderController::class, 'updateStatus']);
+
+    // Protected blog routes (Admin)
+    Route::post('/blogs', [\App\Http\Controllers\API\BlogController::class, 'store']);
+    Route::put('/blogs/{blog}', [\App\Http\Controllers\API\BlogController::class, 'update']);
+    Route::delete('/blogs/{blog}', [\App\Http\Controllers\API\BlogController::class, 'destroy']);
 });
 
 // Public product routes (Read)
@@ -41,3 +46,8 @@ Route::get('/products/{product}', [ProductController::class, 'show']);
 
 // Public order route
 Route::post('/orders', [OrderController::class, 'store']);
+
+// Public blog routes (Read)
+Route::get('/blogs', [\App\Http\Controllers\API\BlogController::class, 'index']);
+Route::get('/blogs/{slug}', [\App\Http\Controllers\API\BlogController::class, 'show']);
+
