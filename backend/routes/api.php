@@ -27,6 +27,15 @@ Route::get('/debug-users', function () {
     ]);
 });
 
+Route::get('/run-seed', function () {
+    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'AdminSeeder']);
+    return response()->json([
+        'message' => 'AdminSeeder ran successfully!',
+        'output' => \Illuminate\Support\Facades\Artisan::output(),
+        'users_count' => \App\Models\User::count(),
+    ]);
+});
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
