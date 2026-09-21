@@ -18,6 +18,10 @@
           <i class="fa-solid fa-shopping-cart w-5"></i>
           Orders
         </NuxtLink>
+        <NuxtLink to="/blogs" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition" active-class="bg-red-600 !text-white hover:bg-red-600">
+          <i class="fa-solid fa-pen-nib w-5"></i>
+          Blogs
+        </NuxtLink>
         <a href="http://localhost:3002" target="_blank" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition">
           <i class="fa-solid fa-arrow-up-right-from-square w-5"></i>
           View Site
