@@ -180,7 +180,9 @@ if (blog.value) {
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid rgba(0,0,0,0.1);
+  border-width: 4px;
+  border-style: solid;
+  border-color: rgba(0,0,0,0.1);
   border-left-color: #E3000F;
   border-radius: 50%;
   animation: spin 1s linear infinite;
