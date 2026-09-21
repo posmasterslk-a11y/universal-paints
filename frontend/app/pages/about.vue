@@ -3,7 +3,7 @@
     <!-- Hero Section -->
     <section class="about-hero">
       <div class="hero-bg">
-        <img src="/images/about-us-page/office.webp" alt="Universal Paints Office" />
+        <img src="/images/about-us-page/hero.webp" alt="Universal Paints Hero" />
         <div class="hero-overlay"></div>
       </div>
       <div class="container hero-content">
