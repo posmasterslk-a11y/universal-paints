@@ -20,6 +20,13 @@ use App\Http\Controllers\API\OrderController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
+Route::get('/debug-users', function () {
+    return response()->json([
+        'users_count' => \App\Models\User::count(),
+        'admin_exists' => \App\Models\User::where('email', 'admin@universalpaints.lk')->exists(),
+    ]);
+});
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
