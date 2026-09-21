@@ -68,7 +68,8 @@
 </template>
 
 <script setup>
+const config = useRuntimeConfig()
 const { user } = useAuth()
-const { data: productsData } = await useFetch('http://127.0.0.1:8002/api/products')
+const { data: productsData } = await useFetch('/api/products')
 const products = computed(() => productsData.value || [])
 </script>

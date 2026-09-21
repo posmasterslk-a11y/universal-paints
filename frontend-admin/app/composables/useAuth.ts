@@ -3,10 +3,11 @@ import { ref } from 'vue'
 export const useAuth = () => {
   const token = useState('auth_token', () => null)
   const user = useState('auth_user', () => null)
+  const config = useRuntimeConfig()
 
   const login = async (email, password) => {
     try {
-      const response = await $fetch('http://127.0.0.1:8002/api/login', {
+      const response = await $fetch(`${config.public.apiBase}/api/login`, {
         method: 'POST',
         body: { email, password }
       })
@@ -30,7 +31,7 @@ export const useAuth = () => {
   const logout = async () => {
     if (token.value) {
       try {
-        await $fetch('http://127.0.0.1:8002/api/logout', {
+        await $fetch(`${config.public.apiBase}/api/logout`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token.value}`
@@ -53,7 +54,7 @@ export const useAuth = () => {
       const storedToken = localStorage.getItem('auth_token')
       if (storedToken) {
         try {
-          const userData = await $fetch('http://127.0.0.1:8002/api/user', {
+          const userData = await $fetch(`${config.public.apiBase}/api/user`, {
             headers: {
               Authorization: `Bearer ${storedToken}`
             }

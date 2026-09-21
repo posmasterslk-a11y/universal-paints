@@ -93,6 +93,7 @@
 </template>
 
 <script setup>
+const config = useRuntimeConfig()
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -120,7 +121,7 @@ const errorMsg = ref('')
 
 onMounted(async () => {
   try {
-    const data = await $fetch(`http://127.0.0.1:8002/api/products/${productId}`)
+    const data = await $fetch(`/api/products/${productId}`)
     if (data) {
       form.value = {
         name: data.name || '',
@@ -166,7 +167,7 @@ const submitForm = async () => {
   }
 
   try {
-    await $fetch(`http://127.0.0.1:8002/api/products/${productId}`, {
+    await $fetch(`/api/products/${productId}`, {
       method: 'PUT',
       body: payload,
       headers: {

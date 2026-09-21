@@ -71,10 +71,11 @@
 </template>
 
 <script setup>
+const config = useRuntimeConfig()
 import { ref, computed } from 'vue'
 
 const { token } = useAuth()
-const { data: productsData, refresh } = await useFetch('http://127.0.0.1:8002/api/products')
+const { data: productsData, refresh } = await useFetch('/api/products')
 
 const searchQuery = ref('')
 
@@ -90,7 +91,7 @@ const filteredProducts = computed(() => {
 const deleteProduct = async (id) => {
   if (confirm('Are you sure you want to delete this product?')) {
     try {
-      await $fetch(`http://127.0.0.1:8002/api/products/${id}`, {
+      await $fetch(`/api/products/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token.value}`

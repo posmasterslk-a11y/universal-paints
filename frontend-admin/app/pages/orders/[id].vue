@@ -118,6 +118,7 @@
 </template>
 
 <script setup>
+const config = useRuntimeConfig()
 import { ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -125,7 +126,7 @@ const { token } = useAuth()
 const route = useRoute()
 const orderId = route.params.id
 
-const { data: order, pending, error, refresh } = await useFetch(`http://127.0.0.1:8002/api/orders/${orderId}`, {
+const { data: order, pending, error, refresh } = await useFetch(`/api/orders/${orderId}`, {
   headers: {
     Authorization: `Bearer ${token.value}`
   }
@@ -147,7 +148,7 @@ const updateStatus = async () => {
   successMsg.value = ''
   
   try {
-    await $fetch(`http://127.0.0.1:8002/api/orders/${orderId}/status`, {
+    await $fetch(`/api/orders/${orderId}/status`, {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${token.value}`

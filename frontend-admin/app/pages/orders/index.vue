@@ -49,11 +49,12 @@
 </template>
 
 <script setup>
+const config = useRuntimeConfig()
 import { computed } from 'vue'
 
 const { token } = useAuth()
 
-const { data: ordersData } = await useFetch('http://127.0.0.1:8002/api/orders', {
+const { data: ordersData } = await useFetch('/api/orders', {
   headers: {
     Authorization: `Bearer ${token.value}`
   }

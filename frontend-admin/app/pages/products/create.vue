@@ -90,6 +90,7 @@
 </template>
 
 <script setup>
+const config = useRuntimeConfig()
 import { ref } from 'vue'
 
 const { token } = useAuth()
@@ -135,7 +136,7 @@ const submitForm = async () => {
   }
 
   try {
-    await $fetch('http://127.0.0.1:8002/api/products', {
+    await $fetch('/api/products', {
       method: 'POST',
       body: payload,
       headers: {
