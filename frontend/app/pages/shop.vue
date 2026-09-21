@@ -252,17 +252,21 @@ const { data: products, pending, error } = await useFetch(`${config.public.apiBa
   min-height: 600px;
   display: flex;
   align-items: center;
-  background-color: #F9FAFB;
+  background-color: #FFFFFF;
   overflow: hidden;
   padding: 140px 0 80px;
 }
 .hero-image-full {
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
+  right: 0;
+  left: auto;
+  width: 65%;
   height: 100%;
   z-index: 0;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 30%, black 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 30%, black 100%);
+
 }
 .hero-image-full img {
   width: 100%;
@@ -271,12 +275,7 @@ const { data: products, pending, error } = await useFetch(`${config.public.apiBa
   object-position: right center;
 }
 .hero-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to right, rgba(249, 250, 251, 0.95) 10%, rgba(249, 250, 251, 0.75) 30%, rgba(249, 250, 251, 0) 60%);
+  display: none;
 }
 .hero-grid {
   position: relative;
