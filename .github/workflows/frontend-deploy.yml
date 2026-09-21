@@ -36,7 +36,9 @@ jobs:
         working-directory: ./frontend
         run: |
           mkdir -p .output/tmp
-          touch .output/tmp/restart.txt
+          date > .output/tmp/restart.txt
+          mkdir -p .output/server/tmp
+          date > .output/server/tmp/restart.txt
 
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
