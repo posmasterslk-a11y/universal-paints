@@ -9,8 +9,8 @@
       <nav class="nav">
         <ul>
           <li><NuxtLink to="/" exact-active-class="active">Home</NuxtLink></li>
-          <li><NuxtLink to="/shop" exact-active-class="active">Shop</NuxtLink></li>
           <li><NuxtLink to="/about" exact-active-class="active">About Us</NuxtLink></li>
+          <li><NuxtLink to="/shop" exact-active-class="active">Shop</NuxtLink></li>
           <li><NuxtLink to="/blog" exact-active-class="active">Blog</NuxtLink></li>
           <li><NuxtLink to="/contact" exact-active-class="active">Contact Us</NuxtLink></li>
         </ul>
@@ -49,8 +49,8 @@
     <nav class="drawer-nav">
       <ul>
         <li><NuxtLink to="/" exact-active-class="active" @click="toggleMobileMenu">Home</NuxtLink></li>
-        <li><NuxtLink to="/shop" exact-active-class="active" @click="toggleMobileMenu">Shop</NuxtLink></li>
         <li><NuxtLink to="/about" exact-active-class="active" @click="toggleMobileMenu">About Us</NuxtLink></li>
+        <li><NuxtLink to="/shop" exact-active-class="active" @click="toggleMobileMenu">Shop</NuxtLink></li>
         <li><NuxtLink to="/blog" exact-active-class="active" @click="toggleMobileMenu">Blog</NuxtLink></li>
         <li><NuxtLink to="/contact" exact-active-class="active" @click="toggleMobileMenu">Contact Us</NuxtLink></li>
       </ul>
