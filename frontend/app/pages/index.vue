@@ -179,7 +179,7 @@
     <!-- About Section -->
     <section class="about-section">
       <div class="about-image">
-        <img src="/images/home-page/ABOUT%20UNIVERSAL%20PAINTS.webp" alt="About Universal Paints" style="width: 100%; height: 100%; object-fit: cover;" />
+        <img src="/images/home-page/about%20universal%20paint.png" alt="About Universal Paints" style="width: 100%; height: 100%; object-fit: cover;" />
       </div>
       <div class="about-content">
         <div class="section-subtitle">ABOUT UNIVERSAL PAINTS</div>
