@@ -42,38 +42,72 @@ foreach ($stateFiles as $file) {
     }
 }
 
-// Recursively ensure all essential local backend directories exist on remote FTP server
+// Essential directories to guarantee exist on the remote server
+$essentialDirs = [
+    'app',
+    'app/Console',
+    'app/Exceptions',
+    'app/Http',
+    'app/Http/Controllers',
+    'app/Http/Controllers/API',
+    'app/Http/Middleware',
+    'app/Models',
+    'app/Providers',
+    'bootstrap',
+    'bootstrap/cache',
+    'config',
+    'database',
+    'database/factories',
+    'database/migrations',
+    'database/seeders',
+    'public',
+    'resources',
+    'routes',
+    'storage',
+    'storage/app',
+    'storage/app/public',
+    'storage/framework',
+    'storage/framework/cache',
+    'storage/framework/cache/data',
+    'storage/framework/sessions',
+    'storage/framework/views',
+    'storage/logs',
+];
+
+// Dynamically discover any subdirectories under backend/app
 $backendDir = realpath(__DIR__ . '/../../backend');
-if (!$backendDir || !is_dir($backendDir)) {
-    $backendDir = getcwd();
-}
-
-echo "Scanning local backend directories in: $backendDir ...\n";
-$iterator = new RecursiveIteratorIterator(
-    new RecursiveDirectoryIterator($backendDir, RecursiveDirectoryIterator::SKIP_DOTS),
-    RecursiveIteratorIterator::SELF_FIRST
-);
-
-$created = 0;
-foreach ($iterator as $item) {
-    if ($item->isDir()) {
-        $relPath = str_replace('\\', '/', $item->getSubPathname());
-        if (preg_match('#^(\.git|vendor|node_modules|storage/logs|tests)#', $relPath)) {
-            continue;
-        }
-
-        // Split path to create parent directories sequentially
-        $parts = explode('/', trim($relPath, '/'));
-        $current = $targetDir;
-        foreach ($parts as $part) {
-            $current .= $part . '/';
-            $remotePath = rtrim($current, '/');
-            if (@ftp_mkdir($conn, $remotePath)) {
-                $created++;
+if ($backendDir && is_dir($backendDir . '/app')) {
+    $appDir = realpath($backendDir . '/app');
+    $appDirNorm = str_replace('\\', '/', $appDir);
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($appDir, RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::SELF_FIRST
+    );
+    foreach ($iterator as $item) {
+        if ($item->isDir()) {
+            $fullPath = str_replace('\\', '/', $item->getPathname());
+            $rel = ltrim(substr($fullPath, strlen($appDirNorm)), '/');
+            if (!empty($rel)) {
+                $essentialDirs[] = 'app/' . $rel;
             }
         }
     }
 }
 
-echo "Remote directory pre-check completed. Created/verified directories.\n";
+$essentialDirs = array_unique($essentialDirs);
+
+$created = 0;
+foreach ($essentialDirs as $dir) {
+    $parts = explode('/', trim($dir, '/'));
+    $current = $targetDir;
+    foreach ($parts as $part) {
+        $current .= $part . '/';
+        $remotePath = rtrim($current, '/');
+        if (@ftp_mkdir($conn, $remotePath)) {
+            $created++;
+        }
+    }
+}
+
+echo "Remote directory pre-check completed. Ensured " . count($essentialDirs) . " directories exist.\n";
 @ftp_close($conn);
