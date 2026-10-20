@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
+// Universal Paints Blog Controller API
 class BlogController extends Controller
 {
     /**

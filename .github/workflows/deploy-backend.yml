@@ -6,14 +6,13 @@ on:
       - main
     paths:
       - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+      - '.github/scripts/**'
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
-    defaults:
-      run:
-        working-directory: ./backend
 
     steps:
       - name: 🚚 Get latest code
@@ -22,21 +21,31 @@ jobs:
       - name: 🛠️ Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # Update this to match your server's PHP version
-          extensions: mbstring, bcmath, pdo_mysql, zip, gd
+          php-version: '8.2'
+          extensions: mbstring, bcmath, pdo_mysql, zip, gd, ftp
           tools: composer:v2
 
       - name: 📦 Install Dependencies
+        working-directory: ./backend
         run: composer install --no-dev --optimize-autoloader --no-progress --no-interaction
 
+      - name: 📁 Ensure Remote Directories & Reset Sync State
+        run: php .github/scripts/ensure-ftp-dirs.php
+        env:
+          BACKEND_FTP_SERVER: ${{ secrets.BACKEND_FTP_SERVER }}
+          BACKEND_FTP_USERNAME: ${{ secrets.BACKEND_FTP_USERNAME }}
+          BACKEND_FTP_PASSWORD: ${{ secrets.BACKEND_FTP_PASSWORD }}
+          BACKEND_FTP_TARGET_DIR: ${{ secrets.BACKEND_FTP_TARGET_DIR }}
+
       - name: 📂 Sync files via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.BACKEND_FTP_SERVER }}
           username: ${{ secrets.BACKEND_FTP_USERNAME }}
           password: ${{ secrets.BACKEND_FTP_PASSWORD }}
           local-dir: ./backend/
           server-dir: ${{ secrets.BACKEND_FTP_TARGET_DIR }}
+          state-name: .ftp-deploy-sync-state.json
           exclude: |
             **/.git*
             **/.git*/**
