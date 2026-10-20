@@ -49,18 +49,20 @@
 </template>
 
 <script setup>
-const config = useRuntimeConfig()
 import { computed } from 'vue'
 
+const config = useRuntimeConfig()
 const { token } = useAuth()
 
-const { data: ordersData } = await useFetch('/api/orders', {
-  headers: {
-    Authorization: `Bearer ${token.value}`
-  }
+const { data: ordersData } = await useFetch(`${config.public.apiBase}/api/orders`, {
+  headers: computed(() => token?.value ? { Authorization: `Bearer ${token.value}` } : {})
 })
 
-const orders = computed(() => ordersData.value || [])
+const orders = computed(() => {
+  if (Array.isArray(ordersData.value)) return ordersData.value
+  if (ordersData.value?.data && Array.isArray(ordersData.value.data)) return ordersData.value.data
+  return []
+})
 
 const statusClass = (status) => {
   switch(status) {

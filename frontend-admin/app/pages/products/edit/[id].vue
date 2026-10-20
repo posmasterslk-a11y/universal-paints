@@ -35,12 +35,17 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">Category *</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-sm font-semibold text-slate-700">Category *</label>
+              <NuxtLink to="/categories" target="_blank" class="text-xs text-red-600 hover:underline">
+                + Manage Categories
+              </NuxtLink>
+            </div>
             <select v-model="form.category" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none transition bg-white">
-              <option value="Interior Paints">Interior Paints</option>
-              <option value="Exterior Paints">Exterior Paints</option>
-              <option value="Wood Finishes">Wood Finishes</option>
-              <option value="Industrial Coatings">Industrial Coatings</option>
+              <option value="" disabled>Select a Category</option>
+              <option v-for="cat in categories" :key="cat.id" :value="cat.name">
+                {{ cat.name }}
+              </option>
             </select>
           </div>
           <div>
@@ -83,7 +88,7 @@
         </div>
 
         <div class="pt-6">
-          <button type="submit" :disabled="isSubmitting" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-lg shadow-red-600/30 disabled:opacity-70 disabled:cursor-not-allowed">
+          <button type="submit" :disabled="isSubmitting" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-lg shadow-red-600/30 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer">
             {{ isSubmitting ? 'Saving...' : 'Update Product' }}
           </button>
         </div>
@@ -93,18 +98,20 @@
 </template>
 
 <script setup>
-const config = useRuntimeConfig()
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
+const config = useRuntimeConfig()
 const { token } = useAuth()
 const route = useRoute()
 const productId = route.params.id
 
+const { data: categories } = await useFetch(`${config.public.apiBase}/api/categories`)
+
 const form = ref({
   name: '',
   subtitle: '',
-  category: 'Interior Paints',
+  category: '',
   description: '',
   is_best_seller: false,
   is_in_stock: true,
@@ -121,12 +128,12 @@ const errorMsg = ref('')
 
 onMounted(async () => {
   try {
-    const data = await $fetch(`/api/products/${productId}`)
+    const data = await $fetch(`${config.public.apiBase}/api/products/${productId}`)
     if (data) {
       form.value = {
         name: data.name || '',
         subtitle: data.subtitle || '',
-        category: data.category || 'Interior Paints',
+        category: data.category || (categories.value?.[0]?.name || 'Interior Paints'),
         description: data.description || '',
         is_best_seller: data.is_best_seller || false,
         is_in_stock: data.is_in_stock ?? true,
@@ -167,7 +174,7 @@ const submitForm = async () => {
   }
 
   try {
-    await $fetch(`/api/products/${productId}`, {
+    await $fetch(`${config.public.apiBase}/api/products/${productId}`, {
       method: 'PUT',
       body: payload,
       headers: {
@@ -176,7 +183,6 @@ const submitForm = async () => {
     })
     
     successMsg.value = 'Product updated successfully!'
-    
   } catch (error) {
     console.error(error)
     errorMsg.value = 'Failed to update product.'

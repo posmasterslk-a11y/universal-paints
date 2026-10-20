@@ -32,6 +32,22 @@
           {{ isLoading ? 'Signing in...' : 'Sign In' }}
         </button>
       </form>
+
+      <!-- TEMPORARY 1-CLICK DEMO LOGIN (Remove before live deployment) -->
+      <div class="mt-6 pt-6 border-t border-slate-100">
+        <button 
+          type="button" 
+          @click="quickDemoLogin" 
+          :disabled="isLoading"
+          class="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 px-4 rounded-lg transition shadow-md hover:shadow-lg disabled:opacity-60 cursor-pointer"
+        >
+          <i class="fa-solid fa-bolt text-yellow-400"></i>
+          <span>1-Click Admin Login</span>
+        </button>
+        <p class="text-xs text-slate-400 mt-2">
+          Demo: <span class="text-slate-600 font-mono">admin@universalpaints.lk</span> / <span class="text-slate-600 font-mono">password123</span>
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -66,5 +82,12 @@ const handleLogin = async () => {
   }
   
   isLoading.value = false
+}
+
+// Temporary 1-click login for development
+const quickDemoLogin = async () => {
+  email.value = 'admin@universalpaints.lk'
+  password.value = 'password123'
+  await handleLogin()
 }
 </script>

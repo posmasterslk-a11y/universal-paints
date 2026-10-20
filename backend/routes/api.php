@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\OrderController;
+use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\CategoryController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -54,7 +56,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/blogs', [\App\Http\Controllers\API\BlogController::class, 'store']);
     Route::put('/blogs/{blog}', [\App\Http\Controllers\API\BlogController::class, 'update']);
     Route::delete('/blogs/{blog}', [\App\Http\Controllers\API\BlogController::class, 'destroy']);
+
+    // Protected user management routes (Admin)
+    Route::get('/users', [UserController::class, 'index']);
+    Route::post('/users', [UserController::class, 'store']);
+    Route::put('/users/{user}', [UserController::class, 'update']);
+    Route::delete('/users/{user}', [UserController::class, 'destroy']);
+
+    // Protected category routes (Admin)
+    Route::post('/categories', [CategoryController::class, 'store']);
+    Route::post('/categories/{id}', [CategoryController::class, 'update']);
+    Route::put('/categories/{id}', [CategoryController::class, 'update']);
+    Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 });
+
+// Public category routes (Read)
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/categories/{id}', [CategoryController::class, 'show']);
 
 // Public product routes (Read)
 Route::get('/products', [ProductController::class, 'index']);

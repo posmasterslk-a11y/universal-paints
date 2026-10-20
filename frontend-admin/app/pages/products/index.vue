@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
           <thead class="bg-slate-50 text-slate-500 font-semibold uppercase text-xs tracking-wider border-b border-slate-100">
@@ -27,11 +27,11 @@
               <th class="px-6 py-4">Category</th>
               <th class="px-6 py-4">Price Range</th>
               <th class="px-6 py-4">Status</th>
-              <th class="px-6 py-4">Actions</th>
+              <th class="px-6 py-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
-            <tr v-for="product in filteredProducts" :key="product.id" class="hover:bg-slate-50">
+            <tr v-for="product in paginatedProducts" :key="product.id" class="hover:bg-slate-50">
               <td class="px-6 py-4">
                 <img :src="product.main_image || 'https://placehold.co/100'" alt="" class="w-12 h-12 rounded-lg object-cover">
               </td>
@@ -51,13 +51,15 @@
                 <span v-if="product.is_in_stock" class="text-green-600 bg-green-50 px-2 py-1 rounded text-xs font-bold">In Stock</span>
                 <span v-else class="text-red-600 bg-red-50 px-2 py-1 rounded text-xs font-bold">Out of Stock</span>
               </td>
-              <td class="px-6 py-4 flex items-center gap-2">
-                <NuxtLink :to="`/products/edit/${product.id}`" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 w-8 h-8 rounded-lg transition flex items-center justify-center cursor-pointer" title="Edit">
-                  <i class="fa-solid fa-pen"></i>
-                </NuxtLink>
-                <button @click="deleteProduct(product.id)" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 w-8 h-8 rounded-lg transition flex items-center justify-center cursor-pointer" title="Delete">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
+              <td class="px-6 py-4 text-right">
+                <div class="flex items-center justify-end gap-2">
+                  <NuxtLink :to="`/products/edit/${product.id}`" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 w-8 h-8 rounded-lg transition flex items-center justify-center cursor-pointer" title="Edit">
+                    <i class="fa-solid fa-pen"></i>
+                  </NuxtLink>
+                  <button @click="deleteProduct(product.id)" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 w-8 h-8 rounded-lg transition flex items-center justify-center cursor-pointer" title="Delete">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
               </td>
             </tr>
             <tr v-if="filteredProducts.length === 0">
@@ -66,32 +68,132 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Pagination Footer -->
+      <div v-if="filteredProducts.length > 0" class="px-6 py-3.5 bg-slate-50/80 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3 text-xs text-slate-500">
+          <span>
+            Showing <strong class="text-slate-800 font-semibold">{{ paginationInfo.start }}</strong> to <strong class="text-slate-800 font-semibold">{{ paginationInfo.end }}</strong> of <strong class="text-slate-800 font-semibold">{{ paginationInfo.total }}</strong> products
+          </span>
+          <span class="text-slate-300">|</span>
+          <div class="flex items-center gap-1.5">
+            <span>Per page:</span>
+            <select v-model="perPage" class="bg-white border border-slate-200 rounded px-2 py-1 text-xs text-slate-700 outline-none focus:border-red-500 cursor-pointer">
+              <option :value="5">5</option>
+              <option :value="8">8</option>
+              <option :value="15">15</option>
+              <option :value="25">25</option>
+            </select>
+          </div>
+        </div>
+
+        <div v-if="totalPages > 1" class="flex items-center gap-1">
+          <button 
+            @click="goToPage(currentPage - 1)" 
+            :disabled="currentPage === 1"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1 cursor-pointer"
+          >
+            <i class="fa-solid fa-chevron-left text-[10px]"></i>
+            <span>Prev</span>
+          </button>
+
+          <button 
+            v-for="(page, idx) in visiblePages" 
+            :key="idx"
+            @click="typeof page === 'number' ? goToPage(page) : null"
+            :disabled="typeof page !== 'number'"
+            :class="[
+              'min-w-8 h-8 rounded-lg text-xs font-semibold transition flex items-center justify-center',
+              page === currentPage ? 'bg-red-600 text-white shadow-xs' : (typeof page === 'number' ? 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer' : 'text-slate-400 cursor-default')
+            ]"
+          >
+            {{ page }}
+          </button>
+
+          <button 
+            @click="goToPage(currentPage + 1)" 
+            :disabled="currentPage >= totalPages"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1 cursor-pointer"
+          >
+            <span>Next</span>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-const config = useRuntimeConfig()
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
+const config = useRuntimeConfig()
 const { token } = useAuth()
-const { data: productsData, refresh } = await useFetch('/api/products')
+const { data: productsData, refresh } = await useFetch(`${config.public.apiBase}/api/products`)
 
 const searchQuery = ref('')
+const currentPage = ref(1)
+const perPage = ref(8)
 
 const filteredProducts = computed(() => {
   let list = productsData.value || []
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase()
-    list = list.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q))
+    list = list.filter(p => p.name?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q))
   }
   return list
 })
 
+watch(searchQuery, () => {
+  currentPage.value = 1
+})
+
+watch(perPage, () => {
+  currentPage.value = 1
+})
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredProducts.value.length / perPage.value) || 1
+})
+
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value
+  return filteredProducts.value.slice(start, start + perPage.value)
+})
+
+const paginationInfo = computed(() => {
+  const total = filteredProducts.value.length
+  if (total === 0) return { start: 0, end: 0, total: 0 }
+  const start = (currentPage.value - 1) * perPage.value + 1
+  const end = Math.min(currentPage.value * perPage.value, total)
+  return { start, end, total }
+})
+
+const visiblePages = computed(() => {
+  const total = totalPages.value
+  const current = currentPage.value
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1)
+  }
+  if (current <= 4) {
+    return [1, 2, 3, 4, 5, '...', total]
+  }
+  if (current >= total - 3) {
+    return [1, '...', total - 4, total - 3, total - 2, total - 1, total]
+  }
+  return [1, '...', current - 1, current, current + 1, '...', total]
+})
+
+const goToPage = (p) => {
+  if (p >= 1 && p <= totalPages.value) {
+    currentPage.value = p
+  }
+}
+
 const deleteProduct = async (id) => {
   if (confirm('Are you sure you want to delete this product?')) {
     try {
-      await $fetch(`/api/products/${id}`, {
+      await $fetch(`${config.public.apiBase}/api/products/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token.value}`

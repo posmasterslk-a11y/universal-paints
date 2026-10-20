@@ -32,12 +32,17 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">Category *</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-sm font-semibold text-slate-700">Category *</label>
+              <NuxtLink to="/categories" target="_blank" class="text-xs text-red-600 hover:underline">
+                + Manage Categories
+              </NuxtLink>
+            </div>
             <select v-model="form.category" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none transition bg-white">
-              <option value="Interior Paints">Interior Paints</option>
-              <option value="Exterior Paints">Exterior Paints</option>
-              <option value="Wood Finishes">Wood Finishes</option>
-              <option value="Industrial Coatings">Industrial Coatings</option>
+              <option value="" disabled>Select a Category</option>
+              <option v-for="cat in categories" :key="cat.id" :value="cat.name">
+                {{ cat.name }}
+              </option>
             </select>
           </div>
           <div>
@@ -80,7 +85,7 @@
         </div>
 
         <div class="pt-6">
-          <button type="submit" :disabled="isSubmitting" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-lg shadow-red-600/30 disabled:opacity-70 disabled:cursor-not-allowed">
+          <button type="submit" :disabled="isSubmitting" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition shadow-lg shadow-red-600/30 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer">
             {{ isSubmitting ? 'Saving...' : 'Save Product' }}
           </button>
         </div>
@@ -90,19 +95,27 @@
 </template>
 
 <script setup>
-const config = useRuntimeConfig()
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
+const config = useRuntimeConfig()
 const { token } = useAuth()
+
+const { data: categories } = await useFetch(`${config.public.apiBase}/api/categories`)
 
 const form = ref({
   name: '',
   subtitle: '',
-  category: 'Interior Paints',
+  category: '',
   description: '',
   is_best_seller: false,
   is_in_stock: true,
   main_image: ''
+})
+
+onMounted(() => {
+  if (categories.value && categories.value.length > 0 && !form.value.category) {
+    form.value.category = categories.value[0].name
+  }
 })
 
 const featuresInput = ref('')
@@ -136,7 +149,7 @@ const submitForm = async () => {
   }
 
   try {
-    await $fetch('/api/products', {
+    await $fetch(`${config.public.apiBase}/api/products`, {
       method: 'POST',
       body: payload,
       headers: {
@@ -153,7 +166,9 @@ const submitForm = async () => {
     featuresInput.value = ''
     colorsInput.value = ''
     packSizesInput.value = ''
-    
+    if (categories.value?.length) {
+      form.value.category = categories.value[0].name
+    }
   } catch (error) {
     console.error(error)
     errorMsg.value = 'Failed to create product.'

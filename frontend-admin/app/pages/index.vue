@@ -22,7 +22,7 @@
         </div>
         <div>
           <h3 class="text-slate-500 font-semibold text-sm">Total Orders</h3>
-          <p class="text-3xl font-extrabold text-slate-900">0</p>
+          <p class="text-3xl font-extrabold text-slate-900">{{ orders.length || 0 }}</p>
         </div>
       </div>
     </div>
@@ -52,7 +52,7 @@
               <td class="px-6 py-4 font-semibold text-slate-900">{{ product.name }}</td>
               <td class="px-6 py-4">
                 <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-semibold">
-                  {{ product.category }}
+                  {{ product.category || 'Uncategorized' }}
                 </span>
               </td>
               <td class="px-6 py-4 text-slate-600">LKR {{ product.price_min?.toLocaleString() }}</td>
@@ -69,7 +69,21 @@
 
 <script setup>
 const config = useRuntimeConfig()
-const { user } = useAuth()
-const { data: productsData } = await useFetch('/api/products')
-const products = computed(() => productsData.value || [])
+const { user, token } = useAuth()
+
+const { data: productsData } = await useFetch(`${config.public.apiBase}/api/products`)
+const products = computed(() => {
+  if (Array.isArray(productsData.value)) return productsData.value
+  if (productsData.value?.data && Array.isArray(productsData.value.data)) return productsData.value.data
+  return []
+})
+
+const { data: ordersData } = await useFetch(`${config.public.apiBase}/api/orders`, {
+  headers: computed(() => token?.value ? { Authorization: `Bearer ${token.value}` } : {})
+})
+const orders = computed(() => {
+  if (Array.isArray(ordersData.value)) return ordersData.value
+  if (ordersData.value?.data && Array.isArray(ordersData.value.data)) return ordersData.value.data
+  return []
+})
 </script>
