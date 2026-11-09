@@ -30,10 +30,11 @@ if (!@ftp_login($conn, $user, $pass)) {
 
 @ftp_pasv($conn, true);
 
-// Remove stale/corrupted sync-state files if present to force FTP action to re-verify directories
+// Remove stale/corrupted sync-state files and config caches if present
 $stateFiles = [
     $targetDir . '.ftp-deploy-sync-state.json',
     $targetDir . '.sync-state.json',
+    $targetDir . 'bootstrap/cache/config.php',
 ];
 
 foreach ($stateFiles as $file) {
