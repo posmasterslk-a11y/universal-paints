@@ -144,13 +144,25 @@
           </div>
           <div class="products-grid" v-if="filteredProducts && filteredProducts.length > 0">
             <div class="product-card" v-for="product in filteredProducts" :key="product.id">
-              <div class="product-img-wrap">
-                <img :src="getProductImageUrl(product.main_image)" :alt="product.name" />
-              </div>
+              <NuxtLink :to="`/shop/${product.id}`" class="product-img-wrap">
+                <img :src="getProductImageUrl(product.main_image)" :alt="product.name" loading="lazy" />
+              </NuxtLink>
               <div class="product-info">
-                <h4>{{ product.name }}</h4>
+                <h4>
+                  <NuxtLink :to="`/shop/${product.id}`" class="product-title-link">{{ product.name }}</NuxtLink>
+                </h4>
                 <p>{{ product.subtitle || product.description?.substring(0, 50) }}</p>
-                <div class="product-price">Rs. {{ product.price_min?.toLocaleString() || 0 }} - Rs. {{ product.price_max?.toLocaleString() || 0 }}</div>
+                <div class="product-price">
+                  <template v-if="product.price_min && product.price_max && product.price_min !== product.price_max">
+                    Rs. {{ product.price_min.toLocaleString() }} - Rs. {{ product.price_max.toLocaleString() }}
+                  </template>
+                  <template v-else-if="product.price_min || product.price_max">
+                    Rs. {{ (product.price_min || product.price_max).toLocaleString() }}
+                  </template>
+                  <template v-else>
+                    <span class="price-quote">Contact for Price</span>
+                  </template>
+                </div>
                 <NuxtLink :to="`/shop/${product.id}`" class="btn btn-outline-red w-100 mt-auto text-center py-2" style="display: block; border-radius: 30px; font-weight: 600; text-decoration: none;">
                   View Details
                 </NuxtLink>
@@ -588,22 +600,49 @@ const getProductImageUrl = (path) => {
   border-radius: 16px;
   border: 1px solid #F1F5F9;
   overflow: hidden;
-  transition: all 0.3s;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
 }
 .product-card:hover {
-  box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.08);
   border-color: #E2E8F0;
+  transform: translateY(-4px);
 }
 .product-img-wrap {
-  padding: 24px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
   background-color: #F8FAFC;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+  text-decoration: none;
+  position: relative;
 }
-.product-img-wrap img { width: 140px; height: 140px; object-fit: contain; }
+.product-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.product-card:hover .product-img-wrap img {
+  transform: scale(1.04);
+}
+.product-title-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.product-title-link:hover {
+  color: #E3000F;
+}
+.price-quote {
+  font-size: 15px;
+  font-weight: 600;
+  color: #E3000F;
+}
 .product-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
 .product-info h4 { font-size: 16px; font-weight: 700; color: #0F172A; margin: 0 0 8px 0; }
 .product-info p { font-size: 13px; color: #64748B; line-height: 1.5; margin: 0 0 16px 0; flex-grow: 1; }

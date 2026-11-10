@@ -744,12 +744,17 @@ onUnmounted(() => {
 .img-wrapper {
   position: relative;
   width: 100%;
-  height: 135px;
+  aspect-ratio: 16 / 10;
+  height: auto;
+  min-height: 135px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 12px;
   flex-shrink: 0;
+  overflow: hidden;
+  background: #f8fafc;
+  border-radius: 10px;
 }
 .img-wrapper::before {
   content: '';
@@ -760,17 +765,18 @@ onUnmounted(() => {
   border-radius: 50%;
   filter: blur(20px);
   z-index: 1;
-  opacity: 0.75;
+  opacity: 0.35;
 }
 .bucket-img {
   width: 100%;
   height: 100%;
-  max-width: 100px;
-  max-height: 110px;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   position: relative;
   z-index: 2;
   transition: transform 0.3s ease;
+  display: block;
 }
 .best-selling-card:hover .bucket-img {
   transform: scale(1.06);
