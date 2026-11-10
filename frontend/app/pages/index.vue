@@ -625,18 +625,25 @@ onUnmounted(() => {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 .card-img {
-  height: 200px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
   overflow: hidden;
   position: relative;
+  background-color: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .card-img img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .category-card:hover .card-img img {
-  transform: scale(1.08);
+  transform: scale(1.03);
 }
 .card-content {
   padding: 20px;
