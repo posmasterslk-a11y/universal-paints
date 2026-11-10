@@ -26,12 +26,44 @@ try {
     echo "OK\n";
 
     echo "Testing Database Configuration...\n";
-    echo " - DB Connection: " . config('database.default') . "\n";
-    echo " - DB Host: " . config('database.connections.mysql.host') . "\n";
-    echo " - DB Name: " . config('database.connections.mysql.database') . "\n";
-    echo " - DB User: " . config('database.connections.mysql.username') . "\n";
+    $dbHost = config('database.connections.mysql.host');
+    $dbName = config('database.connections.mysql.database');
+    $dbUser = config('database.connections.mysql.username');
+    $dbPass = config('database.connections.mysql.password');
 
-    echo "Attempting DB Connection PDO... ";
+    echo " - DB Connection: " . config('database.default') . "\n";
+    echo " - DB Host: " . $dbHost . "\n";
+    echo " - DB Name: " . $dbName . "\n";
+    echo " - DB User: " . $dbUser . "\n";
+
+    echo "\n[Test 1] Connecting to MySQL server without database...\n";
+    try {
+        $pdo = new \PDO("mysql:host={$dbHost}", $dbUser, $dbPass, [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+        echo " -> Authentication successful on {$dbHost}!\n";
+        
+        $stmt = $pdo->query("SHOW DATABASES");
+        $dbs = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        echo " -> Databases visible to user '{$dbUser}':\n";
+        foreach ($dbs as $db) {
+            echo "    * {$db}\n";
+        }
+
+        $userStmt = $pdo->query("SELECT CURRENT_USER(), USER()");
+        $currUser = $userStmt->fetch(\PDO::FETCH_NUM);
+        echo " -> Authenticated as: CURRENT_USER={$currUser[0]}, USER={$currUser[1]}\n";
+    } catch (\Throwable $authErr) {
+        echo " -> Direct connection failed: " . $authErr->getMessage() . "\n";
+    }
+
+    echo "\n[Test 2] Attempting DB Connection with host=localhost...\n";
+    try {
+        $pdoLocal = new \PDO("mysql:host=localhost;dbname={$dbName}", $dbUser, $dbPass, [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+        echo " -> Connected successfully via host=localhost to {$dbName}!\n";
+    } catch (\Throwable $localErr) {
+        echo " -> Failed via host=localhost: " . $localErr->getMessage() . "\n";
+    }
+
+    echo "\n[Test 3] Attempting Laravel DB Connection PDO...\n";
     \Illuminate\Support\Facades\DB::connection()->getPdo();
     echo "CONNECTED SUCCESSFULLY!\n\n";
 
