@@ -48,6 +48,10 @@
           Demo: <span class="text-slate-600 font-mono">admin@universalpaints.lk</span> / <span class="text-slate-600 font-mono">password123</span>
         </p>
       </div>
+
+      <div class="mt-6 text-center text-[11px] text-slate-400 font-mono">
+        v{{ config.public.appVersion }} &bull; {{ config.public.buildTime }}
+      </div>
     </div>
   </div>
 </template>
@@ -62,6 +66,7 @@ definePageMeta({
 
 const { login } = useAuth()
 const router = useRouter()
+const config = useRuntimeConfig()
 
 const email = ref('')
 const password = ref('')

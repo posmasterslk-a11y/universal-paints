@@ -35,24 +35,49 @@
           View Site
         </a>
       </nav>
-      <div class="p-4 border-t border-white/10">
-        <button @click="handleLogout" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-400/10 transition cursor-pointer">
+      <div class="p-4 border-t border-white/10 space-y-2">
+        <button @click="handleLogout" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-400/10 transition cursor-pointer">
           <i class="fa-solid fa-right-from-bracket w-5"></i>
           Logout
         </button>
+        <div class="px-2 pt-2 text-[11px] text-slate-400 flex items-center justify-between border-t border-white/5">
+          <span>v{{ config.public.appVersion }}</span>
+          <span class="text-slate-400 font-mono">{{ config.public.buildTime }}</span>
+        </div>
       </div>
     </aside>
 
     <!-- Main Content -->
-    <main :class="['flex-1 overflow-y-auto', token ? 'ml-64 p-8' : 'flex items-center justify-center p-8']">
-      <slot />
-    </main>
+    <div :class="['flex-1 flex flex-col min-h-screen overflow-y-auto', token ? 'ml-64' : '']">
+      <main :class="['flex-1', token ? 'p-8' : 'flex items-center justify-center p-8']">
+        <slot />
+      </main>
+
+      <!-- Admin Panel Footer with Version & Build Number -->
+      <footer v-if="token" class="px-8 py-3.5 border-t border-slate-200 bg-white text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-2">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-700">Universal Paints</span>
+          <span>&bull; Admin Console &copy; {{ currentYear }}</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 font-mono font-medium border border-slate-200">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+            Version: v{{ config.public.appVersion }}
+          </span>
+          <span class="text-slate-400 font-mono text-[11px]">
+            Build: {{ config.public.buildTime }}
+          </span>
+        </div>
+      </footer>
+    </div>
   </div>
 </template>
 
 <script setup>
 const { token, logout } = useAuth()
 const router = useRouter()
+const config = useRuntimeConfig()
+const currentYear = new Date().getFullYear()
 
 const handleLogout = async () => {
   await logout()

@@ -12,16 +12,32 @@ export const useAuth = () => {
     secure: true
   })
 
-  const token = useState('auth_token', () => authCookie.value || null)
-  const user = useState('auth_user', () => userCookie.value || null)
+  const token = useState('auth_token', () => {
+    if (process.client) {
+      return authCookie.value || localStorage.getItem('auth_token') || null
+    }
+    return authCookie.value || null
+  })
+
+  const user = useState('auth_user', () => {
+    if (process.client) {
+      const stored = localStorage.getItem('auth_user')
+      if (stored) {
+        try { return JSON.parse(stored) } catch (_) {}
+      }
+    }
+    return userCookie.value || null
+  })
+
   const config = useRuntimeConfig()
 
-  // Sync state from cookies immediately on load
-  if (!token.value && authCookie.value) {
-    token.value = authCookie.value
-  }
-  if (!user.value && userCookie.value) {
-    user.value = userCookie.value
+  // Immediately synchronize token from localStorage on client
+  if (process.client && !token.value) {
+    const lsToken = localStorage.getItem('auth_token')
+    if (lsToken) {
+      token.value = lsToken
+      authCookie.value = lsToken
+    }
   }
 
   const login = async (email, password) => {
@@ -81,10 +97,8 @@ export const useAuth = () => {
   }
 
   const initAuth = async () => {
-    // 1. Check cookie or current state first
-    let activeToken = authCookie.value || token.value
-
-    // 2. Fallback to localStorage if in browser
+    // 1. Check state, cookie or localStorage
+    let activeToken = token.value || authCookie.value
     if (!activeToken && process.client) {
       activeToken = localStorage.getItem('auth_token')
     }
@@ -101,33 +115,33 @@ export const useAuth = () => {
         } catch (_) {}
       }
 
-      // Verify and refresh user data in background
-      try {
-        const userData = await $fetch(`${config.public.apiBase}/api/user`, {
+      // Re-verify user asynchronously in background (does NOT block route or logout on network blip)
+      if (process.client) {
+        $fetch(`${config.public.apiBase}/api/user`, {
           headers: {
             Authorization: `Bearer ${activeToken}`,
             Accept: 'application/json'
           }
-        })
-        user.value = userData
-        userCookie.value = userData
-        if (process.client) {
-          try {
-            localStorage.setItem('auth_user', JSON.stringify(userData))
-          } catch (_) {}
-        }
-      } catch (e) {
-        // Only invalidate session if backend returns 401 Unauthorized
-        if (e?.response?.status === 401 || e?.status === 401) {
-          token.value = null
-          user.value = null
-          authCookie.value = null
-          userCookie.value = null
-          if (process.client) {
+        }).then(userData => {
+          if (userData && userData.id) {
+            user.value = userData
+            userCookie.value = userData
+            try {
+              localStorage.setItem('auth_user', JSON.stringify(userData))
+            } catch (_) {}
+          }
+        }).catch(err => {
+          const status = err?.status || err?.statusCode || err?.response?.status
+          if (status === 401) {
+            token.value = null
+            user.value = null
+            authCookie.value = null
+            userCookie.value = null
             localStorage.removeItem('auth_token')
             localStorage.removeItem('auth_user')
+            navigateTo('/login')
           }
-        }
+        })
       }
     }
   }

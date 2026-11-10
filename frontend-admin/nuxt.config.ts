@@ -1,6 +1,12 @@
 import tailwindcss from "@tailwindcss/vite";
 
+const now = new Date();
+const buildTime = now.toISOString().replace(/[-:T]/g, '').slice(0, 12);
+const buildNumber = process.env.GITHUB_RUN_NUMBER || buildTime;
+const appVersion = `1.0.${buildNumber}`;
+
 export default defineNuxtConfig({
+  ssr: false,
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
@@ -21,7 +27,10 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://api.universalpaints.lk'
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://api.universalpaints.lk',
+      appVersion: process.env.APP_VERSION || appVersion,
+      buildNumber: buildNumber,
+      buildTime: now.toLocaleString('en-US', { timeZone: 'Asia/Colombo', dateStyle: 'short', timeStyle: 'short' })
     }
   }
 })
