@@ -1,20 +1,15 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Prevent Directory Listing
-    Options -Indexes
+    # Prevent infinite loop: if already rewritten to public/, stop!
+    RewriteRule ^public/ - [L]
 
-    # Block access to .env and other hidden files
-    <FilesMatch "^\.">
-        Order allow,deny
-        Deny from all
-    </FilesMatch>
+    # Allow direct access to /admin
+    RewriteRule ^admin(/.*)?$ - [L]
 
-    # Allow direct access to /admin (Admin SPA)
-    RewriteCond %{REQUEST_URI} ^/admin [NC]
-    RewriteRule ^ - [L]
+    # Rewrite root / to public/index.php
+    RewriteRule ^$ public/index.php [L]
 
-    # Forward all other requests to the public/ folder
-    RewriteCond %{REQUEST_URI} !^/public/
-    RewriteRule ^(.*)$ public/$1 [L]
+    # Rewrite all other requests to public/
+    RewriteRule ^((?!public/).*)$ public/$1 [L]
 </IfModule>
