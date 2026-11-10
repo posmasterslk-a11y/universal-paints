@@ -7,6 +7,7 @@ use App\Models\Blog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Services\R2StorageService;
 
 // Universal Paints Blog Controller API
 class BlogController extends Controller
@@ -58,8 +59,7 @@ class BlogController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('blogs', 'public');
-            $validated['image'] = '/storage/' . $imagePath;
+            $validated['image'] = R2StorageService::upload($request->file('image'), 'blogs');
         }
 
         $blog = Blog::create($validated);
@@ -118,11 +118,9 @@ class BlogController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image
             if ($blog->image) {
-                $oldPath = str_replace('/storage/', '', $blog->image);
-                Storage::disk('public')->delete($oldPath);
+                R2StorageService::delete($blog->image);
             }
-            $imagePath = $request->file('image')->store('blogs', 'public');
-            $validated['image'] = '/storage/' . $imagePath;
+            $validated['image'] = R2StorageService::upload($request->file('image'), 'blogs');
         }
 
         $blog->update($validated);
@@ -144,8 +142,7 @@ class BlogController extends Controller
         $blog = Blog::findOrFail($id);
         
         if ($blog->image) {
-            $oldPath = str_replace('/storage/', '', $blog->image);
-            Storage::disk('public')->delete($oldPath);
+            R2StorageService::delete($blog->image);
         }
         
         $blog->delete();

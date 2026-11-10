@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use App\Services\R2StorageService;
 
 class CategoryController extends Controller
 {
@@ -20,6 +21,10 @@ class CategoryController extends Controller
 
         if ($request->boolean('active_only')) {
             $query->where('is_active', true);
+        }
+
+        if ($request->boolean('home_only')) {
+            $query->where('show_on_home', true);
         }
 
         $categories = $query->orderBy('sort_order', 'asc')
@@ -49,13 +54,17 @@ class CategoryController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $stored = $request->file('image')->store('categories', 'public');
-            $imagePath = '/storage/' . $stored;
+            $imagePath = R2StorageService::upload($request->file('image'), 'categories');
         }
 
         $isActive = true;
         if ($request->has('is_active')) {
             $isActive = filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN);
+        }
+
+        $showOnHome = false;
+        if ($request->has('show_on_home')) {
+            $showOnHome = filter_var($request->input('show_on_home'), FILTER_VALIDATE_BOOLEAN);
         }
 
         $category = Category::create([
@@ -65,6 +74,7 @@ class CategoryController extends Controller
             'icon' => $validated['icon'] ?? '🎨',
             'image' => $imagePath,
             'is_active' => $isActive,
+            'show_on_home' => $showOnHome,
         ]);
 
         return response()->json([
@@ -115,14 +125,16 @@ class CategoryController extends Controller
             $category->is_active = filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN);
         }
 
+        if ($request->has('show_on_home')) {
+            $category->show_on_home = filter_var($request->input('show_on_home'), FILTER_VALIDATE_BOOLEAN);
+        }
+
         if ($request->hasFile('image')) {
-            // Delete old uploaded image if it was in storage
-            if ($category->image && str_starts_with($category->image, '/storage/')) {
-                $oldPath = str_replace('/storage/', '', $category->image);
-                Storage::disk('public')->delete($oldPath);
+            // Delete old uploaded image if it was on R2 or storage
+            if ($category->image) {
+                R2StorageService::delete($category->image);
             }
-            $stored = $request->file('image')->store('categories', 'public');
-            $category->image = '/storage/' . $stored;
+            $category->image = R2StorageService::upload($request->file('image'), 'categories');
         }
 
         $category->save();
@@ -140,9 +152,8 @@ class CategoryController extends Controller
     {
         $category = Category::findOrFail($id);
 
-        if ($category->image && str_starts_with($category->image, '/storage/')) {
-            $oldPath = str_replace('/storage/', '', $category->image);
-            Storage::disk('public')->delete($oldPath);
+        if ($category->image) {
+            R2StorageService::delete($category->image);
         }
 
         $category->delete();

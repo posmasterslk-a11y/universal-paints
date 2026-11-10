@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Services\R2StorageService;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -41,10 +42,14 @@ class ProductController extends Controller
             'pack_sizes' => 'nullable|array',
             'colors' => 'nullable|array',
             'gallery' => 'nullable|array',
-            'main_image' => 'nullable|string',
+            'main_image' => 'nullable',
             'is_best_seller' => 'boolean',
             'is_in_stock' => 'boolean',
         ]);
+
+        if ($request->hasFile('main_image')) {
+            $validated['main_image'] = R2StorageService::upload($request->file('main_image'), 'products');
+        }
 
         $product = Product::create($validated);
         return response()->json($product, 201);
@@ -72,7 +77,17 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        $product->update($request->all());
+
+        $data = $request->all();
+
+        if ($request->hasFile('main_image')) {
+            if ($product->main_image) {
+                R2StorageService::delete($product->main_image);
+            }
+            $data['main_image'] = R2StorageService::upload($request->file('main_image'), 'products');
+        }
+
+        $product->update($data);
         return response()->json($product);
     }
 
@@ -85,7 +100,13 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
+
+        if ($product->main_image) {
+            R2StorageService::delete($product->main_image);
+        }
+
         $product->delete();
         return response()->json(null, 204);
     }
 }
+

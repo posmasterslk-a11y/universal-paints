@@ -46,8 +46,33 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">Image URL</label>
-            <input type="text" v-model="form.main_image" placeholder="/images/home-page/interior.jpg" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none transition">
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Product Image</label>
+            <div class="space-y-2">
+              <div v-if="form.main_image" class="relative w-24 h-24 rounded-lg border border-slate-200 overflow-hidden bg-slate-50 group">
+                <img :src="form.main_image" alt="Product preview" class="w-full h-full object-cover" />
+                <button 
+                  type="button" 
+                  @click="form.main_image = ''" 
+                  class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center shadow hover:bg-red-700 text-xs cursor-pointer"
+                  title="Remove image"
+                >
+                  <i class="fa-solid fa-xmark text-[10px]"></i>
+                </button>
+              </div>
+              <div class="flex items-center gap-2">
+                <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2 px-3 rounded-lg border border-slate-300 transition flex items-center gap-1.5 shrink-0">
+                  <i class="fa-solid fa-cloud-arrow-up text-red-600"></i>
+                  <span>{{ isUploadingImage ? 'Uploading...' : 'Upload to Cloudflare R2' }}</span>
+                  <input type="file" accept="image/*" class="hidden" :disabled="isUploadingImage" @change="handleImageUpload" />
+                </label>
+                <input 
+                  type="text" 
+                  v-model="form.main_image" 
+                  placeholder="Or paste image URL" 
+                  class="flex-1 px-3 py-1.5 text-xs rounded-lg border border-slate-300 focus:border-red-600 focus:ring-1 focus:ring-red-600/20 outline-none transition"
+                >
+              </div>
+            </div>
           </div>
         </div>
 
@@ -122,8 +147,35 @@ const featuresInput = ref('')
 const colorsInput = ref('')
 const packSizesInput = ref('')
 const isSubmitting = ref(false)
+const isUploadingImage = ref(false)
 const successMsg = ref('')
 const errorMsg = ref('')
+
+const handleImageUpload = async (e) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+
+  isUploadingImage.value = true
+  const formData = new FormData()
+  formData.append('image', file)
+  formData.append('folder', 'products')
+
+  try {
+    const res = await $fetch(`${config.public.apiBase}/api/upload`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${token.value}`
+      }
+    })
+    form.value.main_image = res.url
+  } catch (err) {
+    alert('Failed to upload image to Cloudflare R2: ' + (err.data?.message || err.message))
+  } finally {
+    isUploadingImage.value = false
+    e.target.value = ''
+  }
+}
 
 const submitForm = async () => {
   isSubmitting.value = true

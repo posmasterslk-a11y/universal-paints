@@ -16,7 +16,7 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-5">
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
         <div class="w-12 h-12 rounded-lg bg-red-50 text-red-600 flex items-center justify-center text-xl">
           <i class="fa-solid fa-tags"></i>
@@ -44,6 +44,16 @@
         <div>
           <div class="text-2xl font-black text-slate-800">{{ withImagesCount }}</div>
           <div class="text-xs uppercase font-bold text-slate-400">With Cover Images</div>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+          <i class="fa-solid fa-house"></i>
+        </div>
+        <div>
+          <div class="text-2xl font-black text-slate-800">{{ homeCategoriesCount }} / 4</div>
+          <div class="text-xs uppercase font-bold text-slate-400">Home Display (4)</div>
         </div>
       </div>
     </div>
@@ -96,6 +106,7 @@
               <th class="p-4">Category Name</th>
               <th class="p-4">Description</th>
               <th class="p-4 text-center">Products</th>
+              <th class="p-4 text-center">Home Display</th>
               <th class="p-4">Status</th>
               <th class="p-4">Created Date</th>
               <th class="p-4 pr-6 text-right">Actions</th>
@@ -143,6 +154,19 @@
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
                   <i class="fa-solid fa-box text-[10px] text-slate-400"></i>
                   {{ cat.products_count || 0 }}
+                </span>
+              </td>
+
+              <!-- Home Display Badge -->
+              <td class="p-4 text-center">
+                <span 
+                  :class="[
+                    'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold',
+                    cat.show_on_home ? 'bg-amber-50 text-amber-700 border border-amber-200/60' : 'bg-slate-100 text-slate-400'
+                  ]"
+                >
+                  <i :class="cat.show_on_home ? 'fa-solid fa-house text-amber-500' : 'fa-solid fa-minus text-slate-300'"></i>
+                  {{ cat.show_on_home ? 'Home (4)' : 'No' }}
                 </span>
               </td>
 
@@ -352,6 +376,23 @@
             </label>
           </div>
 
+          <!-- Show on Home Page Toggle -->
+          <div class="flex items-start gap-2 pt-1 bg-amber-50/60 p-3 rounded-lg border border-amber-200/60">
+            <input 
+              id="create_show_on_home" 
+              v-model="createForm.show_on_home" 
+              type="checkbox" 
+              class="w-4 h-4 mt-0.5 text-amber-600 rounded border-amber-300 focus:ring-amber-500 cursor-pointer"
+            />
+            <div>
+              <label for="create_show_on_home" class="text-sm font-bold text-amber-900 cursor-pointer flex items-center gap-1.5">
+                <i class="fa-solid fa-house text-amber-600 text-xs"></i>
+                Display on Home Page (Featured in Top 4)
+              </label>
+              <p class="text-xs text-amber-700/80 mt-0.5">Tick this if you want this category displayed in the 4 cards on the website homepage.</p>
+            </div>
+          </div>
+
           <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
             <button 
               type="button" 
@@ -453,6 +494,23 @@
             </label>
           </div>
 
+          <!-- Show on Home Page Toggle -->
+          <div class="flex items-start gap-2 pt-1 bg-amber-50/60 p-3 rounded-lg border border-amber-200/60">
+            <input 
+              id="edit_show_on_home" 
+              v-model="editForm.show_on_home" 
+              type="checkbox" 
+              class="w-4 h-4 mt-0.5 text-amber-600 rounded border-amber-300 focus:ring-amber-500 cursor-pointer"
+            />
+            <div>
+              <label for="edit_show_on_home" class="text-sm font-bold text-amber-900 cursor-pointer flex items-center gap-1.5">
+                <i class="fa-solid fa-house text-amber-600 text-xs"></i>
+                Display on Home Page (Featured in Top 4)
+              </label>
+              <p class="text-xs text-amber-700/80 mt-0.5">Tick this if you want this category displayed in the 4 cards on the website homepage.</p>
+            </div>
+          </div>
+
           <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
             <button 
               type="button" 
@@ -499,7 +557,8 @@ const notification = reactive({
 const createForm = reactive({
   name: '',
   description: '',
-  is_active: true
+  is_active: true,
+  show_on_home: false
 })
 const createSelectedFile = ref(null)
 const createImagePreview = ref('')
@@ -509,7 +568,8 @@ const editForm = reactive({
   name: '',
   description: '',
   currentImage: '',
-  is_active: true
+  is_active: true,
+  show_on_home: false
 })
 const editSelectedFile = ref(null)
 const editImagePreview = ref('')
@@ -519,6 +579,10 @@ const { data: categories, pending, refresh } = await useFetch(`${config.public.a
 
 const activeCategoriesCount = computed(() => {
   return categories.value?.filter(c => c.is_active)?.length || 0
+})
+
+const homeCategoriesCount = computed(() => {
+  return categories.value?.filter(c => c.show_on_home)?.length || 0
 })
 
 const withImagesCount = computed(() => {
@@ -607,6 +671,7 @@ const openCreateModal = () => {
   createForm.name = ''
   createForm.description = ''
   createForm.is_active = true
+  createForm.show_on_home = false
   createSelectedFile.value = null
   createImagePreview.value = ''
   formError.value = ''
@@ -642,6 +707,7 @@ const handleCreateCategory = async () => {
       formData.append('description', createForm.description)
     }
     formData.append('is_active', createForm.is_active ? '1' : '0')
+    formData.append('show_on_home', createForm.show_on_home ? '1' : '0')
     if (createSelectedFile.value) {
       formData.append('image', createSelectedFile.value)
     }
@@ -673,6 +739,7 @@ const openEditModal = (cat) => {
   editForm.description = cat.description || ''
   editForm.currentImage = cat.image || ''
   editForm.is_active = !!cat.is_active
+  editForm.show_on_home = !!cat.show_on_home
   editSelectedFile.value = null
   editImagePreview.value = ''
   editFormError.value = ''
@@ -703,6 +770,7 @@ const handleUpdateCategory = async () => {
       formData.append('description', editForm.description || '')
     }
     formData.append('is_active', editForm.is_active ? '1' : '0')
+    formData.append('show_on_home', editForm.show_on_home ? '1' : '0')
     if (editSelectedFile.value) {
       formData.append('image', editSelectedFile.value)
     }

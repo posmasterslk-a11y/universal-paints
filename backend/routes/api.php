@@ -68,7 +68,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/categories/{id}', [CategoryController::class, 'update']);
     Route::put('/categories/{id}', [CategoryController::class, 'update']);
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+
+    // Direct Cloudflare R2 file upload/delete (Admin)
+    Route::post('/upload', [\App\Http\Controllers\API\UploadController::class, 'upload']);
+    Route::delete('/upload', [\App\Http\Controllers\API\UploadController::class, 'destroy']);
+
+    // Protected Sales Representatives routes (Admin)
+    Route::post('/sales-reps', [\App\Http\Controllers\API\SalesRepresentativeController::class, 'store']);
+    Route::post('/sales-reps/{id}', [\App\Http\Controllers\API\SalesRepresentativeController::class, 'update']);
+    Route::put('/sales-reps/{id}', [\App\Http\Controllers\API\SalesRepresentativeController::class, 'update']);
+    Route::delete('/sales-reps/{id}', [\App\Http\Controllers\API\SalesRepresentativeController::class, 'destroy']);
 });
+
+// Public Sales Representatives routes (Read)
+Route::get('/sales-reps', [\App\Http\Controllers\API\SalesRepresentativeController::class, 'index']);
+Route::get('/sales-reps/{id}', [\App\Http\Controllers\API\SalesRepresentativeController::class, 'show']);
 
 // Public category routes (Read)
 Route::get('/categories', [CategoryController::class, 'index']);

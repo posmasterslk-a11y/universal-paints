@@ -18,28 +18,32 @@ class CategorySeeder extends Seeder
     {
         $defaultCategories = [
             [
-                'name' => 'Interior Paints',
-                'description' => 'Premium wall and ceiling finishes formulated for durable, washable, and beautiful interiors.',
-                'image' => '/images/products/interior.webp',
-                'icon' => '🏢'
-            ],
-            [
                 'name' => 'Exterior Paints',
                 'description' => 'Weather-resistant, UV-blocking protective exterior coatings for homes and commercial facades.',
                 'image' => '/images/products/exterior.webp',
-                'icon' => '🏠'
+                'icon' => '🏠',
+                'sort_order' => 1,
             ],
             [
-                'name' => 'Wood Finishes',
-                'description' => 'Fine varnishes, wood stains, and protective sealers enhancing natural wood beauty.',
-                'image' => '/images/products/wood.webp',
-                'icon' => '🪵'
+                'name' => 'Interior Paints',
+                'description' => 'Premium wall and ceiling finishes formulated for durable, washable, and beautiful interiors.',
+                'image' => '/images/products/interior.webp',
+                'icon' => '🏢',
+                'sort_order' => 2,
             ],
             [
                 'name' => 'Industrial Coatings',
                 'description' => 'Heavy-duty protective primers, floor coatings, and anti-corrosive industrial paints.',
                 'image' => '/images/products/industrial.webp',
-                'icon' => '🏭'
+                'icon' => '🏭',
+                'sort_order' => 3,
+            ],
+            [
+                'name' => 'Wood Finishes',
+                'description' => 'Fine varnishes, wood stains, and protective sealers enhancing natural wood beauty.',
+                'image' => '/images/products/wood.webp',
+                'icon' => '🪵',
+                'sort_order' => 4,
             ]
         ];
 
@@ -52,6 +56,8 @@ class CategorySeeder extends Seeder
                     'image' => $item['image'],
                     'icon' => $item['icon'],
                     'is_active' => true,
+                    'show_on_home' => true,
+                    'sort_order' => $item['sort_order'],
                 ]
             );
         }

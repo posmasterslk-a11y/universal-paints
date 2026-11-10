@@ -47,19 +47,24 @@
     <section class="shop-categories">
       <div class="container">
         <div class="category-pills">
-          <button class="cat-pill active">
+          <button 
+            class="cat-pill"
+            :class="{ active: selectedCategory === 'All' }"
+            @click="selectCategory('All')"
+          >
             <span class="cat-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" /></svg></span>
             <span class="cat-label">All Products</span>
           </button>
-          <button class="cat-pill">
-            <span class="cat-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg></span>
-            <span class="cat-label">Exterior Paints</span>
+          <button 
+            v-for="cat in activeCategories" 
+            :key="cat.id"
+            class="cat-pill"
+            :class="{ active: selectedCategory === cat.name }"
+            @click="selectCategory(cat.name)"
+          >
+            <span v-if="cat.icon" class="cat-icon" style="font-size: 16px;">{{ cat.icon }}</span>
+            <span class="cat-label">{{ cat.name }}</span>
           </button>
-          <button class="cat-pill">
-            <span class="cat-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1.091M15 6.249l3 1.091M5.25 9.75l1.5.545M2.25 12l1.5.545M5.25 12l1.5.545" /></svg></span>
-            <span class="cat-label">Interior Paints</span>
-          </button>
-          <!-- Additional pills as needed -->
         </div>
       </div>
     </section>
@@ -71,14 +76,24 @@
         <aside class="shop-sidebar">
           <div class="filter-header">
             <h3>Filter Products</h3>
-            <button class="clear-btn">Clear All</button>
+            <button class="clear-btn" @click="resetFilters">Clear All</button>
           </div>
           <div class="filter-group">
             <h4 class="filter-title">Category <span>&#8964;</span></h4>
             <div class="filter-options">
-              <label class="checkbox-label"><input type="checkbox"/> Exterior Paints</label>
-              <label class="checkbox-label"><input type="checkbox"/> Interior Paints</label>
-              <label class="checkbox-label"><input type="checkbox"/> Primer & Sealers</label>
+              <label class="checkbox-label" @click.prevent="selectCategory('All')">
+                <input type="radio" name="cat-radio" :checked="selectedCategory === 'All'" />
+                All Categories
+              </label>
+              <label 
+                v-for="cat in activeCategories" 
+                :key="'filter-'+cat.id" 
+                class="checkbox-label"
+                @click.prevent="selectCategory(cat.name)"
+              >
+                <input type="radio" name="cat-radio" :checked="selectedCategory === cat.name" />
+                {{ cat.name }}
+              </label>
             </div>
           </div>
           <div class="filter-group">
@@ -110,31 +125,32 @@
               <input type="range" min="0" max="50000" class="range-slider" />
             </div>
           </div>
-          <button class="btn btn-outline-red w-100">Reset Filters &#x21bb;</button>
+          <button class="btn btn-outline-red w-100" @click="resetFilters">Reset Filters &#x21bb;</button>
         </aside>
 
         <!-- Product Grid Area -->
         <div class="shop-products-area">
           <div class="products-header">
-            <p>Showing 1-12 of 48 products</p>
+            <p>Showing {{ filteredProducts.length }} products <span v-if="selectedCategory !== 'All'">in <strong>{{ selectedCategory }}</strong></span></p>
             <div class="sort-by">
               <label>Sort by:</label>
-              <select>
-                <option>Newest First</option>
-                <option>Price: Low to High</option>
-                <option>Price: High to Low</option>
+              <select v-model="sortBy">
+                <option value="newest">Newest First</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+                <option value="name_asc">Name: A to Z</option>
               </select>
             </div>
           </div>
-          <div class="products-grid" v-if="products && products.length > 0">
-            <div class="product-card" v-for="product in products" :key="product.id">
+          <div class="products-grid" v-if="filteredProducts && filteredProducts.length > 0">
+            <div class="product-card" v-for="product in filteredProducts" :key="product.id">
               <div class="product-img-wrap">
-                <img :src="product.main_image || 'https://placehold.co/400x400/eee/999?text=Product'" :alt="product.name" />
+                <img :src="getProductImageUrl(product.main_image)" :alt="product.name" />
               </div>
               <div class="product-info">
                 <h4>{{ product.name }}</h4>
                 <p>{{ product.subtitle || product.description?.substring(0, 50) }}</p>
-                <div class="product-price">Rs. {{ product.price_min }} - Rs. {{ product.price_max }}</div>
+                <div class="product-price">Rs. {{ product.price_min?.toLocaleString() || 0 }} - Rs. {{ product.price_max?.toLocaleString() || 0 }}</div>
                 <NuxtLink :to="`/shop/${product.id}`" class="btn btn-outline-red w-100 mt-auto text-center py-2" style="display: block; border-radius: 30px; font-weight: 600; text-decoration: none;">
                   View Details
                 </NuxtLink>
@@ -142,7 +158,7 @@
             </div>
           </div>
           <div v-else class="text-center py-10 text-gray-500">
-            No products found.
+            No products found in this category.
           </div>
           
           <!-- Pagination -->
@@ -215,16 +231,103 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+const route = useRoute()
+const router = useRouter()
+const config = useRuntimeConfig()
 
 const searchQuery = ref('')
-const selectedCategory = ref('All')
+const selectedCategory = ref(route.query.category ? String(route.query.category) : 'All')
 const selectedFinish = ref('All')
 const selectedColor = ref('All')
-const priceRange = ref(15000)
+const sortBy = ref('newest')
+const priceRange = ref(50000)
 
-const config = useRuntimeConfig()
-const { data: products, pending, error } = await useFetch(`${config.public.apiBase}/api/products`)
+// Watch query param changes from URL
+watch(() => route.query.category, (newCat) => {
+  selectedCategory.value = newCat ? String(newCat) : 'All'
+})
+
+const selectCategory = (catName) => {
+  selectedCategory.value = catName
+  router.push({
+    query: {
+      ...route.query,
+      category: catName === 'All' ? undefined : catName
+    }
+  })
+}
+
+const resetFilters = () => {
+  selectedCategory.value = 'All'
+  searchQuery.value = ''
+  selectedFinish.value = 'All'
+  selectedColor.value = 'All'
+  sortBy.value = 'newest'
+  router.push({ query: {} })
+}
+
+// Fetch active categories dynamically from backend
+const { data: categoriesData } = await useFetch(`${config.public.apiBase}/api/categories?active_only=true`)
+
+const activeCategories = computed(() => {
+  const list = Array.isArray(categoriesData.value) ? categoriesData.value : (categoriesData.value?.data || [])
+  return list || []
+})
+
+// Fetch products from backend
+const { data: productsData, pending, error } = await useFetch(`${config.public.apiBase}/api/products`)
+
+const allProducts = computed(() => {
+  const list = Array.isArray(productsData.value) ? productsData.value : (productsData.value?.data || [])
+  return list || []
+})
+
+const filteredProducts = computed(() => {
+  let list = [...allProducts.value]
+
+  // Filter by category
+  if (selectedCategory.value && selectedCategory.value !== 'All') {
+    const target = selectedCategory.value.toLowerCase().trim()
+    list = list.filter(p => {
+      const pCat = (p.category || '').toLowerCase().trim()
+      return pCat === target || pCat.includes(target) || target.includes(pCat)
+    })
+  }
+
+  // Filter by search query
+  if (searchQuery.value.trim()) {
+    const q = searchQuery.value.toLowerCase().trim()
+    list = list.filter(p => 
+      (p.name || '').toLowerCase().includes(q) || 
+      (p.subtitle || '').toLowerCase().includes(q) ||
+      (p.description || '').toLowerCase().includes(q)
+    )
+  }
+
+  // Sorting
+  if (sortBy.value === 'price_asc') {
+    list.sort((a, b) => (Number(a.price_min) || 0) - (Number(b.price_min) || 0))
+  } else if (sortBy.value === 'price_desc') {
+    list.sort((a, b) => (Number(b.price_min) || 0) - (Number(a.price_min) || 0))
+  } else if (sortBy.value === 'name_asc') {
+    list.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+  } else {
+    // Newest first
+    list.sort((a, b) => (b.id || 0) - (a.id || 0))
+  }
+
+  return list
+})
+
+const getProductImageUrl = (path) => {
+  if (!path) return 'https://placehold.co/400x400/eee/999?text=Universal+Paints'
+  if (path.startsWith('http://') || path.startsWith('https://')) return path
+  if (path.startsWith('/storage/')) return `${config.public.apiBase}${path}`
+  return path
+}
 </script>
 
 <style scoped>

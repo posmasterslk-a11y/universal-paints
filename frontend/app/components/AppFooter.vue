@@ -22,7 +22,8 @@
           <h4>Quick Links</h4>
           <ul>
             <li><NuxtLink to="/">Home</NuxtLink></li>
-            <li><NuxtLink to="/shop">Shop</NuxtLink></li>
+            <li><NuxtLink to="/shop">Products</NuxtLink></li>
+            <li><NuxtLink to="/sales-representatives">Sales Representatives</NuxtLink></li>
             <li><NuxtLink to="/about">About Us</NuxtLink></li>
             <li><NuxtLink to="/blog">Blog</NuxtLink></li>
             <li><NuxtLink to="/contact">Contact Us</NuxtLink></li>
@@ -31,11 +32,9 @@
         <div class="link-group">
           <h4>Our Products</h4>
           <ul>
-            <li><NuxtLink to="/products/exterior">Exterior Paints</NuxtLink></li>
-            <li><NuxtLink to="/products/interior">Interior Paints</NuxtLink></li>
-            <li><NuxtLink to="/products/primers">Primers & Sealers</NuxtLink></li>
-            <li><NuxtLink to="/products/industrial">Industrial Coatings</NuxtLink></li>
-            <li><NuxtLink to="/products/floor">Floor Coatings</NuxtLink></li>
+            <li v-for="cat in footerCategories" :key="cat.id">
+              <NuxtLink :to="`/shop?category=${encodeURIComponent(cat.name)}`">{{ cat.name }}</NuxtLink>
+            </li>
           </ul>
         </div>
         <div class="link-group">
@@ -73,6 +72,26 @@
     </div>
   </footer>
 </template>
+
+<script setup>
+import { computed } from 'vue'
+
+const config = useRuntimeConfig()
+const { data: categoriesData } = await useFetch(`${config.public.apiBase}/api/categories?active_only=true`)
+
+const footerCategories = computed(() => {
+  const list = Array.isArray(categoriesData.value) ? categoriesData.value : (categoriesData.value?.data || [])
+  if (list && list.length > 0) {
+    return list.slice(0, 6)
+  }
+  return [
+    { id: 2, name: 'Exterior Paints' },
+    { id: 1, name: 'Interior Paints' },
+    { id: 4, name: 'Industrial Coatings' },
+    { id: 3, name: 'Wood Finishes' }
+  ]
+})
+</script>
 
 <style scoped>
 /* Footer Section */

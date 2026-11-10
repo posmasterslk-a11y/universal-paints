@@ -18,6 +18,10 @@
           <i class="fa-solid fa-tags w-5"></i>
           Categories
         </NuxtLink>
+        <NuxtLink to="/sales-reps" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition" active-class="bg-red-600 !text-white hover:bg-red-600">
+          <i class="fa-solid fa-map-location-dot w-5"></i>
+          Sales Representatives
+        </NuxtLink>
         <NuxtLink to="/orders" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition" active-class="bg-red-600 !text-white hover:bg-red-600">
           <i class="fa-solid fa-shopping-cart w-5"></i>
           Orders

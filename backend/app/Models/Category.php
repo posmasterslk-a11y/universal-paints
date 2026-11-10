@@ -16,11 +16,13 @@ class Category extends Model
         'image',
         'icon',
         'is_active',
+        'show_on_home',
         'sort_order',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'show_on_home' => 'boolean',
         'sort_order' => 'integer',
     ];
 

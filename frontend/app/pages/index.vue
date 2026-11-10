@@ -89,12 +89,12 @@
       </div>
     </section>
 
-    <!-- Categories (What Are You Painting?) -->
+    <!-- Categories (Product Categories from Backend) -->
     <section class="categories-section">
       <div class="container">
         <div class="categories-header">
           <div>
-            <div class="section-subtitle">WHAT ARE YOU PAINTING?</div>
+            <div class="section-subtitle">PRODUCT CATEGORIES</div>
             <h2 class="section-title">Paints for Every Surface</h2>
           </div>
           <NuxtLink to="/shop" class="btn btn-outline">
@@ -103,58 +103,35 @@
         </div>
         
         <div class="categories-grid">
-          <NuxtLink to="/shop" class="category-card">
+          <NuxtLink 
+            v-for="cat in displayCategories" 
+            :key="cat.id || cat.name" 
+            :to="cat.link" 
+            class="category-card"
+          >
             <div class="card-img">
-              <img src="/images/products/exterior.webp" alt="Home" />
+              <img :src="cat.image" :alt="cat.name" />
             </div>
             <div class="card-content">
               <div class="card-title-wrap">
-                <div class="card-icon bg-red">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <div class="card-icon" :class="cat.iconBg">
+                  <!-- Exterior Icon -->
+                  <svg v-if="cat.iconKey === 'exterior'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                  
+                  <!-- Interior Icon -->
+                  <svg v-else-if="cat.iconKey === 'interior'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>
+                  
+                  <!-- Industrial Icon -->
+                  <svg v-else-if="cat.iconKey === 'industrial'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><path d="M17 18h1"></path><path d="M12 18h1"></path><path d="M7 18h1"></path></svg>
+                  
+                  <!-- Wood Icon -->
+                  <svg v-else-if="cat.iconKey === 'wood'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 12-8.5 8.5a2.12 2.12 0 1 1-3-3L11 9"></path><path d="M15 13 9 7l4-4 6 6h3a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 0-1 1v2a1 1 0 0 1-1 1z"></path></svg>
+                  
+                  <!-- Default Emoji or SVG -->
+                  <span v-else-if="cat.iconEmoji" style="font-size: 20px;">{{ cat.iconEmoji }}</span>
+                  <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2Z"/></svg>
                 </div>
-                <h3>Home</h3>
-              </div>
-            </div>
-          </NuxtLink>
-          
-          <NuxtLink to="/shop" class="category-card">
-            <div class="card-img">
-              <img src="/images/products/interior.webp" alt="Office" />
-            </div>
-            <div class="card-content">
-              <div class="card-title-wrap">
-                <div class="card-icon bg-orange">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>
-                </div>
-                <h3>Office</h3>
-              </div>
-            </div>
-          </NuxtLink>
-          
-          <NuxtLink to="/shop" class="category-card">
-            <div class="card-img">
-              <img src="/images/products/industrial.webp" alt="Factory" />
-            </div>
-            <div class="card-content">
-              <div class="card-title-wrap">
-                <div class="card-icon bg-blue">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><path d="M17 18h1"></path><path d="M12 18h1"></path><path d="M7 18h1"></path></svg>
-                </div>
-                <h3>Factory</h3>
-              </div>
-            </div>
-          </NuxtLink>
-          
-          <NuxtLink to="/shop" class="category-card">
-            <div class="card-img">
-              <img src="/images/products/wood.webp" alt="Wood" />
-            </div>
-            <div class="card-content">
-              <div class="card-title-wrap">
-                <div class="card-icon bg-green">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                </div>
-                <h3>Wood</h3>
+                <h3>{{ cat.name }}</h3>
               </div>
             </div>
           </NuxtLink>
@@ -355,6 +332,84 @@ const bestSellingProducts = computed(() => {
   if (!allProducts.value) return []
   const list = Array.isArray(allProducts.value) ? allProducts.value : (allProducts.value?.data || [])
   return list.filter(p => p.is_best_seller).slice(0, 6)
+})
+
+// Fetch categories from backend (marked for home display)
+const { data: backendCategories } = await useFetch(`${config.public.apiBase}/api/categories?active_only=true&home_only=true`)
+
+const fallbackCategories = [
+  {
+    id: 2,
+    name: 'Exterior Paints',
+    image: '/images/products/exterior.webp',
+    iconKey: 'exterior',
+    iconBg: 'bg-red',
+    link: '/shop?category=Exterior Paints'
+  },
+  {
+    id: 1,
+    name: 'Interior Paints',
+    image: '/images/products/interior.webp',
+    iconKey: 'interior',
+    iconBg: 'bg-orange',
+    link: '/shop?category=Interior Paints'
+  },
+  {
+    id: 4,
+    name: 'Industrial Coatings',
+    image: '/images/products/industrial.webp',
+    iconKey: 'industrial',
+    iconBg: 'bg-blue',
+    link: '/shop?category=Industrial Coatings'
+  },
+  {
+    id: 3,
+    name: 'Wood Finishes',
+    image: '/images/products/wood.webp',
+    iconKey: 'wood',
+    iconBg: 'bg-green',
+    link: '/shop?category=Wood Finishes'
+  }
+]
+
+const getCategoryImageUrl = (path) => {
+  if (!path) return '/images/products/exterior.webp'
+  if (path.startsWith('http://') || path.startsWith('https://')) return path
+  if (path.startsWith('/storage/')) return `${config.public.apiBase}${path}`
+  return path
+}
+
+const getCategoryIconKey = (name) => {
+  const n = (name || '').toLowerCase()
+  if (n.includes('exterior') || n.includes('outdoor')) return 'exterior'
+  if (n.includes('interior') || n.includes('indoor') || n.includes('wall')) return 'interior'
+  if (n.includes('industrial') || n.includes('metal') || n.includes('floor') || n.includes('protective')) return 'industrial'
+  if (n.includes('wood') || n.includes('varnish') || n.includes('timber')) return 'wood'
+  return 'default'
+}
+
+const colorCycle = ['bg-red', 'bg-orange', 'bg-blue', 'bg-green']
+
+const displayCategories = computed(() => {
+  const list = Array.isArray(backendCategories.value) ? backendCategories.value : (backendCategories.value?.data || [])
+  const homeList = list.filter(c => c.show_on_home !== false)
+  const targetList = homeList.length > 0 ? homeList : list
+
+  if (targetList && targetList.length > 0) {
+    // Display up to 4 categories on the homepage
+    return targetList.slice(0, 4).map((cat, index) => {
+      return {
+        id: cat.id,
+        name: cat.name,
+        image: getCategoryImageUrl(cat.image),
+        iconKey: getCategoryIconKey(cat.name),
+        iconEmoji: cat.icon,
+        iconBg: colorCycle[index % colorCycle.length],
+        link: `/shop?category=${encodeURIComponent(cat.name)}`
+      }
+    })
+  }
+  return fallbackCategories
 })
 
 const heroBackgrounds = [
