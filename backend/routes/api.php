@@ -83,6 +83,63 @@ Route::post('/orders', [OrderController::class, 'store']);
 Route::get('/blogs', [\App\Http\Controllers\API\BlogController::class, 'index']);
 Route::get('/blogs/{slug}', [\App\Http\Controllers\API\BlogController::class, 'show']);
 
+// Secure deployment endpoint for admin panel frontend extraction
+Route::get('/extract-admin', function (\Illuminate\Http\Request $request) {
+    if ($request->query('key') !== 'universal_paints_deploy_secure_key_2026') {
+        return response()->json(['error' => 'Forbidden'], 403);
+    }
+
+    $candidates = [
+        base_path('admin.zip'),
+        public_path('admin.zip'),
+        dirname(base_path()) . '/admin.zip'
+    ];
+
+    $zipFile = null;
+    foreach ($candidates as $cand) {
+        if (file_exists($cand)) {
+            $zipFile = $cand;
+            break;
+        }
+    }
+
+    if (!$zipFile) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'admin.zip not found in candidates: ' . implode(', ', $candidates)
+        ], 404);
+    }
+
+    if (!class_exists('ZipArchive')) {
+        return response()->json(['error' => 'ZipArchive extension missing'], 500);
+    }
+
+    $targets = [
+        base_path('admin'),
+        public_path('admin')
+    ];
+
+    $extracted = [];
+    foreach ($targets as $targetDir) {
+        if (!is_dir($targetDir)) {
+            @mkdir($targetDir, 0755, true);
+        }
+        $zip = new \ZipArchive;
+        if ($zip->open($zipFile) === true) {
+            $zip->extractTo($targetDir);
+            $zip->close();
+            $extracted[] = $targetDir;
+        }
+    }
+
+    @unlink($zipFile);
+
+    return response()->json([
+        'status' => 'SUCCESS',
+        'message' => 'Admin extracted successfully to ' . implode(' and ', $extracted)
+    ]);
+});
+
 // Graceful fallback for clients calling with double /api prefix (e.g. /api/api/...)
 Route::prefix('api')->group(function () {
     Route::get('/categories', [CategoryController::class, 'index']);
