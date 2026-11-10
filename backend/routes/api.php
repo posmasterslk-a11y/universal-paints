@@ -83,3 +83,15 @@ Route::post('/orders', [OrderController::class, 'store']);
 Route::get('/blogs', [\App\Http\Controllers\API\BlogController::class, 'index']);
 Route::get('/blogs/{slug}', [\App\Http\Controllers\API\BlogController::class, 'show']);
 
+// Graceful fallback for clients calling with double /api prefix (e.g. /api/api/...)
+Route::prefix('api')->group(function () {
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::get('/categories/{id}', [CategoryController::class, 'show']);
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/{product}', [ProductController::class, 'show']);
+    Route::get('/sales-reps', [\App\Http\Controllers\API\SalesRepresentativeController::class, 'index']);
+    Route::get('/sales-reps/{id}', [\App\Http\Controllers\API\SalesRepresentativeController::class, 'show']);
+    Route::get('/blogs', [\App\Http\Controllers\API\BlogController::class, 'index']);
+    Route::get('/blogs/{slug}', [\App\Http\Controllers\API\BlogController::class, 'show']);
+});
+

@@ -90,7 +90,7 @@
     </section>
 
     <!-- Categories (Product Categories from Backend) -->
-    <section class="categories-section">
+    <section class="categories-section" v-if="displayCategories && displayCategories.length > 0">
       <div class="container">
         <div class="categories-header">
           <div>
@@ -327,55 +327,22 @@ useHead({
 })
 
 const config = useRuntimeConfig()
-const { data: allProducts } = await useFetch(`${config.public.apiBase}/api/products`)
+const cleanApiBase = computed(() => (config.public.apiBase || 'https://api.universalpaints.lk').replace(/\/api\/?$/, ''))
+
+const { data: allProducts } = await useFetch(() => `${cleanApiBase.value}/api/products`, { key: 'home-products' })
 const bestSellingProducts = computed(() => {
   if (!allProducts.value) return []
   const list = Array.isArray(allProducts.value) ? allProducts.value : (allProducts.value?.data || [])
   return list.filter(p => p.is_best_seller).slice(0, 6)
 })
 
-// Fetch categories from backend (marked for home display)
-const { data: backendCategories } = await useFetch(`${config.public.apiBase}/api/categories?active_only=true&home_only=true`)
-
-const fallbackCategories = [
-  {
-    id: 2,
-    name: 'Exterior Paints',
-    image: '/images/products/exterior.webp',
-    iconKey: 'exterior',
-    iconBg: 'bg-red',
-    link: '/shop?category=Exterior Paints'
-  },
-  {
-    id: 1,
-    name: 'Interior Paints',
-    image: '/images/products/interior.webp',
-    iconKey: 'interior',
-    iconBg: 'bg-orange',
-    link: '/shop?category=Interior Paints'
-  },
-  {
-    id: 4,
-    name: 'Industrial Coatings',
-    image: '/images/products/industrial.webp',
-    iconKey: 'industrial',
-    iconBg: 'bg-blue',
-    link: '/shop?category=Industrial Coatings'
-  },
-  {
-    id: 3,
-    name: 'Wood Finishes',
-    image: '/images/products/wood.webp',
-    iconKey: 'wood',
-    iconBg: 'bg-green',
-    link: '/shop?category=Wood Finishes'
-  }
-]
+// Fetch active categories from backend
+const { data: backendCategories } = await useFetch(() => `${cleanApiBase.value}/api/categories?active_only=true`, { key: 'home-categories' })
 
 const getCategoryImageUrl = (path) => {
   if (!path) return '/images/products/exterior.webp'
   if (path.startsWith('http://') || path.startsWith('https://')) return path
-  if (path.startsWith('/storage/')) return `${config.public.apiBase}${path}`
+  if (path.startsWith('/storage/')) return `${cleanApiBase.value}${path}`
   return path
 }
 
@@ -394,7 +361,11 @@ const displayCategories = computed(() => {
   const list = Array.isArray(backendCategories.value) ? backendCategories.value : (backendCategories.value?.data || [])
 
   if (list && list.length > 0) {
-    return list.map((cat, index) => {
+    // If categories are marked for home display in admin, show those; otherwise show up to 4 active categories
+    const homeList = list.filter(cat => cat.show_on_home)
+    const effectiveList = homeList.length > 0 ? homeList : list.slice(0, 4)
+
+    return effectiveList.map((cat, index) => {
       return {
         id: cat.id,
         name: cat.name,
@@ -406,7 +377,7 @@ const displayCategories = computed(() => {
       }
     })
   }
-  return fallbackCategories
+  return []
 })
 
 const heroBackgrounds = [
@@ -427,10 +398,26 @@ const setHeroSlide = (index) => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   bgInterval = setInterval(() => {
     currentBgIndex.value = (currentBgIndex.value + 1) % heroBackgrounds.length;
   }, 5000);
+
+  // Client-side hydration retry if SSR payload was empty or failed
+  const currentList = Array.isArray(backendCategories.value) ? backendCategories.value : (backendCategories.value?.data || [])
+  if (!currentList.length) {
+    try {
+      const res = await $fetch(`${cleanApiBase.value}/api/categories?active_only=true`)
+      if (res && (Array.isArray(res) ? res.length : res.data?.length)) {
+        backendCategories.value = res
+      }
+    } catch (err) {
+      try {
+        const res2 = await $fetch('https://api.universalpaints.lk/api/categories?active_only=true')
+        if (res2) backendCategories.value = res2
+      } catch (e) {}
+    }
+  }
 });
 
 onUnmounted(() => {

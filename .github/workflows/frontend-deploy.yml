@@ -45,9 +45,9 @@ jobs:
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          server: ${{ secrets.FTP_SERVER || secrets.BACKEND_FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME || secrets.BACKEND_FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD || secrets.BACKEND_FTP_PASSWORD }}
           local-dir: ./frontend/.output/
           # Ensure this path is relative to your FTP user's root. 
           # If your FTP user lands in the home directory, it should be /web_app/

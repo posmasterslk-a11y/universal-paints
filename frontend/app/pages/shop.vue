@@ -270,7 +270,9 @@ const resetFilters = () => {
 }
 
 // Fetch active categories dynamically from backend
-const { data: categoriesData } = await useFetch(`${config.public.apiBase}/api/categories?active_only=true`)
+const cleanApiBase = computed(() => (config.public.apiBase || 'https://api.universalpaints.lk').replace(/\/api\/?$/, ''))
+
+const { data: categoriesData } = await useFetch(() => `${cleanApiBase.value}/api/categories?active_only=true`, { key: 'shop-categories' })
 
 const activeCategories = computed(() => {
   const list = Array.isArray(categoriesData.value) ? categoriesData.value : (categoriesData.value?.data || [])
@@ -278,7 +280,7 @@ const activeCategories = computed(() => {
 })
 
 // Fetch products from backend
-const { data: productsData, pending, error } = await useFetch(`${config.public.apiBase}/api/products`)
+const { data: productsData, pending, error } = await useFetch(() => `${cleanApiBase.value}/api/products`, { key: 'shop-products' })
 
 const allProducts = computed(() => {
   const list = Array.isArray(productsData.value) ? productsData.value : (productsData.value?.data || [])

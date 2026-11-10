@@ -74,22 +74,31 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 
 const config = useRuntimeConfig()
-const { data: categoriesData } = await useFetch(`${config.public.apiBase}/api/categories?active_only=true`)
+const cleanApiBase = computed(() => (config.public.apiBase || 'https://api.universalpaints.lk').replace(/\/api\/?$/, ''))
+
+const { data: categoriesData } = await useFetch(() => `${cleanApiBase.value}/api/categories?active_only=true`, { key: 'footer-categories' })
+
+onMounted(async () => {
+  const list = Array.isArray(categoriesData.value) ? categoriesData.value : (categoriesData.value?.data || [])
+  if (!list.length) {
+    try {
+      const res = await $fetch(`${cleanApiBase.value}/api/categories?active_only=true`)
+      if (res && (Array.isArray(res) ? res.length : res.data?.length)) {
+        categoriesData.value = res
+      }
+    } catch (e) {}
+  }
+})
 
 const footerCategories = computed(() => {
   const list = Array.isArray(categoriesData.value) ? categoriesData.value : (categoriesData.value?.data || [])
   if (list && list.length > 0) {
     return list.slice(0, 6)
   }
-  return [
-    { id: 2, name: 'Exterior Paints' },
-    { id: 1, name: 'Interior Paints' },
-    { id: 4, name: 'Industrial Coatings' },
-    { id: 3, name: 'Wood Finishes' }
-  ]
+  return []
 })
 </script>
 
