@@ -307,10 +307,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import SriLankaMap from '~/components/SriLankaMap.vue'
 
 const config = useRuntimeConfig()
+const cleanApiBase = computed(() => (config.public.apiBase || 'https://api.universalpaints.lk').replace(/\/api\/?$/, ''))
 const isQuotePopupOpen = useState('quotePopup', () => false)
 
 useHead({
@@ -321,13 +322,31 @@ useHead({
 })
 
 // Fetch all active representatives from backend
-const { data: repsData, pending, error, refresh } = await useFetch(`${config.public.apiBase}/api/sales-reps`, {
-  key: 'sales-representatives-list',
-  default: () => []
+const { data: repsData, pending, error, refresh } = await useFetch(() => `${cleanApiBase.value}/api/sales-reps`, {
+  key: 'sales-representatives-list'
 })
 
 const reps = computed(() => {
-  return Array.isArray(repsData.value) ? repsData.value : []
+  if (!repsData.value) return []
+  return Array.isArray(repsData.value) ? repsData.value : (repsData.value?.data || [])
+})
+
+// Client-side hydration retry if SSR payload was empty or failed
+onMounted(async () => {
+  const currentList = Array.isArray(repsData.value) ? repsData.value : (repsData.value?.data || [])
+  if (!currentList.length) {
+    try {
+      const res = await $fetch(`${cleanApiBase.value}/api/sales-reps`)
+      if (res && (Array.isArray(res) ? res.length : res.data?.length)) {
+        repsData.value = res
+      }
+    } catch (err) {
+      try {
+        const res2 = await $fetch('https://api.universalpaints.lk/api/sales-reps')
+        if (res2) repsData.value = res2
+      } catch (e) {}
+    }
+  }
 })
 
 // Sri Lanka Geography Reference
@@ -426,7 +445,7 @@ const displayedReps = computed(() => {
 const getRepImage = (image) => {
   if (!image) return 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80'
   if (image.startsWith('http://') || image.startsWith('https://')) return image
-  if (image.startsWith('/storage/')) return `${config.public.apiBase}${image}`
+  if (image.startsWith('/storage/')) return `${cleanApiBase.value}${image}`
   return image
 }
 
