@@ -536,6 +536,7 @@
 
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
+import { compressImage } from '~/utils/imageCompressor'
 
 const config = useRuntimeConfig()
 const { token } = useAuth()
@@ -678,17 +679,18 @@ const openCreateModal = () => {
   showCreateModal.value = true
 }
 
-const handleCreateImageSelect = (event) => {
+const handleCreateImageSelect = async (event) => {
   const file = event.target.files?.[0]
   if (!file) return
 
-  if (file.size > 5 * 1024 * 1024) {
-    formError.value = 'Image size must be less than 5MB.'
-    return
+  try {
+    const compressed = await compressImage(file, { maxWidth: 1920, maxHeight: 1920, quality: 0.82 })
+    createSelectedFile.value = compressed
+    createImagePreview.value = URL.createObjectURL(compressed)
+  } catch (err) {
+    createSelectedFile.value = file
+    createImagePreview.value = URL.createObjectURL(file)
   }
-
-  createSelectedFile.value = file
-  createImagePreview.value = URL.createObjectURL(file)
 }
 
 const removeCreateImage = () => {
@@ -746,17 +748,18 @@ const openEditModal = (cat) => {
   showEditModal.value = true
 }
 
-const handleEditImageSelect = (event) => {
+const handleEditImageSelect = async (event) => {
   const file = event.target.files?.[0]
   if (!file) return
 
-  if (file.size > 5 * 1024 * 1024) {
-    editFormError.value = 'Image size must be less than 5MB.'
-    return
+  try {
+    const compressed = await compressImage(file, { maxWidth: 1920, maxHeight: 1920, quality: 0.82 })
+    editSelectedFile.value = compressed
+    editImagePreview.value = URL.createObjectURL(compressed)
+  } catch (err) {
+    editSelectedFile.value = file
+    editImagePreview.value = URL.createObjectURL(file)
   }
-
-  editSelectedFile.value = file
-  editImagePreview.value = URL.createObjectURL(file)
 }
 
 const handleUpdateCategory = async () => {

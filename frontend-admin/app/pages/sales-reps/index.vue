@@ -432,6 +432,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { compressImage } from '~/utils/imageCompressor'
 
 const config = useRuntimeConfig()
 const { token } = useAuth()
@@ -594,15 +595,16 @@ const toggleProvince = (districts) => {
 
 // Upload photo to Cloudflare R2 via /api/upload
 const handlePhotoUpload = async (e) => {
-  const file = e.target.files?.[0]
-  if (!file) return
+  const rawFile = e.target.files?.[0]
+  if (!rawFile) return
 
   isUploadingImage.value = true
-  const formData = new FormData()
-  formData.append('image', file)
-  formData.append('folder', 'sales-reps')
-
   try {
+    const file = await compressImage(rawFile, { maxWidth: 1200, maxHeight: 1200, quality: 0.82 })
+    const formData = new FormData()
+    formData.append('image', file)
+    formData.append('folder', 'sales-reps')
+
     const res = await $fetch(`${config.public.apiBase}/api/upload`, {
       method: 'POST',
       body: formData,

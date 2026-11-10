@@ -121,6 +121,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { compressImage } from '~/utils/imageCompressor'
 
 const config = useRuntimeConfig()
 const { token } = useAuth()
@@ -152,15 +153,16 @@ const successMsg = ref('')
 const errorMsg = ref('')
 
 const handleImageUpload = async (e) => {
-  const file = e.target.files?.[0]
-  if (!file) return
+  const rawFile = e.target.files?.[0]
+  if (!rawFile) return
 
   isUploadingImage.value = true
-  const formData = new FormData()
-  formData.append('image', file)
-  formData.append('folder', 'products')
-
   try {
+    const file = await compressImage(rawFile)
+    const formData = new FormData()
+    formData.append('image', file)
+    formData.append('folder', 'products')
+
     const res = await $fetch(`${config.public.apiBase}/api/upload`, {
       method: 'POST',
       body: formData,
