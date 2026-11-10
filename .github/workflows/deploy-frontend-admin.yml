@@ -30,6 +30,8 @@ jobs:
 
       - name: 🏗️ Build Static Files
         working-directory: ./frontend-admin
+        env:
+          NUXT_PUBLIC_API_BASE: https://api.universalpaints.lk
         run: npm run generate
 
       - name: 📂 Sync files via FTP to API /admin
