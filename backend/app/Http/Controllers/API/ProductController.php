@@ -26,6 +26,15 @@ class ProductController extends Controller
             return response()->json([
                 'message' => 'Database error: ' . $e->getMessage(),
                 'error' => $e->getMessage(),
+                'diag' => [
+                    'base_path' => base_path(),
+                    'env_file_exists' => file_exists(base_path('.env')),
+                    'env_readable' => is_readable(base_path('.env')),
+                    'config_cached' => app()->configurationIsCached(),
+                    'config_cached_file' => file_exists(app()->getCachedConfigPath()),
+                    'env_db' => env('DB_DATABASE'),
+                    'env_user' => env('DB_USERNAME'),
+                ]
             ], 500);
         }
     }
