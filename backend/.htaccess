@@ -1,18 +1,20 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    
+
+    # Prevent Directory Listing
+    Options -Indexes
+
     # Block access to .env and other hidden files
     <FilesMatch "^\.">
         Order allow,deny
         Deny from all
     </FilesMatch>
 
-    # Allow /admin and existing files/directories in public_html to be served directly
-    RewriteCond %{REQUEST_URI} ^/admin [NC,OR]
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
+    # Allow direct access to /admin (Admin SPA)
+    RewriteCond %{REQUEST_URI} ^/admin [NC]
     RewriteRule ^ - [L]
 
     # Forward all other requests to the public/ folder
+    RewriteCond %{REQUEST_URI} !^/public/
     RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
