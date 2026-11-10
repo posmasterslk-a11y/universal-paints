@@ -9,7 +9,42 @@ echo ".env Exists at Base: " . (file_exists(dirname(__DIR__) . '/.env') ? 'YES' 
 echo "Storage Writable: " . (is_writable(dirname(__DIR__) . '/storage') ? 'YES' : 'NO') . "\n";
 echo "Storage Logs Writable: " . (is_writable(dirname(__DIR__) . '/storage/logs') ? 'YES' : 'NO') . "\n";
 echo "Storage Framework Views: " . (is_dir(dirname(__DIR__) . '/storage/framework/views') ? 'EXISTS' : 'MISSING') . "\n";
-echo "Bootstrap Cache Writable: " . (is_writable(dirname(__DIR__) . '/bootstrap/cache') ? 'YES' : 'NO') . "\n\n";
+echo "Bootstrap Cache Writable: " . (is_writable(dirname(__DIR__) . '/bootstrap/cache') ? 'YES' : 'NO') . "\n";
+
+// Auto-patch admin files if old dev URL is present:
+$adminDir = dirname(__DIR__) . '/admin';
+if (is_dir($adminDir)) {
+    $fixedFiles = 0;
+    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($adminDir));
+    foreach ($iterator as $f) {
+        if ($f->isFile() && in_array(strtolower($f->getExtension()), ['html', 'js', 'json'])) {
+            $content = @file_get_contents($f->getPathname());
+            if ($content !== false && strpos($content, 'http://127.0.0.1:8080') !== false) {
+                $newContent = str_replace('http://127.0.0.1:8080', 'https://api.universalpaints.lk', $content);
+                @file_put_contents($f->getPathname(), $newContent);
+                $fixedFiles++;
+            }
+        }
+    }
+    if ($fixedFiles > 0) {
+        echo "Admin Auto-Patch: Replaced 127.0.0.1:8080 in $fixedFiles admin files successfully!\n";
+    } else {
+        echo "Admin Files Status: Clean (no 127.0.0.1:8080 found).\n";
+    }
+}
+
+// Auto-extract admin.zip if uploaded:
+$adminZip = dirname(__DIR__) . '/admin.zip';
+if (file_exists($adminZip) && class_exists('ZipArchive')) {
+    $za = new ZipArchive;
+    if ($za->open($adminZip) === true) {
+        $za->extractTo($adminDir);
+        $za->close();
+        @unlink($adminZip);
+        echo "Admin Auto-Extract: Extracted admin.zip into $adminDir successfully!\n";
+    }
+}
+echo "\n";
 
 try {
     echo "Loading vendor/autoload.php... ";

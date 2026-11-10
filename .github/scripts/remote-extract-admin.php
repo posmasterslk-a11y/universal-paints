@@ -64,3 +64,4 @@ $zip->close();
 
 echo "SUCCESS: Admin extracted successfully to $targetDir";
 @unlink(__FILE__);
+

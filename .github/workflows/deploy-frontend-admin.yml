@@ -105,3 +105,6 @@ jobs:
             RESPONSE2=$(curl -s "https://api.universalpaints.lk/public/extract-admin.php?key=universal_paints_deploy_secure_key_2026" || true)
             echo "Public extraction response: $RESPONSE2"
           fi
+          echo "Triggering diagnostic self-heal..."
+          curl -s "https://api.universalpaints.lk/check.php" || true
+          echo "Deployment steps completed successfully."
