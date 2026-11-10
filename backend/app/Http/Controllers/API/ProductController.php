@@ -16,11 +16,18 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::query();
-        if ($request->has('category')) {
-            $query->where('category', $request->category);
+        try {
+            $query = Product::query();
+            if ($request->has('category')) {
+                $query->where('category', $request->category);
+            }
+            return response()->json($query->get());
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Database error: ' . $e->getMessage(),
+                'error' => $e->getMessage(),
+            ], 500);
         }
-        return response()->json($query->get());
     }
 
     /**
