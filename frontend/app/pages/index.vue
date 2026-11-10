@@ -161,13 +161,13 @@
               <div class="card-details">
                 <h4 class="product-name" :title="product.name">{{ product.name }}</h4>
                 <p class="product-sub">{{ product.subtitle || product.category || 'Universal Paints' }}</p>
-                <div class="product-price">
-                  LKR {{ (product.price_min || 1500).toLocaleString() }}
-                </div>
-                <div class="size-pills">
-                  <span v-for="(size, sIdx) in (product.pack_sizes && product.pack_sizes.length ? product.pack_sizes.slice(0, 3) : ['1L', '4L', '20L'])" :key="sIdx">
+                <div class="size-pills" v-if="product.pack_sizes && product.pack_sizes.length">
+                  <span v-for="(size, sIdx) in product.pack_sizes.slice(0, 3)" :key="sIdx">
                     {{ typeof size === 'object' && size !== null ? size.size : size }}
                   </span>
+                </div>
+                <div class="view-more-tag mt-auto pt-2">
+                  <span class="text-red font-semibold text-xs">View More →</span>
                 </div>
               </div>
             </NuxtLink>

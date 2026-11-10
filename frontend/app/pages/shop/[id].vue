@@ -63,8 +63,15 @@
             </div>
           </div>
 
-          <div class="price-wrap">
-            <div class="price text-red">Rs. {{ product.price_min }} – Rs. {{ product.price_max }}</div>
+          <div class="price-wrap" v-if="product.price_min || product.price_max">
+            <div class="price text-red">
+              <template v-if="product.price_min && product.price_max && product.price_min !== product.price_max">
+                Rs. {{ product.price_min }} – Rs. {{ product.price_max }}
+              </template>
+              <template v-else>
+                Rs. {{ product.price_min || product.price_max }}
+              </template>
+            </div>
             <div class="tax-info">Inclusive of all taxes</div>
           </div>
 

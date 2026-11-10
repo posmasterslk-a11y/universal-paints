@@ -136,8 +136,6 @@
               <label>Sort by:</label>
               <select v-model="sortBy">
                 <option value="newest">Newest First</option>
-                <option value="price_asc">Price: Low to High</option>
-                <option value="price_desc">Price: High to Low</option>
                 <option value="name_asc">Name: A to Z</option>
               </select>
             </div>
@@ -151,20 +149,9 @@
                 <h4>
                   <NuxtLink :to="`/shop/${product.id}`" class="product-title-link">{{ product.name }}</NuxtLink>
                 </h4>
-                <p>{{ product.subtitle || product.description?.substring(0, 50) }}</p>
-                <div class="product-price">
-                  <template v-if="product.price_min && product.price_max && product.price_min !== product.price_max">
-                    Rs. {{ product.price_min.toLocaleString() }} - Rs. {{ product.price_max.toLocaleString() }}
-                  </template>
-                  <template v-else-if="product.price_min || product.price_max">
-                    Rs. {{ (product.price_min || product.price_max).toLocaleString() }}
-                  </template>
-                  <template v-else>
-                    <span class="price-quote">Contact for Price</span>
-                  </template>
-                </div>
+                <p>{{ product.subtitle || product.description?.substring(0, 75) }}</p>
                 <NuxtLink :to="`/shop/${product.id}`" class="btn btn-outline-red w-100 mt-auto text-center py-2" style="display: block; border-radius: 30px; font-weight: 600; text-decoration: none;">
-                  View Details
+                  View More
                 </NuxtLink>
               </div>
             </div>
