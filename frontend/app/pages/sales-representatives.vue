@@ -159,7 +159,7 @@
                   <!-- Photo -->
                   <div class="rep-avatar">
                     <img 
-                      :src="rep.image || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80'" 
+                      :src="getRepImage(rep.image)" 
                       :alt="rep.name" 
                       @error="(e) => e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80'"
                     />
@@ -321,7 +321,10 @@ useHead({
 })
 
 // Fetch all active representatives from backend
-const { data: repsData, pending } = await useFetch(`${config.public.apiBase}/api/sales-reps`)
+const { data: repsData, pending, error, refresh } = await useFetch(`${config.public.apiBase}/api/sales-reps`, {
+  key: 'sales-representatives-list',
+  default: () => []
+})
 
 const reps = computed(() => {
   return Array.isArray(repsData.value) ? repsData.value : []
@@ -420,6 +423,13 @@ const displayedReps = computed(() => {
 })
 
 // Helper methods
+const getRepImage = (image) => {
+  if (!image) return 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80'
+  if (image.startsWith('http://') || image.startsWith('https://')) return image
+  if (image.startsWith('/storage/')) return `${config.public.apiBase}${image}`
+  return image
+}
+
 const cleanPhone = (phone) => {
   return (phone || '').replace(/[^0-9+]/g, '')
 }

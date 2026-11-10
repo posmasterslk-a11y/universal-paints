@@ -30,6 +30,8 @@ jobs:
 
       - name: Build Nuxt App
         working-directory: ./frontend
+        env:
+          NUXT_PUBLIC_API_BASE: https://api.universalpaints.lk
         run: npm run build
 
       - name: Prepare Restart Trigger for cPanel
