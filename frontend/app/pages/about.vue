@@ -313,8 +313,44 @@
 </template>
 
 <script setup>
+useSeoMeta({
+  title: 'About Us | Pioneering Quality Coatings in Sri Lanka',
+  ogTitle: 'About Universal Paints | Pioneering Quality Coatings in Sri Lanka',
+  description: 'Learn about Universal Paints Sri Lanka, our 20+ year legacy, innovative coating formulations, eco-friendly manufacturing, and nationwide network of 1000+ retailers.',
+  ogDescription: 'Learn about Universal Paints Sri Lanka, our 20+ year legacy, innovative coating formulations, eco-friendly manufacturing, and nationwide network of 1000+ retailers.',
+  ogImage: 'https://universalpaints.lk/images/about-us-page/hero.webp',
+  ogUrl: 'https://universalpaints.lk/about',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'About Universal Paints Sri Lanka',
+  twitterDescription: '20+ years of manufacturing superior paint, waterproofing, and surface protection in Sri Lanka.',
+  twitterImage: 'https://universalpaints.lk/images/about-us-page/hero.webp'
+})
+
 useHead({
-  title: 'About Us - Universal Paints',
+  link: [
+    { rel: 'canonical', href: 'https://universalpaints.lk/about' }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'AboutPage',
+        name: 'About Universal Paints',
+        description: 'Universal Paints is a leading Sri Lankan manufacturer of architectural coatings, primers, and waterproofing solutions.',
+        url: 'https://universalpaints.lk/about',
+        mainEntity: {
+          '@type': 'Organization',
+          name: 'Universal Paints (Pvt) Ltd',
+          url: 'https://universalpaints.lk',
+          logo: 'https://universalpaints.lk/logo.png',
+          foundingDate: '2004',
+          areaServed: 'LK'
+        }
+      })
+    }
+  ]
 })
 </script>
 

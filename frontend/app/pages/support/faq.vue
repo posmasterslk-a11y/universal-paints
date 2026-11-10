@@ -43,8 +43,75 @@
 </template>
 
 <script setup>
+useSeoMeta({
+  title: 'Frequently Asked Questions (FAQ) | Painting & Coating Guide',
+  ogTitle: 'Universal Paints FAQ | Painting & Coating Guide Sri Lanka',
+  description: 'Answers to frequent questions about paint selection, surface preparation, islandwide delivery, color matching, and paint quantity calculation in Sri Lanka.',
+  ogDescription: 'Answers to frequent questions about paint selection, surface preparation, islandwide delivery, color matching, and paint quantity calculation in Sri Lanka.',
+  ogImage: 'https://universalpaints.lk/images/og-image.jpg',
+  ogUrl: 'https://universalpaints.lk/support/faq',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Universal Paints FAQ',
+  twitterDescription: 'Paint selection advice, islandwide delivery, and custom color matching in Sri Lanka.',
+  twitterImage: 'https://universalpaints.lk/images/og-image.jpg'
+})
+
 useHead({
-  title: 'FAQ - Universal Paints'
+  link: [
+    { rel: 'canonical', href: 'https://universalpaints.lk/support/faq' }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: [
+          {
+            '@type': 'Question',
+            name: 'How do I choose the right paint for my walls?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'The right paint depends on the surface and the location. For interiors, we recommend our premium emulsions with a matte or eggshell finish. For exteriors, you need weather-resistant paints like our Exterior Shield range.'
+            }
+          },
+          {
+            '@type': 'Question',
+            name: 'Do you deliver islandwide in Sri Lanka?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Yes, we provide delivery services across all 25 districts of Sri Lanka. Delivery times and charges may vary depending on your location and the size of your order.'
+            }
+          },
+          {
+            '@type': 'Question',
+            name: 'Can I get a custom colour mixed?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Absolutely! We have state-of-the-art colour mixing technology available at all our main dealerships. Just bring in a sample of the colour you want, and we can match it perfectly.'
+            }
+          },
+          {
+            '@type': 'Question',
+            name: 'How do I calculate how much paint I need?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'As a general rule, 1 litre of our standard emulsion covers approximately 12-14 square meters for a single coat. Two coats are recommended for a durable finish.'
+            }
+          },
+          {
+            '@type': 'Question',
+            name: 'What is your return policy?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'We accept returns on unopened, standard colour paints within 14 days of purchase. Custom-mixed colours cannot be returned unless defective.'
+            }
+          }
+        ]
+      })
+    }
+  ]
 })
 </script>
 

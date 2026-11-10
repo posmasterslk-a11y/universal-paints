@@ -43,8 +43,18 @@
 </template>
 
 <script setup>
+useSeoMeta({
+  title: 'Privacy Policy | Universal Paints Sri Lanka',
+  ogTitle: 'Privacy Policy | Universal Paints Sri Lanka',
+  description: 'Read the privacy policy of Universal Paints (Pvt) Ltd. We safeguard customer information and ensure secure data handling.',
+  ogUrl: 'https://universalpaints.lk/privacy',
+  twitterCard: 'summary'
+})
+
 useHead({
-  title: 'Privacy Policy - Universal Paints'
+  link: [
+    { rel: 'canonical', href: 'https://universalpaints.lk/privacy' }
+  ]
 })
 </script>
 

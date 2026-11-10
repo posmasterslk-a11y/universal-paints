@@ -201,8 +201,49 @@
 </template>
 
 <script setup>
-definePageMeta({
-  title: 'Contact Us - Universal Paints'
+useSeoMeta({
+  title: 'Contact Us | Universal Paints Sri Lanka Head Office & Inquiries',
+  ogTitle: 'Contact Us | Universal Paints Sri Lanka Head Office & Inquiries',
+  description: 'Get in touch with Universal Paints Sri Lanka. Speak with our technical coating specialists, request quotation, or visit our head office. Call +94 11 209 9055.',
+  ogDescription: 'Get in touch with Universal Paints Sri Lanka. Speak with our technical coating specialists, request quotation, or visit our head office. Call +94 11 209 9055.',
+  ogImage: 'https://universalpaints.lk/images/og-image.jpg',
+  ogUrl: 'https://universalpaints.lk/contact',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Contact Universal Paints Sri Lanka',
+  twitterDescription: 'Customer support, technical paint consultation, and dealer inquiries in Sri Lanka.',
+  twitterImage: 'https://universalpaints.lk/images/og-image.jpg'
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://universalpaints.lk/contact' }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'ContactPage',
+        name: 'Contact Universal Paints',
+        url: 'https://universalpaints.lk/contact',
+        mainEntity: {
+          '@type': 'LocalBusiness',
+          name: 'Universal Paints (Pvt) Ltd',
+          image: 'https://universalpaints.lk/logo.png',
+          telephone: '+94112099055',
+          email: 'info@universalpaints.lk',
+          address: {
+            '@type': 'PostalAddress',
+            streetAddress: 'Universal Paints Head Office',
+            addressLocality: 'Colombo',
+            addressCountry: 'LK'
+          },
+          url: 'https://universalpaints.lk'
+        }
+      })
+    }
+  ]
 })
 </script>
 

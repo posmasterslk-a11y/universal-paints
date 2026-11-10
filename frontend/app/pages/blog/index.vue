@@ -65,17 +65,27 @@ const { data: blogs, pending, error } = await useFetch(`${config.public.apiBase}
 
 const getExcerpt = (html) => {
   if (!html) return ''
-  // Strip HTML tags and get first 150 chars
-  const tmp = document.createElement('DIV')
-  tmp.innerHTML = html
-  const text = tmp.textContent || tmp.innerText || ''
+  const text = html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
   return text.length > 150 ? text.substring(0, 150) + '...' : text
 }
 
+useSeoMeta({
+  title: 'Painting Guides, Color Ideas & Industry News',
+  ogTitle: 'Universal Paints Blog | Painting Guides & Color Ideas Sri Lanka',
+  description: 'Expert home painting advice, architectural coating guides, waterproofing tips, and color trend inspirations from Universal Paints Sri Lanka.',
+  ogDescription: 'Expert home painting advice, architectural coating guides, waterproofing tips, and color trend inspirations from Universal Paints Sri Lanka.',
+  ogImage: 'https://universalpaints.lk/images/about-us-page/hero.webp',
+  ogUrl: 'https://universalpaints.lk/blog',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Universal Paints Blog',
+  twitterDescription: 'Painting guides, color tips, and surface protection advice.',
+  twitterImage: 'https://universalpaints.lk/images/about-us-page/hero.webp'
+})
+
 useHead({
-  title: 'Blog - Universal Paints',
-  meta: [
-    { name: 'description', content: 'Read the latest news, tips, and insights from Universal Paints.' }
+  link: [
+    { rel: 'canonical', href: 'https://universalpaints.lk/blog' }
   ]
 })
 </script>

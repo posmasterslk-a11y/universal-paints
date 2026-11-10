@@ -462,6 +462,44 @@ const getWhatsAppLink = (phone, repName) => {
 const openQuoteModal = () => {
   isQuotePopupOpen.value = true
 }
+
+useSeoMeta({
+  title: 'Find Sales Representatives Across Sri Lanka',
+  ogTitle: 'Find Universal Paints Sales Representatives Across Sri Lanka',
+  description: 'Connect directly with official Universal Paints sales representatives across all 25 districts of Sri Lanka for trade inquiries, dealer support, and bulk paint orders.',
+  ogDescription: 'Connect directly with official Universal Paints sales representatives across all 25 districts of Sri Lanka for trade inquiries, dealer support, and bulk paint orders.',
+  ogImage: 'https://universalpaints.lk/images/og-image.jpg',
+  ogUrl: 'https://universalpaints.lk/sales-representatives',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Find Sales Representatives Across Sri Lanka | Universal Paints',
+  twitterDescription: 'Direct contact details and WhatsApp for all district paint sales representatives in Sri Lanka.',
+  twitterImage: 'https://universalpaints.lk/images/og-image.jpg'
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://universalpaints.lk/sales-representatives' }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'ContactPage',
+        name: 'Universal Paints Sales Network',
+        description: 'Direct sales representatives directory covering all 9 provinces and 25 districts in Sri Lanka.',
+        url: 'https://universalpaints.lk/sales-representatives',
+        mainEntity: {
+          '@type': 'Organization',
+          name: 'Universal Paints (Pvt) Ltd',
+          url: 'https://universalpaints.lk',
+          areaServed: 'LK'
+        }
+      })
+    }
+  ]
+})
 </script>
 
 <style scoped>

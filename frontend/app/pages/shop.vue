@@ -329,6 +329,43 @@ const getProductImageUrl = (path) => {
   if (path.startsWith('/storage/')) return `${config.public.apiBase}${path}`
   return path
 }
+
+useSeoMeta({
+  title: 'Products & Coatings Catalog',
+  ogTitle: 'Products & Coatings Catalog | Universal Paints Sri Lanka',
+  description: 'Explore the full range of Universal Paints: Exterior coatings, Interior emulsions, Wall fillers, and Waterproofing paint engineered for long-lasting protection in Sri Lanka.',
+  ogDescription: 'Explore the full range of Universal Paints: Exterior coatings, Interior emulsions, Wall fillers, and Waterproofing paint engineered for long-lasting protection in Sri Lanka.',
+  ogImage: 'https://universalpaints.lk/images/og-image.jpg',
+  ogUrl: 'https://universalpaints.lk/shop',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Products & Coatings Catalog | Universal Paints Sri Lanka',
+  twitterDescription: 'Premium interior, exterior, wall filler, and waterproofing coatings by Universal Paints Sri Lanka.',
+  twitterImage: 'https://universalpaints.lk/images/og-image.jpg'
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://universalpaints.lk/shop' }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: 'Universal Paints Products Catalog',
+        description: 'Architectural and decorative paints, waterproofing coatings, and wall fillers in Sri Lanka.',
+        url: 'https://universalpaints.lk/shop',
+        publisher: {
+          '@type': 'Organization',
+          name: 'Universal Paints (Pvt) Ltd',
+          url: 'https://universalpaints.lk'
+        }
+      })
+    }
+  ]
+})
 </script>
 
 <style scoped>
@@ -610,7 +647,7 @@ const getProductImageUrl = (path) => {
 .product-img-wrap img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   display: block;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }

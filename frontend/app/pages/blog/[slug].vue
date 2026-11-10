@@ -52,22 +52,69 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+
 const route = useRoute()
 const config = useRuntimeConfig()
 
 const { data: blog, pending, error } = await useFetch(`${config.public.apiBase}/api/blogs/${route.params.slug}`)
 
-// Setup SEO tags if blog exists
-if (blog.value) {
-  useHead({
-    title: `${blog.value.title} - Universal Paints Blog`,
-    meta: [
-      { name: 'description', content: blog.value.title },
-      { property: 'og:title', content: blog.value.title },
-      { property: 'og:image', content: blog.value.image ? config.public.apiBase + blog.value.image : '' }
-    ]
-  })
-}
+const blogTitle = computed(() => blog.value?.title ? `${blog.value.title} | Universal Paints Sri Lanka` : 'Universal Paints Blog')
+const blogDesc = computed(() => {
+  if (!blog.value?.content) return 'Read insights, surface preparation tips, and painting advice from Universal Paints Sri Lanka.'
+  return blog.value.content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().substring(0, 160)
+})
+const blogImg = computed(() => blog.value?.image ? (blog.value.image.startsWith('http') ? blog.value.image : config.public.apiBase + blog.value.image) : 'https://universalpaints.lk/images/about-us-page/hero.webp')
+const blogUrl = computed(() => `https://universalpaints.lk/blog/${route.params.slug}`)
+
+useSeoMeta({
+  title: () => blog.value?.title || 'Blog Post',
+  ogTitle: blogTitle,
+  description: blogDesc,
+  ogDescription: blogDesc,
+  ogImage: blogImg,
+  ogUrl: blogUrl,
+  ogType: 'article',
+  twitterCard: 'summary_large_image',
+  twitterTitle: blogTitle,
+  twitterDescription: blogDesc,
+  twitterImage: blogImg
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: blogUrl }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: computed(() => JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: blog.value?.title || 'Universal Paints Blog Post',
+        image: [blogImg.value],
+        description: blogDesc.value,
+        datePublished: blog.value?.published_at || blog.value?.created_at || new Date().toISOString(),
+        author: {
+          '@type': 'Organization',
+          name: 'Universal Paints (Pvt) Ltd'
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'Universal Paints (Pvt) Ltd',
+          logo: {
+            '@type': 'ImageObject',
+            url: 'https://universalpaints.lk/logo.png'
+          }
+        },
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': blogUrl.value
+        }
+      }))
+    }
+  ]
+})
 </script>
 
 <style scoped>

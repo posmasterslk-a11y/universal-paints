@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Home Page -->
+  <url>
+    <loc>https://universalpaints.lk/</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://universalpaints.lk/images/logo/Logo.webp</image:loc>
+      <image:title>Universal Paints Sri Lanka</image:title>
+    </image:image>
+  </url>
+
+  <!-- Products / Catalog Page -->
+  <url>
+    <loc>https://universalpaints.lk/shop</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Sales Representatives Page -->
+  <url>
+    <loc>https://universalpaints.lk/sales-representatives</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- About Us -->
+  <url>
+    <loc>https://universalpaints.lk/about</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Contact Us -->
+  <url>
+    <loc>https://universalpaints.lk/contact</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Blog Listing -->
+  <url>
+    <loc>https://universalpaints.lk/blog</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- FAQ / Support -->
+  <url>
+    <loc>https://universalpaints.lk/support/faq</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Terms and Privacy -->
+  <url>
+    <loc>https://universalpaints.lk/terms</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://universalpaints.lk/privacy</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- Featured Products -->
+  <url>
+    <loc>https://universalpaints.lk/shop/25</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://pub-731f67f291b0486e9dc8894b5712a107.r2.dev/products/4ZNyCHDWWQcgOny061nRd1jRqC6dkQQezZTGhyUx.png</image:loc>
+      <image:title>Universal Paints Hybrid Aquamax Waterproofing paint</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://universalpaints.lk/shop/17</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://pub-731f67f291b0486e9dc8894b5712a107.r2.dev/products/VVgRh3LAWYSoe2Ie1HowtNAMoPWFqGcuheYf6wEx.png</image:loc>
+      <image:title>Universal Paints Slab Seal Cement-based Waterproofing</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://universalpaints.lk/shop/33</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://pub-731f67f291b0486e9dc8894b5712a107.r2.dev/products/O9VKdEMALM8XFyUpsgOAjElAw5BVjhQ2bqdkLnYC.png</image:loc>
+      <image:title>Universal Paints Sudo Sudu Premium Emulsion</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://universalpaints.lk/shop/6</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://universalpaints.lk/images/logo/Logo.webp</image:loc>
+      <image:title>Universal Paints Premium Wall Filler</image:title>
+    </image:image>
+  </url>
+
+</urlset>

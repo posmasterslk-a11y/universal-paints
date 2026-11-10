@@ -302,6 +302,61 @@ const addToCart = () => {
 
   isCartOpen.value = true
 }
+
+// SEO & Structured Data
+const pageTitle = computed(() => product.value?.name ? `${product.value.name} | Universal Paints Sri Lanka` : 'Paint Product Details | Universal Paints')
+const pageDesc = computed(() => product.value?.description ? product.value.description.substring(0, 160).replace(/\s+/g, ' ').trim() : 'Premium architectural and decorative coatings by Universal Paints Sri Lanka.')
+const pageImage = computed(() => product.value?.main_image || 'https://universalpaints.lk/images/og-image.jpg')
+const canonicalUrl = computed(() => `https://universalpaints.lk/shop/${route.params.id}`)
+
+useSeoMeta({
+  title: () => product.value?.name || 'Paint Product Details',
+  ogTitle: pageTitle,
+  description: pageDesc,
+  ogDescription: pageDesc,
+  ogImage: pageImage,
+  ogUrl: canonicalUrl,
+  ogType: 'product',
+  twitterCard: 'summary_large_image',
+  twitterTitle: pageTitle,
+  twitterDescription: pageDesc,
+  twitterImage: pageImage
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: canonicalUrl }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: computed(() => JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.value?.name || 'Universal Paints Product',
+        image: product.value?.main_image ? [product.value.main_image] : ['https://universalpaints.lk/images/og-image.jpg'],
+        description: pageDesc.value,
+        sku: `UP-${route.params.id}`,
+        brand: {
+          '@type': 'Brand',
+          name: 'Universal Paints'
+        },
+        offers: {
+          '@type': 'AggregateOffer',
+          priceCurrency: 'LKR',
+          lowPrice: Number(product.value?.price_min) || 0,
+          highPrice: Number(product.value?.price_max) || Number(product.value?.price_min) || 0,
+          availability: product.value?.is_in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+          seller: {
+            '@type': 'Organization',
+            name: 'Universal Paints (Pvt) Ltd',
+            url: 'https://universalpaints.lk'
+          }
+        }
+      }))
+    }
+  ]
+})
 </script>
 
 <style scoped>

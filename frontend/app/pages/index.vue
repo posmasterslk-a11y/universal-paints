@@ -316,13 +316,24 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 
+useSeoMeta({
+  title: 'Universal Paints | Premium Quality Paints & Coatings Sri Lanka',
+  description: 'Leading manufacturer and distributor of premium architectural, decorative, and waterproofing paints for every surface. Over 20 years of excellence across Sri Lanka.',
+  keywords: 'universal paints, universal paints sri lanka, buy paint sri lanka, exterior paint, interior emulsion, waterproofing paint, wall filler, wood finishes, paint dealers colombo',
+  ogTitle: 'Universal Paints | Premium Quality Paints & Coatings',
+  ogDescription: 'Discover high-performance paints and coatings designed to protect and beautify what matters most. Nationwide delivery and dealer network.',
+  ogImage: 'https://universalpaints.lk/images/logo/Logo.webp',
+  ogUrl: 'https://universalpaints.lk/',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Universal Paints | Premium Quality Paints & Coatings',
+  twitterDescription: 'Discover high-performance paints and coatings designed to protect and beautify what matters most.',
+  twitterImage: 'https://universalpaints.lk/images/logo/Logo.webp'
+})
+
 useHead({
-  title: 'Universal Paints | Premium Quality Paints & Coatings',
-  meta: [
-    { 
-      name: 'description', 
-      content: 'Universal Paints is a leading manufacturer and distributor of premium quality paints, architectural coatings, and industrial finishes in Sri Lanka.' 
-    }
+  link: [
+    { rel: 'canonical', href: 'https://universalpaints.lk/' }
   ]
 })
 

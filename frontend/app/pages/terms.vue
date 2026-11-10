@@ -39,8 +39,18 @@
 </template>
 
 <script setup>
+useSeoMeta({
+  title: 'Terms & Conditions | Universal Paints Sri Lanka',
+  ogTitle: 'Terms & Conditions | Universal Paints Sri Lanka',
+  description: 'Terms and conditions for Universal Paints (Pvt) Ltd products, islandwide delivery, ordering, and customer agreements.',
+  ogUrl: 'https://universalpaints.lk/terms',
+  twitterCard: 'summary'
+})
+
 useHead({
-  title: 'Terms & Conditions - Universal Paints'
+  link: [
+    { rel: 'canonical', href: 'https://universalpaints.lk/terms' }
+  ]
 })
 </script>
 
