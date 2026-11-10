@@ -4,6 +4,9 @@
     # Prevent infinite loop: if already rewritten to public/, stop!
     RewriteRule ^public/ - [L]
 
+    # Handle accidental double /api/api/ requests gracefully
+    RewriteRule ^api/api/(.*)$ public/index.php [L]
+
     # Allow direct access to /admin
     RewriteRule ^admin(/.*)?$ - [L]
 

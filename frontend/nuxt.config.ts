@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://api.universalpaints.lk'
+      apiBase: (process.env.NUXT_PUBLIC_API_BASE || 'https://api.universalpaints.lk').replace(/\/api\/?$/, '')
     }
   },
   compatibilityDate: '2024-04-03',

@@ -392,12 +392,9 @@ const colorCycle = ['bg-red', 'bg-orange', 'bg-blue', 'bg-green']
 
 const displayCategories = computed(() => {
   const list = Array.isArray(backendCategories.value) ? backendCategories.value : (backendCategories.value?.data || [])
-  const homeList = list.filter(c => c.show_on_home !== false)
-  const targetList = homeList.length > 0 ? homeList : list
 
-  if (targetList && targetList.length > 0) {
-    // Display up to 4 categories on the homepage
-    return targetList.slice(0, 4).map((cat, index) => {
+  if (list && list.length > 0) {
+    return list.map((cat, index) => {
       return {
         id: cat.id,
         name: cat.name,
@@ -623,7 +620,7 @@ onUnmounted(() => {
 }
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 30px;
 }
 .category-card {
