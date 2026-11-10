@@ -29,13 +29,38 @@ Route::get('/debug-users', function () {
     ]);
 });
 
+Route::get('/run-migrate', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Migrations executed successfully!',
+            'output' => \Illuminate\Support\Facades\Artisan::output(),
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+});
+
 Route::get('/run-seed', function () {
-    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'AdminSeeder']);
-    return response()->json([
-        'message' => 'AdminSeeder ran successfully!',
-        'output' => \Illuminate\Support\Facades\Artisan::output(),
-        'users_count' => \App\Models\User::count(),
-    ]);
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'AdminSeeder', '--force' => true]);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'AdminSeeder ran successfully!',
+            'output' => \Illuminate\Support\Facades\Artisan::output(),
+            'users_count' => \App\Models\User::count(),
+            'admin_exists' => \App\Models\User::where('email', 'admin@universalpaints.lk')->exists(),
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+        ], 500);
+    }
 });
 
 Route::middleware('auth:sanctum')->group(function () {

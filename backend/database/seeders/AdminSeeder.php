@@ -15,10 +15,12 @@ class AdminSeeder extends Seeder
      */
     public function run()
     {
-        User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@universalpaints.lk',
-            'password' => Hash::make('password123'),
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@universalpaints.lk'],
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('password123'),
+            ]
+        );
     }
 }
