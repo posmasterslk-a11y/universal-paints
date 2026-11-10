@@ -60,7 +60,7 @@ jobs:
           password: ${{ secrets.BACKEND_FTP_PASSWORD }}
           local-dir: ./deploy_dist/
           server-dir: ${{ secrets.BACKEND_FTP_TARGET_DIR }}
-          state-name: .ftp-deploy-sync-state.json
+          state-name: .ftp-zip-deploy-sync-state.json
 
       - name: 🔍 Verify Remote FTP Files & Trigger Extraction
         run: |
@@ -69,16 +69,22 @@ jobs:
             $u = getenv("BACKEND_FTP_USERNAME");
             $p = getenv("BACKEND_FTP_PASSWORD");
             $t = rtrim(getenv("BACKEND_FTP_TARGET_DIR"), "/") . "/";
+
+            $summary = "### FTP Deployment Diagnostics\n- Target Dir: `$t`\n";
             $c = @ftp_connect($s, 21, 30);
-            if ($c && @ftp_login($c, $u, $p)) {
+            if (!$c || !@ftp_login($c, $u, $p)) {
+              $summary .= "- **FTP Connection Failed!**\n";
+            } else {
               @ftp_pasv($c, true);
-              echo "Remote files in $t:\n";
-              $list = @ftp_nlist($c, $t);
-              print_r($list);
-              $pubList = @ftp_nlist($c, $t . "public");
-              echo "Remote files in ${t}public:\n";
-              print_r($pubList);
+              $rootFiles = @ftp_nlist($c, $t) ?: [];
+              $summary .= "- Root files count: " . count($rootFiles) . "\n";
+              $summary .= "```\n" . implode("\n", array_slice($rootFiles, 0, 25)) . "\n```\n";
+              
+              $pubFiles = @ftp_nlist($c, $t . "public") ?: [];
+              $summary .= "- Public files count: " . count($pubFiles) . "\n";
+              $summary .= "```\n" . implode("\n", array_slice($pubFiles, 0, 25)) . "\n```\n";
             }
+            file_put_contents(getenv("GITHUB_STEP_SUMMARY"), $summary);
           '
           echo "Triggering remote extraction via HTTP..."
           URL="https://api.universalpaints.lk/extract.php?key=universal_paints_deploy_secure_key_2026"
