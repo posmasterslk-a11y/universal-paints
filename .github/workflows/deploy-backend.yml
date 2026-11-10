@@ -52,40 +52,49 @@ jobs:
           echo "ZIP and Extractor prepared successfully:"
           ls -lh deploy_dist/
 
-      - name: 📂 Upload ZIP via Proven FTP Action
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.BACKEND_FTP_SERVER }}
-          username: ${{ secrets.BACKEND_FTP_USERNAME }}
-          password: ${{ secrets.BACKEND_FTP_PASSWORD }}
-          local-dir: ./deploy_dist/
-          server-dir: ${{ secrets.BACKEND_FTP_TARGET_DIR }}
-          state-name: .ftp-zip-deploy-sync-state.json
-
-      - name: 🔍 Verify Remote FTP Files & Trigger Extraction
+      - name: 🚀 Upload ZIP via Robust Direct FTP & Trigger Remote Extraction
+        env:
+          BACKEND_FTP_SERVER: ${{ secrets.BACKEND_FTP_SERVER }}
+          BACKEND_FTP_USERNAME: ${{ secrets.BACKEND_FTP_USERNAME }}
+          BACKEND_FTP_PASSWORD: ${{ secrets.BACKEND_FTP_PASSWORD }}
+          BACKEND_FTP_TARGET_DIR: ${{ secrets.BACKEND_FTP_TARGET_DIR }}
         run: |
           php -r '
-            $s = getenv("BACKEND_FTP_SERVER");
-            $u = getenv("BACKEND_FTP_USERNAME");
-            $p = getenv("BACKEND_FTP_PASSWORD");
-            $t = rtrim(getenv("BACKEND_FTP_TARGET_DIR"), "/") . "/";
+            $server = getenv("BACKEND_FTP_SERVER");
+            $user = getenv("BACKEND_FTP_USERNAME");
+            $pass = getenv("BACKEND_FTP_PASSWORD");
+            $target = rtrim(getenv("BACKEND_FTP_TARGET_DIR") ?: "/public_html", "/") . "/";
 
-            $summary = "### FTP Deployment Diagnostics\n- Target Dir: `$t`\n";
-            $c = @ftp_connect($s, 21, 30);
-            if (!$c || !@ftp_login($c, $u, $p)) {
-              $summary .= "- **FTP Connection Failed!**\n";
-            } else {
-              @ftp_pasv($c, true);
-              $rootFiles = @ftp_nlist($c, $t) ?: [];
-              $summary .= "- Root files count: " . count($rootFiles) . "\n";
-              $summary .= "```\n" . implode("\n", array_slice($rootFiles, 0, 25)) . "\n```\n";
-              
-              $pubFiles = @ftp_nlist($c, $t . "public") ?: [];
-              $summary .= "- Public files count: " . count($pubFiles) . "\n";
-              $summary .= "```\n" . implode("\n", array_slice($pubFiles, 0, 25)) . "\n```\n";
+            echo "Connecting to FTP server: $server\n";
+            $conn = @ftp_connect($server, 21, 60);
+            if (!$conn || !@ftp_login($conn, $user, $pass)) {
+                echo "FTP Login failed!\n";
+                exit(1);
             }
-            file_put_contents(getenv("GITHUB_STEP_SUMMARY"), $summary);
+            @ftp_pasv($conn, true);
+
+            // Upload backend.zip
+            $zipDest = $target . "backend.zip";
+            echo "Uploading backend.zip to $zipDest...\n";
+            if (!@ftp_put($conn, $zipDest, "deploy_dist/backend.zip", FTP_BINARY)) {
+                if (!@ftp_put($conn, "backend.zip", "deploy_dist/backend.zip", FTP_BINARY)) {
+                    echo "Failed to upload backend.zip!\n";
+                    exit(1);
+                }
+            }
+            echo "backend.zip uploaded successfully!\n";
+
+            // Upload extractor
+            $extractDest = $target . "extract.php";
+            echo "Uploading extract.php...\n";
+            if (!@ftp_put($conn, $extractDest, "deploy_dist/extract.php", FTP_BINARY)) {
+                @ftp_put($conn, "extract.php", "deploy_dist/extract.php", FTP_BINARY);
+            }
+            @ftp_put($conn, $target . "public/extract.php", "deploy_dist/extract.php", FTP_BINARY);
+            @ftp_close($conn);
+            echo "FTP Upload complete!\n";
           '
+
           echo "Triggering remote extraction via HTTP..."
           URL="https://api.universalpaints.lk/extract.php?key=universal_paints_deploy_secure_key_2026"
           RESPONSE=$(curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$URL")
@@ -104,8 +113,4 @@ jobs:
               echo "The ZIP was uploaded successfully via FTP."
             fi
           fi
-        env:
-          BACKEND_FTP_SERVER: ${{ secrets.BACKEND_FTP_SERVER }}
-          BACKEND_FTP_USERNAME: ${{ secrets.BACKEND_FTP_USERNAME }}
-          BACKEND_FTP_PASSWORD: ${{ secrets.BACKEND_FTP_PASSWORD }}
-          BACKEND_FTP_TARGET_DIR: ${{ secrets.BACKEND_FTP_TARGET_DIR }}
+          echo "Backend deployment completed successfully!"
