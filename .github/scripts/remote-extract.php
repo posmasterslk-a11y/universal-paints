@@ -69,3 +69,4 @@ echo "SUCCESS: Extracted successfully to $baseDir";
 
 // Self delete extractor script
 @unlink(__FILE__);
+

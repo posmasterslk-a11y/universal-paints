@@ -5,3 +5,6 @@ vendor/
 dist/
 .output/
 .nuxt/
+
+backend_deploy.zip
+temp_backend_pkg/
