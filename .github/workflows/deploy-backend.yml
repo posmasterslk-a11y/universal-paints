@@ -62,8 +62,24 @@ jobs:
           server-dir: ${{ secrets.BACKEND_FTP_TARGET_DIR }}
           state-name: .ftp-deploy-sync-state.json
 
-      - name: ⚡ Trigger Remote ZIP Extraction
+      - name: 🔍 Verify Remote FTP Files & Trigger Extraction
         run: |
+          php -r '
+            $s = getenv("BACKEND_FTP_SERVER");
+            $u = getenv("BACKEND_FTP_USERNAME");
+            $p = getenv("BACKEND_FTP_PASSWORD");
+            $t = rtrim(getenv("BACKEND_FTP_TARGET_DIR"), "/") . "/";
+            $c = @ftp_connect($s, 21, 30);
+            if ($c && @ftp_login($c, $u, $p)) {
+              @ftp_pasv($c, true);
+              echo "Remote files in $t:\n";
+              $list = @ftp_nlist($c, $t);
+              print_r($list);
+              $pubList = @ftp_nlist($c, $t . "public");
+              echo "Remote files in ${t}public:\n";
+              print_r($pubList);
+            }
+          '
           echo "Triggering remote extraction via HTTP..."
           URL="https://api.universalpaints.lk/extract.php?key=universal_paints_deploy_secure_key_2026"
           RESPONSE=$(curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$URL")
@@ -82,3 +98,8 @@ jobs:
               exit 1
             fi
           fi
+        env:
+          BACKEND_FTP_SERVER: ${{ secrets.BACKEND_FTP_SERVER }}
+          BACKEND_FTP_USERNAME: ${{ secrets.BACKEND_FTP_USERNAME }}
+          BACKEND_FTP_PASSWORD: ${{ secrets.BACKEND_FTP_PASSWORD }}
+          BACKEND_FTP_TARGET_DIR: ${{ secrets.BACKEND_FTP_TARGET_DIR }}
