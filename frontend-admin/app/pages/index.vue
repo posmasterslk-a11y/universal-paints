@@ -5,7 +5,7 @@
       <p class="text-slate-500 mt-1">Welcome back, {{ user?.name || 'Admin' }}</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <div class="bg-white p-6 rounded-xl shadow-sm flex items-center gap-6">
         <div class="w-14 h-14 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-2xl">
           <i class="fa-solid fa-box-open"></i>
@@ -17,12 +17,22 @@
       </div>
       
       <div class="bg-white p-6 rounded-xl shadow-sm flex items-center gap-6">
-        <div class="w-14 h-14 rounded-xl bg-red-50 text-red-500 flex items-center justify-center text-2xl">
-          <i class="fa-solid fa-shopping-cart"></i>
+        <div class="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-2xl">
+          <i class="fa-solid fa-tags"></i>
         </div>
         <div>
-          <h3 class="text-slate-500 font-semibold text-sm">Total Orders</h3>
-          <p class="text-3xl font-extrabold text-slate-900">{{ orders.length || 0 }}</p>
+          <h3 class="text-slate-500 font-semibold text-sm">Total Categories</h3>
+          <p class="text-3xl font-extrabold text-slate-900">{{ categories.length || 0 }}</p>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl shadow-sm flex items-center gap-6">
+        <div class="w-14 h-14 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center text-2xl">
+          <i class="fa-solid fa-map-location-dot"></i>
+        </div>
+        <div>
+          <h3 class="text-slate-500 font-semibold text-sm">Sales Reps</h3>
+          <p class="text-3xl font-extrabold text-slate-900">{{ salesReps.length || 0 }}</p>
         </div>
       </div>
     </div>
@@ -78,12 +88,17 @@ const products = computed(() => {
   return []
 })
 
-const { data: ordersData } = await useFetch(`${config.public.apiBase}/api/orders`, {
-  headers: computed(() => token?.value ? { Authorization: `Bearer ${token.value}` } : {})
+const { data: categoriesData } = await useFetch(`${config.public.apiBase}/api/categories`)
+const categories = computed(() => {
+  if (Array.isArray(categoriesData.value)) return categoriesData.value
+  if (categoriesData.value?.data && Array.isArray(categoriesData.value.data)) return categoriesData.value.data
+  return []
 })
-const orders = computed(() => {
-  if (Array.isArray(ordersData.value)) return ordersData.value
-  if (ordersData.value?.data && Array.isArray(ordersData.value.data)) return ordersData.value.data
+
+const { data: repsData } = await useFetch(`${config.public.apiBase}/api/sales-reps`)
+const salesReps = computed(() => {
+  if (Array.isArray(repsData.value)) return repsData.value
+  if (repsData.value?.data && Array.isArray(repsData.value.data)) return repsData.value.data
   return []
 })
 </script>
