@@ -7,6 +7,9 @@
     # Allow direct access to /admin
     RewriteRule ^admin(/.*)?$ - [L]
 
+    # Allow direct access to extract deployment scripts
+    RewriteRule ^(extract.*\.php)$ - [L]
+
     # Rewrite root / to public/index.php
     RewriteRule ^$ public/index.php [L]
 

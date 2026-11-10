@@ -7,7 +7,12 @@ on:
     paths:
       - 'frontend-admin/**'
       - '.github/workflows/deploy-frontend-admin.yml'
+      - '.github/scripts/remote-extract-admin.php'
   workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend-admin
+  cancel-in-progress: true
 
 jobs:
   build-and-deploy:
@@ -34,11 +39,69 @@ jobs:
           NUXT_PUBLIC_API_BASE: https://api.universalpaints.lk
         run: npm run generate
 
-      - name: 📂 Sync files via FTP to API /admin
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.BACKEND_FTP_SERVER }}
-          username: ${{ secrets.BACKEND_FTP_USERNAME }}
-          password: ${{ secrets.BACKEND_FTP_PASSWORD }}
-          local-dir: ./frontend-admin/.output/public/
-          server-dir: /public_html/admin/
+      - name: 🗜️ Package Admin to Single ZIP
+        run: |
+          mkdir -p admin_deploy_dist/public
+          cd frontend-admin/.output/public
+          zip -q -r ../../../admin_deploy_dist/admin.zip .
+          cd ../../..
+          cp .github/scripts/remote-extract-admin.php admin_deploy_dist/extract-admin.php
+          cp .github/scripts/remote-extract-admin.php admin_deploy_dist/public/extract-admin.php
+          echo "Admin package prepared:"
+          ls -lh admin_deploy_dist/
+
+      - name: 🚀 Upload ZIP via Robust Direct FTP & Trigger Remote Extraction
+        env:
+          BACKEND_FTP_SERVER: ${{ secrets.BACKEND_FTP_SERVER }}
+          BACKEND_FTP_USERNAME: ${{ secrets.BACKEND_FTP_USERNAME }}
+          BACKEND_FTP_PASSWORD: ${{ secrets.BACKEND_FTP_PASSWORD }}
+          BACKEND_FTP_TARGET_DIR: ${{ secrets.BACKEND_FTP_TARGET_DIR }}
+        run: |
+          php -r '
+            $server = getenv("BACKEND_FTP_SERVER");
+            $user = getenv("BACKEND_FTP_USERNAME");
+            $pass = getenv("BACKEND_FTP_PASSWORD");
+            $target = rtrim(getenv("BACKEND_FTP_TARGET_DIR") ?: "/public_html", "/") . "/";
+
+            echo "Connecting to FTP server: $server\n";
+            $conn = @ftp_connect($server, 21, 60);
+            if (!$conn || !@ftp_login($conn, $user, $pass)) {
+                echo "FTP Login failed!\n";
+                exit(1);
+            }
+            @ftp_pasv($conn, true);
+
+            // Upload admin.zip
+            $zipDest = $target . "admin.zip";
+            echo "Uploading admin.zip to $zipDest...\n";
+            if (!@ftp_put($conn, $zipDest, "admin_deploy_dist/admin.zip", FTP_BINARY)) {
+                // Fallback to relative
+                if (!@ftp_put($conn, "admin.zip", "admin_deploy_dist/admin.zip", FTP_BINARY)) {
+                    echo "Failed to upload admin.zip!\n";
+                    exit(1);
+                }
+            }
+            echo "admin.zip uploaded successfully!\n";
+
+            // Upload extractor
+            $extractDest = $target . "extract-admin.php";
+            echo "Uploading extract-admin.php...\n";
+            if (!@ftp_put($conn, $extractDest, "admin_deploy_dist/extract-admin.php", FTP_BINARY)) {
+                @ftp_put($conn, "extract-admin.php", "admin_deploy_dist/extract-admin.php", FTP_BINARY);
+            }
+            // Also copy to public/
+            @ftp_put($conn, $target . "public/extract-admin.php", "admin_deploy_dist/extract-admin.php", FTP_BINARY);
+            @ftp_close($conn);
+            echo "FTP Upload complete!\n";
+          '
+
+          echo "Triggering remote extraction..."
+          sleep 2
+          RESPONSE=$(curl -s "https://api.universalpaints.lk/extract-admin.php?key=universal_paints_deploy_secure_key_2026" || true)
+          echo "Extraction response: $RESPONSE"
+
+          if [[ "$RESPONSE" != *"SUCCESS"* ]]; then
+            echo "Retrying via public endpoint..."
+            RESPONSE2=$(curl -s "https://api.universalpaints.lk/public/extract-admin.php?key=universal_paints_deploy_secure_key_2026" || true)
+            echo "Public extraction response: $RESPONSE2"
+          fi
