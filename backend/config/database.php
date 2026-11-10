@@ -2,6 +2,43 @@
 
 use Illuminate\Support\Str;
 
+if (!function_exists('db_env_fallback')) {
+    function db_env_fallback($key, $default = '') {
+        $val = env($key);
+        if ($val !== null && $val !== '' && $val !== 'forge') {
+            return $val;
+        }
+
+        $candidates = [
+            base_path('.env'),
+            dirname(base_path()) . '/.env',
+            dirname(__DIR__) . '/.env',
+            (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/../.env' : ''),
+            (isset($_SERVER['DOCUMENT_ROOT']) && $_SERVER['DOCUMENT_ROOT'] ? rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/.env' : ''),
+        ];
+
+        foreach ($candidates as $path) {
+            if (!empty($path) && file_exists($path) && is_readable($path)) {
+                $lines = @file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                if ($lines) {
+                    foreach ($lines as $line) {
+                        $trimmed = trim($line);
+                        if (str_starts_with($trimmed, '#')) {
+                            continue;
+                        }
+                        if (str_starts_with($trimmed, $key . '=')) {
+                            $raw = trim(substr($trimmed, strlen($key . '=')));
+                            return trim($raw, " \"'");
+                        }
+                    }
+                }
+            }
+        }
+
+        return $default;
+    }
+}
+
 return [
 
     /*
@@ -15,7 +52,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => db_env_fallback('DB_CONNECTION', 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -46,11 +83,11 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+            'host' => db_env_fallback('DB_HOST', '127.0.0.1'),
+            'port' => db_env_fallback('DB_PORT', '3306'),
+            'database' => db_env_fallback('DB_DATABASE', 'forge'),
+            'username' => db_env_fallback('DB_USERNAME', 'forge'),
+            'password' => db_env_fallback('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
