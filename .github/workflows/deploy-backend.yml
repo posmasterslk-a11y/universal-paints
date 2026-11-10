@@ -10,6 +10,10 @@ on:
       - '.github/scripts/**'
   workflow_dispatch:
 
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: true
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -22,37 +26,32 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, bcmath, pdo_mysql, zip, gd, ftp
+          extensions: mbstring, bcmath, pdo_mysql, zip, gd, ftp, curl
           tools: composer:v2
 
       - name: 📦 Install Dependencies
         working-directory: ./backend
         run: composer install --no-dev --optimize-autoloader --no-progress --no-interaction
 
-      - name: 📁 Ensure Remote Directories & Reset Sync State
-        run: php .github/scripts/ensure-ftp-dirs.php
+      - name: 🗜️ Package Backend to ZIP
+        working-directory: ./backend
+        run: |
+          zip -q -r ../backend.zip . \
+            -x ".env*" \
+            -x "node_modules/*" \
+            -x ".git/*" \
+            -x "tests/*" \
+            -x "storage/logs/*" \
+            -x "storage/framework/cache/data/*" \
+            -x "storage/framework/sessions/*" \
+            -x "storage/framework/views/*"
+          echo "backend.zip created successfully! Size:"
+          ls -lh ../backend.zip
+
+      - name: 🚀 Upload ZIP & Extract on Remote Server
+        run: php .github/scripts/upload-and-extract.php
         env:
           BACKEND_FTP_SERVER: ${{ secrets.BACKEND_FTP_SERVER }}
           BACKEND_FTP_USERNAME: ${{ secrets.BACKEND_FTP_USERNAME }}
           BACKEND_FTP_PASSWORD: ${{ secrets.BACKEND_FTP_PASSWORD }}
           BACKEND_FTP_TARGET_DIR: ${{ secrets.BACKEND_FTP_TARGET_DIR }}
-
-      - name: 📂 Sync files via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.BACKEND_FTP_SERVER }}
-          username: ${{ secrets.BACKEND_FTP_USERNAME }}
-          password: ${{ secrets.BACKEND_FTP_PASSWORD }}
-          local-dir: ./backend/
-          server-dir: ${{ secrets.BACKEND_FTP_TARGET_DIR }}
-          state-name: .ftp-deploy-sync-state.json
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            .env
-            storage/logs/**
-            storage/framework/cache/data/**
-            storage/framework/sessions/**
-            storage/framework/views/**
-            tests/**
