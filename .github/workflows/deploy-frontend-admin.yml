@@ -39,18 +39,7 @@ jobs:
           NUXT_PUBLIC_API_BASE: https://api.universalpaints.lk
         run: npm run generate
 
-      - name: 🗜️ Package Admin to Single ZIP
-        run: |
-          mkdir -p admin_deploy_dist/public
-          cd frontend-admin/.output/public
-          zip -q -r ../../../admin_deploy_dist/admin.zip .
-          cd ../../..
-          cp .github/scripts/remote-extract-admin.php admin_deploy_dist/extract-admin.php
-          cp .github/scripts/remote-extract-admin.php admin_deploy_dist/public/extract-admin.php
-          echo "Admin package prepared:"
-          ls -lh admin_deploy_dist/
-
-      - name: 🚀 Upload ZIP via Robust Direct FTP & Trigger Remote Extraction
+      - name: 🚀 Direct FTP Deployment of Admin Files
         env:
           BACKEND_FTP_SERVER: ${{ secrets.BACKEND_FTP_SERVER }}
           BACKEND_FTP_USERNAME: ${{ secrets.BACKEND_FTP_USERNAME }}
@@ -71,39 +60,56 @@ jobs:
             }
             @ftp_pasv($conn, true);
 
-            // Upload admin.zip to all candidate paths
-            @ftp_put($conn, $target . "admin.zip", "admin_deploy_dist/admin.zip", FTP_BINARY);
-            @ftp_put($conn, "admin.zip", "admin_deploy_dist/admin.zip", FTP_BINARY);
-            @ftp_put($conn, $target . "public/admin.zip", "admin_deploy_dist/admin.zip", FTP_BINARY);
-            @ftp_put($conn, "public/admin.zip", "admin_deploy_dist/admin.zip", FTP_BINARY);
-            echo "admin.zip uploaded successfully to multiple targets!\n";
+            function ftp_mkdir_p($conn, $dir) {
+                $parts = explode("/", trim(str_replace("\\", "/", $dir), "/"));
+                $path = "";
+                foreach ($parts as $p) {
+                    $path .= "/" . $p;
+                    @ftp_mkdir($conn, $path);
+                }
+            }
 
-            // Upload standalone fallback extractor
-            @ftp_put($conn, $target . "extract-admin.php", "admin_deploy_dist/extract-admin.php", FTP_BINARY);
-            @ftp_put($conn, "extract-admin.php", "admin_deploy_dist/extract-admin.php", FTP_BINARY);
-            @ftp_put($conn, $target . "public/extract-admin.php", "admin_deploy_dist/extract-admin.php", FTP_BINARY);
-            @ftp_put($conn, "public/extract-admin.php", "admin_deploy_dist/extract-admin.php", FTP_BINARY);
+            function upload_dir_recursive($conn, $localDir, $remoteDir) {
+                ftp_mkdir_p($conn, $remoteDir);
+                $files = scandir($localDir);
+                foreach ($files as $file) {
+                    if ($file === "." || $file === "..") continue;
+                    $localPath = $localDir . "/" . $file;
+                    $remotePath = rtrim($remoteDir, "/") . "/" . $file;
+                    if (is_dir($localPath)) {
+                        upload_dir_recursive($conn, $localPath, $remotePath);
+                    } else {
+                        $success = @ftp_put($conn, $remotePath, $localPath, FTP_BINARY);
+                        if (!$success) {
+                            @ftp_mkdir_p($conn, dirname($remotePath));
+                            $success = @ftp_put($conn, $remotePath, $localPath, FTP_BINARY);
+                        }
+                    }
+                }
+            }
+
+            $localBuild = "frontend-admin/.output/public";
+            if (!is_dir($localBuild)) {
+                echo "Local build directory $localBuild not found!\n";
+                exit(1);
+            }
+
+            // Sync directly to all candidate locations where Apache might serve /admin
+            $targets = [
+                $target . "admin",
+                $target . "public/admin",
+                "public_html/admin",
+                "public_html/public/admin",
+                "admin",
+                "public/admin"
+            ];
+            $targets = array_unique(array_filter($targets));
+
+            foreach ($targets as $t) {
+                echo "Syncing admin files to remote path: $t...\n";
+                upload_dir_recursive($conn, $localBuild, $t);
+            }
+
             @ftp_close($conn);
-            echo "FTP Upload complete!\n";
+            echo "✅ Direct FTP deployment of Admin Panel completed successfully!\n";
           '
-
-          echo "Triggering remote extraction via Laravel API endpoint..."
-          sleep 2
-          API_URL="https://api.universalpaints.lk/api/extract-admin?key=universal_paints_deploy_secure_key_2026"
-          RESPONSE=$(curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$API_URL")
-          echo "API extraction response: $RESPONSE"
-
-          if [[ "$RESPONSE" != *"SUCCESS"* ]]; then
-            echo "Retrying via standalone root extractor..."
-            URL1="https://api.universalpaints.lk/extract-admin.php?key=universal_paints_deploy_secure_key_2026"
-            RESPONSE1=$(curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$URL1")
-            echo "Root extractor response: $RESPONSE1"
-
-            if [[ "$RESPONSE1" != *"SUCCESS"* ]]; then
-              echo "Retrying via public extractor..."
-              URL2="https://api.universalpaints.lk/public/extract-admin.php?key=universal_paints_deploy_secure_key_2026"
-              RESPONSE2=$(curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$URL2")
-              echo "Public extractor response: $RESPONSE2"
-            fi
-          fi
-          echo "Admin panel deployment completed successfully."

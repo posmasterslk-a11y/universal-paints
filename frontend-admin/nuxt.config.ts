@@ -1,3 +1,4 @@
+// Admin Panel Nuxt Configuration - Universal Paints
 import tailwindcss from "@tailwindcss/vite";
 
 const now = new Date();
