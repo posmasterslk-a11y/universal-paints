@@ -150,8 +150,11 @@
                   <NuxtLink :to="`/shop/${getProductSlug(product)}`" class="product-title-link">{{ product.name }}</NuxtLink>
                 </h4>
                 <p>{{ product.subtitle || product.description?.substring(0, 75) }}</p>
-                <NuxtLink :to="`/shop/${getProductSlug(product)}`" class="btn btn-outline-red w-100 mt-auto text-center py-2" style="display: block; border-radius: 30px; font-weight: 600; text-decoration: none;">
-                  View More
+                <NuxtLink :to="`/shop/${getProductSlug(product)}`" class="btn btn-outline-red w-100 mt-auto btn-view-more">
+                  <span>View More</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="btn-arrow-icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                  </svg>
                 </NuxtLink>
               </div>
             </div>
@@ -607,6 +610,30 @@ useHead({
   transition: all 0.3s;
 }
 .btn-outline-red:hover { background: #FEF2F2; }
+.btn-view-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  padding: 9px 16px;
+  border-radius: 30px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+.btn-view-more .btn-arrow-icon {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.25s ease;
+}
+.product-card:hover .btn-view-more {
+  background: #E3000F;
+  color: white;
+}
+.product-card:hover .btn-view-more .btn-arrow-icon {
+  transform: translateX(4px);
+}
 
 /* Product Grid Area */
 .products-header {

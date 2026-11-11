@@ -226,7 +226,10 @@
                 <NuxtLink :to="`/shop/${getProductSlug(rel)}`">{{ rel.name }}</NuxtLink>
               </h4>
               <NuxtLink :to="`/shop/${getProductSlug(rel)}`" class="btn-view-more">
-                View More &rarr;
+                <span>View More</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="btn-arrow-icon">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
               </NuxtLink>
             </div>
           </div>
@@ -1002,7 +1005,11 @@ useHead(() => ({
 }
 .rel-info h4 a:hover { color: #E3000F; }
 .btn-view-more {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
   text-align: center;
   padding: 8px 14px;
   border: 1px solid #E3000F;
@@ -1011,11 +1018,21 @@ useHead(() => ({
   font-size: 13px;
   font-weight: 700;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
-.btn-view-more:hover {
+.btn-view-more .btn-arrow-icon {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.25s ease;
+}
+.btn-view-more:hover,
+.product-card:hover .btn-view-more {
   background: #E3000F;
   color: white;
+}
+.btn-view-more:hover .btn-arrow-icon,
+.product-card:hover .btn-view-more .btn-arrow-icon {
+  transform: translateX(4px);
 }
 
 .spinner {

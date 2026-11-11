@@ -167,7 +167,12 @@
                   </span>
                 </div>
                 <div class="view-more-tag mt-auto pt-2">
-                  <span class="text-red font-semibold text-xs">View More →</span>
+                  <span class="view-more-btn">
+                    View More
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                    </svg>
+                  </span>
                 </div>
               </div>
             </NuxtLink>
@@ -866,6 +871,36 @@ onUnmounted(() => {
   text-overflow: ellipsis;
   overflow: hidden;
   max-width: 65px;
+}
+.view-more-tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  padding-top: 10px;
+  width: 100%;
+}
+.view-more-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #E3000F;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.25s ease;
+}
+.view-more-btn svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.25s ease;
+}
+.best-selling-card:hover .view-more-btn {
+  color: #B91C1C;
+  gap: 8px;
+}
+.best-selling-card:hover .view-more-btn svg {
+  transform: translateX(3px);
 }
 .empty-products-box {
   text-align: center;
