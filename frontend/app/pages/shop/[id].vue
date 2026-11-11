@@ -1,5 +1,5 @@
 <template>
-  <div class="product-page" v-if="product">
+  <div class="product-page" v-if="currentProduct">
     <div class="container product-container">
       
       <!-- Top Section -->
@@ -9,135 +9,117 @@
           <div class="breadcrumbs">
             <NuxtLink to="/">Home</NuxtLink>
             <span class="sep">&gt;</span>
-            <NuxtLink to="/shop">Shop</NuxtLink>
+            <NuxtLink to="/shop">Products</NuxtLink>
             <span class="sep">&gt;</span>
-            <NuxtLink :to="'/shop?category=' + product.category">{{ product.category || 'Paints' }}</NuxtLink>
+            <NuxtLink :to="'/shop?category=' + encodeURIComponent(currentProduct.category || '')">{{ currentProduct.category || 'Coatings' }}</NuxtLink>
             <span class="sep">&gt;</span>
-            <span class="current">{{ product.name }}</span>
+            <span class="current">{{ currentProduct.name }}</span>
           </div>
 
           <div class="main-image-wrap">
-            <div class="badge-best-seller" v-if="product.is_best_seller">BEST<br/>SELLER</div>
-            <button class="nav-arrow left-arrow">
+            <div class="badge-best-seller" v-if="currentProduct.is_best_seller">FEATURED</div>
+            <button class="nav-arrow left-arrow" v-if="galleryImages.length > 1" @click="prevImage">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
             </button>
-            <img :src="product.main_image || 'https://placehold.co/400x400/eee/999?text=Product'" :alt="product.name" class="main-image"/>
-            <button class="nav-arrow right-arrow">
+            <img :src="displayedImage" :alt="currentProduct.name" class="main-image" />
+            <button class="nav-arrow right-arrow" v-if="galleryImages.length > 1" @click="nextImage">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
             </button>
           </div>
 
-          <div class="thumbnails" v-if="product.gallery && product.gallery.length > 0">
-            <div class="thumb active">
-              <img :src="product.main_image || 'https://placehold.co/400x400/eee/999?text=Product'" alt="Thumb 1" />
-            </div>
-            <div class="thumb" v-for="(img, idx) in product.gallery" :key="idx">
-              <img :src="img" :alt="'Thumb ' + (idx+2)" />
-            </div>
-            <div class="thumb-more">
-              <span>+2<br/>More</span>
+          <!-- Thumbnails -->
+          <div class="thumbnails" v-if="galleryImages.length > 1">
+            <div 
+              class="thumb" 
+              v-for="(img, idx) in galleryImages" 
+              :key="idx"
+              :class="{ active: currentImageIndex === idx }"
+              @click="currentImageIndex = idx"
+            >
+              <img :src="img" :alt="`${currentProduct.name} - View ${idx + 1}`" />
             </div>
           </div>
         </div>
 
         <!-- Right Column: Info -->
         <div class="product-info">
-          <h1 class="product-title">{{ product.name }}</h1>
-          <p class="product-subtitle">{{ product.subtitle }}</p>
-          
-          <div class="rating-stock">
-            <div class="rating">
-              <span class="stars text-yellow">
-                <svg v-for="i in 4" :key="i" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 opacity-50"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
-              </span>
-              <span class="rating-text">{{ product.rating }} ({{ product.reviews }} reviews)</span>
+          <div class="category-pill-wrap">
+            <span class="category-pill">{{ currentProduct.category || 'Universal Coating' }}</span>
+            <span class="stock-pill" :class="currentProduct.is_in_stock ? 'in-stock' : 'out-stock'">
+              <span class="dot"></span> {{ currentProduct.is_in_stock ? 'In Stock & Available' : 'Made to Order' }}
+            </span>
+          </div>
+
+          <h1 class="product-title">{{ currentProduct.name }}</h1>
+          <p class="product-subtitle" v-if="currentProduct.subtitle">{{ currentProduct.subtitle }}</p>
+
+          <!-- Highlights Bar -->
+          <div class="product-highlights">
+            <div class="highlight-item">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+              <span>100% Original Formula</span>
             </div>
-            <div class="divider">|</div>
-            <div class="stock text-green" v-if="product.is_in_stock">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              In Stock
+            <div class="highlight-item">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
+              <span>Islandwide Delivery</span>
             </div>
-            <div class="stock text-red" v-else>
-              Out of Stock
+            <div class="highlight-item">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+              <span>Wholesale & Trade Rates</span>
             </div>
           </div>
 
-          <div class="price-wrap" v-if="product.price_min || product.price_max">
-            <div class="price text-red">
-              <template v-if="product.price_min && product.price_max && product.price_min !== product.price_max">
-                Rs. {{ product.price_min }} – Rs. {{ product.price_max }}
-              </template>
-              <template v-else>
-                Rs. {{ product.price_min || product.price_max }}
-              </template>
-            </div>
-            <div class="tax-info">Inclusive of all taxes</div>
+          <!-- Short Description -->
+          <p class="description-short">{{ shortDescription }}</p>
+
+          <!-- Key Feature Pills -->
+          <div class="feature-pills" v-if="currentProduct.features && currentProduct.features.length > 0">
+            <span class="feat-pill" v-for="(feat, idx) in currentProduct.features.slice(0, 6)" :key="idx">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
+              {{ feat }}
+            </span>
           </div>
 
-          <p class="description-short">{{ product.description }}</p>
-
-          <div class="feature-badges" v-if="product.features && product.features.length > 0">
-            <div class="badge text-orange" v-for="(feat, idx) in product.features" :key="idx">
-              <span>{{ feat }}</span>
-            </div>
-          </div>
-
-          <div class="selection-group" v-if="product.pack_sizes && product.pack_sizes.length > 0">
-            <h4 class="selection-title">Select Pack Size</h4>
+          <!-- Pack Sizes -->
+          <div class="selection-group" v-if="packSizes.length > 0">
+            <h4 class="selection-title">Available Pack Sizes:</h4>
             <div class="pack-options">
-              <div class="pack-box" v-for="pack in product.pack_sizes" :key="pack.size" :class="{active: selectedPack === pack.size}" @click="selectedPack = pack.size">
-                <span class="pack-size">{{ pack.size }}</span>
-                <span class="pack-price">Rs. {{ pack.price }}</span>
+              <div 
+                class="pack-box" 
+                v-for="pack in packSizes" 
+                :key="pack"
+                :class="{ active: selectedPack === pack }"
+                @click="selectedPack = pack"
+              >
+                <span class="pack-size">{{ pack }}</span>
               </div>
             </div>
           </div>
 
-          <div class="selection-group" v-if="product.colors && product.colors.length > 0">
-            <h4 class="selection-title">Select Color</h4>
-            <div class="color-selection">
-              <div class="color-options">
-                <div class="color-circle" v-for="c in product.colors" :key="c" :style="'background-color: ' + c"></div>
-              </div>
-              <button class="btn-view-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402M6.75 21A3.75 3.75 0 0 1 3 17.25l7.22-7.22C10.554 9.696 11.233 9 12 9c.767 0 1.446.696 1.78 1.03l6.402 6.402" /></svg>
-                View All Colors
-              </button>
-            </div>
-          </div>
-
+          <!-- CTA Buttons -->
           <div class="actions-group">
-            <div class="qty-selector">
-              <button class="qty-btn" @click="qty > 1 ? qty-- : null">-</button>
-              <input type="text" class="qty-input" v-model="qty" readonly/>
-              <button class="qty-btn" @click="qty++">+</button>
-            </div>
-            <button class="btn btn-red btn-add-cart" @click="addToCart">Add to Cart 🛒</button>
-            <button class="btn btn-outline-red btn-buy-now">Buy Now 💳</button>
+            <button class="btn btn-red btn-quote" @click="openQuoteModal">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a.75.75 0 0 1-.974-.94 4.053 4.053 0 0 0 .546-1.382A8.957 8.957 0 0 1 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" /></svg>
+              Request a Free Quote
+            </button>
+            <a :href="whatsappUrl" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">
+              <i class="fa-brands fa-whatsapp text-lg"></i>
+              WhatsApp Inquiry
+            </a>
           </div>
 
-          <div class="trust-badges">
-            <div class="trust-badge">
-              <svg class="text-green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
-              Secure Payment
+          <!-- Sales Rep Locator Link -->
+          <div class="reps-box">
+            <div class="reps-box-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
             </div>
-            <div class="trust-badge">
-              <svg class="text-green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-              Original Products
+            <div class="reps-box-text">
+              <strong>Need trade pricing or delivery in your area?</strong>
+              <p>Connect with your assigned Universal Paints district representative.</p>
             </div>
-            <div class="trust-badge">
-              <svg class="text-green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
-              Fast Delivery
-            </div>
-          </div>
-          
-          <div class="share-actions">
-            <span>Share:</span>
-            <div class="social-icons">
-              <div class="s-icon bg-blue"><svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></div>
-              <div class="s-icon bg-light-blue"><svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg></div>
-              <div class="s-icon bg-red"><svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.283c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/></svg></div>
-            </div>
+            <NuxtLink to="/sales-representatives" class="btn-rep-link">
+              Find Rep &rarr;
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -145,122 +127,117 @@
       <!-- Tabs Section -->
       <div class="product-tabs-section">
         <div class="tabs-nav">
-          <button class="tab-btn active">Description</button>
-          <button class="tab-btn">Key Features</button>
-          <button class="tab-btn">Technical Details</button>
-          <button class="tab-btn">How to Use</button>
-          <button class="tab-btn">Reviews ({{ product.reviews }})</button>
-          <button class="tab-btn">FAQs</button>
+          <button 
+            class="tab-btn" 
+            :class="{ active: activeTab === 'description' }"
+            @click="activeTab = 'description'"
+          >
+            Description & Overview
+          </button>
+          <button 
+            class="tab-btn" 
+            :class="{ active: activeTab === 'features' }"
+            @click="activeTab = 'features'"
+          >
+            Key Features ({{ currentProduct.features?.length || 0 }})
+          </button>
+          <button 
+            class="tab-btn" 
+            :class="{ active: activeTab === 'application' }"
+            @click="activeTab = 'application'"
+          >
+            Application & Preparation
+          </button>
         </div>
+
         <div class="tab-content">
-          <div class="tab-pane active description-pane">
-            <div class="desc-text-col">
-              <p>{{ product.description }}</p>
-              <ul class="desc-features" v-if="product.features && product.features.length > 0">
-                <li v-for="(feat, idx) in product.features" :key="idx">
-                  <svg class="w-5 h-5 text-green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
-                  {{ feat }}
-                </li>
-              </ul>
+          <!-- Description Tab -->
+          <div class="tab-pane" v-if="activeTab === 'description'">
+            <div class="content-body" v-html="formattedDescription"></div>
+          </div>
+
+          <!-- Key Features Tab -->
+          <div class="tab-pane" v-if="activeTab === 'features'">
+            <div class="features-grid-list" v-if="currentProduct.features && currentProduct.features.length > 0">
+              <div class="feat-card" v-for="(feat, idx) in currentProduct.features" :key="idx">
+                <div class="feat-check">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                </div>
+                <span>{{ feat }}</span>
+              </div>
             </div>
-            <div class="desc-img-col">
-              <img src="/images/products/interior.webp" alt="Interior Application" />
+            <p v-else class="text-gray-500">Contact our technical department for detailed specifications.</p>
+          </div>
+
+          <!-- Application Tab -->
+          <div class="tab-pane" v-if="activeTab === 'application'">
+            <div class="app-steps">
+              <div class="app-step">
+                <span class="step-num">1</span>
+                <div>
+                  <h4>Surface Preparation</h4>
+                  <p>Ensure the substrate is clean, dry, and free of dirt, oil, efflorescence, grease, and loose paint flakes. Repair cracks with Universal Paints Premium Wall Filler.</p>
+                </div>
+              </div>
+              <div class="app-step">
+                <span class="step-num">2</span>
+                <div>
+                  <h4>Primer Application</h4>
+                  <p>Apply one coat of suitable Universal Paints Primer / Undercoat to seal porous masonry surfaces and ensure maximum adhesion and topcoat longevity.</p>
+                </div>
+              </div>
+              <div class="app-step">
+                <span class="step-num">3</span>
+                <div>
+                  <h4>Topcoat Application</h4>
+                  <p>Stir paint thoroughly before use. Apply 2 uniform coats using roller, brush, or spray equipment. Allow 3 to 4 hours drying time between coats.</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
     
-    <!-- Cross Sell Section -->
-    <section class="cross-sell-section container">
-      <h2 class="section-title text-center">Complete Your Painting System</h2>
-      <div class="cross-sell-grid">
-        <div class="cs-card">
-          <div class="cs-img"><img src="/images/contact-us-page/paint-bucket.webp" alt="Primer" /></div>
-          <div class="cs-info">
-            <h5>Surface Primer</h5>
-            <p>Strong adhesion and better finish</p>
-            <div class="cs-price">Rs. 4,250</div>
-            <button class="btn-outline-red btn-cs-add">Add to Cart</button>
-          </div>
+    <!-- Related Products -->
+    <section class="related-section container" v-if="relatedProducts.length > 0">
+      <div class="related-header">
+        <div>
+          <span class="sub-label">Recommended for you</span>
+          <h2 class="section-title">Explore Related Coatings</h2>
         </div>
-        <div class="cs-card">
-          <div class="cs-img"><img src="/images/contact-us-page/paint-bucket.webp" alt="Putty" /></div>
-          <div class="cs-info">
-            <h5>Wall Putty</h5>
-            <p>Smoothens surface for perfect finish</p>
-            <div class="cs-price">Rs. 2,450</div>
-            <button class="btn-outline-red btn-cs-add">Add to Cart</button>
-          </div>
-        </div>
-        <div class="cs-card">
-          <div class="cs-img"><img src="https://placehold.co/100x100/eee/999?text=Roller" alt="Roller" /></div>
-          <div class="cs-info">
-            <h5>Paint Roller</h5>
-            <p>For smooth and even application</p>
-            <div class="cs-price">Rs. 750</div>
-            <button class="btn-outline-red btn-cs-add">Add to Cart</button>
-          </div>
-        </div>
-        <div class="cs-card">
-          <div class="cs-img"><img src="https://placehold.co/100x100/eee/999?text=Brush" alt="Brush" /></div>
-          <div class="cs-info">
-            <h5>Paint Brush</h5>
-            <p>High quality brush for best results</p>
-            <div class="cs-price">Rs. 350</div>
-            <button class="btn-outline-red btn-cs-add">Add to Cart</button>
+        <NuxtLink to="/shop" class="view-all-link">View Full Catalog &rarr;</NuxtLink>
+      </div>
+      <div class="related-grid">
+        <div class="product-card" v-for="rel in relatedProducts" :key="rel.id">
+          <NuxtLink :to="`/shop/${rel.id}`" class="product-img-wrap">
+            <img :src="rel.main_image || '/images/logo/Logo.webp'" :alt="rel.name" loading="lazy" />
+          </NuxtLink>
+          <div class="rel-info">
+            <span class="rel-cat">{{ rel.category || 'Coating' }}</span>
+            <h4>
+              <NuxtLink :to="`/shop/${rel.id}`">{{ rel.name }}</NuxtLink>
+            </h4>
+            <NuxtLink :to="`/shop/${rel.id}`" class="btn-view-more">
+              View More &rarr;
+            </NuxtLink>
           </div>
         </div>
       </div>
     </section>
+  </div>
 
-    <!-- Features Banner -->
-    <section class="shop-features">
-      <div class="container features-wrap">
-        <div class="feature-item">
-          <div class="feature-icon text-red">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" /></svg>
-          </div>
-          <div class="feature-text">
-            <strong>100% Original Products</strong>
-            <span>Guaranteed Quality</span>
-          </div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon text-blue">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
-          </div>
-          <div class="feature-text">
-            <strong>Secure Payments</strong>
-            <span>Safe & Secure Checkout</span>
-          </div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon text-orange">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
-          </div>
-          <div class="feature-text">
-            <strong>Fast Delivery</strong>
-            <span>Islandwide Delivery</span>
-          </div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon text-green">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
-          </div>
-          <div class="feature-text">
-            <strong>Expert Support</strong>
-            <span>We're Here to Help</span>
-          </div>
-        </div>
-      </div>
-    </section>
+  <!-- Loading State -->
+  <div class="loading-state container py-20 text-center" v-else-if="pending">
+    <div class="spinner"></div>
+    <p class="mt-4 text-gray-600 font-semibold">Loading product details...</p>
   </div>
-  <div class="loading-state" v-else-if="pending">
-    <p>Loading product details...</p>
-  </div>
-  <div class="error-state" v-else>
-    <p>Product not found.</p>
+
+  <!-- Error State -->
+  <div class="error-state container py-20 text-center" v-else>
+    <h2 class="text-2xl font-bold text-gray-900 mb-2">Product Not Found</h2>
+    <p class="text-gray-500 mb-6">The requested product could not be loaded or may have been updated.</p>
+    <NuxtLink to="/shop" class="btn btn-red inline-block">Return to Catalog</NuxtLink>
   </div>
 </template>
 
@@ -270,47 +247,108 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const config = useRuntimeConfig()
-const { data: product, pending, error } = await useFetch(`${config.public.apiBase}/api/products/${route.params.id}`)
 
-const selectedPack = ref('20L')
-const qty = ref(1)
+const cleanApiBase = computed(() => (config.public.apiBase || 'https://api.universalpaints.lk').replace(/\/api\/?$/, ''))
 
-const cart = useState('cart', () => [])
-const isCartOpen = useState('cartOpen', () => false)
+// Fetch current product
+const { data: productData, pending, error } = await useFetch(
+  () => `${cleanApiBase.value}/api/products/${route.params.id}`,
+  { key: `product-${route.params.id}` }
+)
 
-const addToCart = () => {
-  if (!product.value) return
-  
-  const price = product.value.pack_sizes?.find(p => p.size === selectedPack.value)?.price || product.value.price_min
+const currentProduct = computed(() => productData.value?.data || productData.value || null)
 
-  const newItem = {
-    id: product.value.id,
-    name: product.value.name,
-    image: product.value.main_image || 'https://placehold.co/400x400/eee/999?text=Product',
-    price: price,
-    qty: qty.value,
-    pack_size: selectedPack.value
+// Fetch related products
+const { data: allProductsData } = await useFetch(
+  () => `${cleanApiBase.value}/api/products`,
+  { key: 'all-products-for-related' }
+)
+
+const relatedProducts = computed(() => {
+  const list = Array.isArray(allProductsData.value) ? allProductsData.value : (allProductsData.value?.data || [])
+  return list.filter(p => String(p.id) !== String(route.params.id)).slice(0, 4)
+})
+
+// Gallery Images
+const currentImageIndex = ref(0)
+const galleryImages = computed(() => {
+  if (!currentProduct.value) return []
+  const imgs = []
+  if (currentProduct.value.main_image) {
+    imgs.push(currentProduct.value.main_image)
   }
-
-  const existingItemIndex = cart.value.findIndex(item => item.id === newItem.id && item.pack_size === newItem.pack_size)
-  
-  if (existingItemIndex > -1) {
-    cart.value[existingItemIndex].qty += newItem.qty
-  } else {
-    cart.value.push(newItem)
+  if (Array.isArray(currentProduct.value.gallery)) {
+    currentProduct.value.gallery.forEach(img => {
+      if (img && !imgs.includes(img)) imgs.push(img)
+    })
   }
+  return imgs.length > 0 ? imgs : ['/images/logo/Logo.webp']
+})
 
-  isCartOpen.value = true
+const displayedImage = computed(() => {
+  return galleryImages.value[currentImageIndex.value] || currentProduct.value?.main_image || '/images/logo/Logo.webp'
+})
+
+const nextImage = () => {
+  if (galleryImages.value.length <= 1) return
+  currentImageIndex.value = (currentImageIndex.value + 1) % galleryImages.value.length
 }
 
+const prevImage = () => {
+  if (galleryImages.value.length <= 1) return
+  currentImageIndex.value = (currentImageIndex.value - 1 + galleryImages.value.length) % galleryImages.value.length
+}
+
+// Active Tab
+const activeTab = ref('description')
+
+// Pack sizes
+const packSizes = computed(() => {
+  if (!currentProduct.value) return []
+  if (Array.isArray(currentProduct.value.pack_sizes) && currentProduct.value.pack_sizes.length > 0) {
+    return currentProduct.value.pack_sizes.map(p => typeof p === 'object' ? p.size : String(p))
+  }
+  return ['1L', '4L', '10L', '20L']
+})
+
+const selectedPack = ref('4L')
+
+// Formatting
+const shortDescription = computed(() => {
+  if (!currentProduct.value?.description) return ''
+  const firstPara = currentProduct.value.description.split('\n')[0]
+  return firstPara.length > 250 ? firstPara.substring(0, 250) + '...' : firstPara
+})
+
+const formattedDescription = computed(() => {
+  if (!currentProduct.value?.description) return '<p>No description provided.</p>'
+  return currentProduct.value.description
+    .split('\n\n')
+    .map(p => `<p class="mb-4 leading-relaxed">${p.replace(/\n/g, '<br/>')}</p>`)
+    .join('')
+})
+
+// Quote modal state
+const isQuotePopupOpen = useState('quotePopup', () => false)
+const openQuoteModal = () => {
+  isQuotePopupOpen.value = true
+}
+
+// WhatsApp link
+const whatsappUrl = computed(() => {
+  const name = currentProduct.value?.name || 'paint product'
+  const text = encodeURIComponent(`Hello Universal Paints! I am interested in getting a price quotation and dealer information for: ${name}.`)
+  return `https://wa.me/94112099055?text=${text}`
+})
+
 // SEO & Structured Data
-const pageTitle = computed(() => product.value?.name ? `${product.value.name} | Universal Paints Sri Lanka` : 'Paint Product Details | Universal Paints')
-const pageDesc = computed(() => product.value?.description ? product.value.description.substring(0, 160).replace(/\s+/g, ' ').trim() : 'Premium architectural and decorative coatings by Universal Paints Sri Lanka.')
-const pageImage = computed(() => product.value?.main_image || 'https://universalpaints.lk/images/og-image.jpg')
+const pageTitle = computed(() => currentProduct.value?.name ? `${currentProduct.value.name} | Universal Paints Sri Lanka` : 'Paint Product Details | Universal Paints')
+const pageDesc = computed(() => currentProduct.value?.description ? currentProduct.value.description.substring(0, 160).replace(/\s+/g, ' ').trim() : 'Premium architectural and decorative coatings by Universal Paints Sri Lanka.')
+const pageImage = computed(() => displayedImage.value)
 const canonicalUrl = computed(() => `https://universalpaints.lk/shop/${route.params.id}`)
 
 useSeoMeta({
-  title: () => product.value?.name || 'Paint Product Details',
+  title: () => currentProduct.value?.name || 'Product Details',
   ogTitle: pageTitle,
   description: pageDesc,
   ogDescription: pageDesc,
@@ -333,8 +371,8 @@ useHead({
       children: computed(() => JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'Product',
-        name: product.value?.name || 'Universal Paints Product',
-        image: product.value?.main_image ? [product.value.main_image] : ['https://universalpaints.lk/images/og-image.jpg'],
+        name: currentProduct.value?.name || 'Universal Paints Product',
+        image: galleryImages.value,
         description: pageDesc.value,
         sku: `UP-${route.params.id}`,
         brand: {
@@ -344,9 +382,7 @@ useHead({
         offers: {
           '@type': 'AggregateOffer',
           priceCurrency: 'LKR',
-          lowPrice: Number(product.value?.price_min) || 0,
-          highPrice: Number(product.value?.price_max) || Number(product.value?.price_min) || 0,
-          availability: product.value?.is_in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+          availability: currentProduct.value?.is_in_stock ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder',
           seller: {
             '@type': 'Organization',
             name: 'Universal Paints (Pvt) Ltd',
@@ -361,18 +397,20 @@ useHead({
 
 <style scoped>
 .product-page {
-  padding: 60px 0;
-  background-color: #FAFAFA;
+  padding: 50px 0 80px;
+  background-color: #F8FAFC;
 }
 .product-container {
   background: white;
-  padding: 0;
   border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  border: 1px solid #F1F5F9;
+  overflow: hidden;
 }
 .product-top {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 50px;
   padding: 40px;
 }
 
@@ -382,42 +420,50 @@ useHead({
   color: #64748B;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
-.breadcrumbs a { color: #64748B; text-decoration: none; }
+.breadcrumbs a { color: #64748B; text-decoration: none; transition: color 0.2s; }
 .breadcrumbs a:hover { color: #E3000F; }
-.breadcrumbs .current { color: #E3000F; font-weight: 500; }
+.breadcrumbs .current { color: #0F172A; font-weight: 600; }
 .sep { color: #CBD5E1; }
 
 .main-image-wrap {
   position: relative;
-  background: #F1F5F9;
-  border-radius: 16px;
-  padding: 40px;
+  background: #F8FAFC;
+  border-radius: 20px;
+  border: 1px solid #E2E8F0;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 500px;
-  margin-bottom: 20px;
+  aspect-ratio: 16 / 10;
+  max-height: 480px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 16px;
+  transition: transform 0.3s ease;
+}
+.main-image:hover {
+  transform: scale(1.02);
 }
 .badge-best-seller {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 16px;
+  left: 16px;
   background: #E3000F;
   color: white;
   font-weight: 800;
-  font-size: 12px;
-  padding: 10px;
-  border-radius: 8px;
-  line-height: 1.2;
-  text-align: center;
-}
-.main-image {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  padding: 6px 14px;
+  border-radius: 30px;
+  box-shadow: 0 4px 10px rgba(227, 0, 15, 0.3);
 }
 .nav-arrow {
   position: absolute;
@@ -425,163 +471,484 @@ useHead({
   transform: translateY(-50%);
   background: white;
   border: 1px solid #E2E8F0;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: #475569;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.2s;
 }
-.nav-arrow:hover { color: #0F172A; border-color: #CBD5E1; }
-.left-arrow { left: 20px; }
-.right-arrow { right: 20px; }
+.nav-arrow:hover {
+  background: #E3000F;
+  color: white;
+  border-color: #E3000F;
+}
+.left-arrow { left: 16px; }
+.right-arrow { right: 16px; }
 .nav-arrow svg { width: 20px; height: 20px; }
 
 .thumbnails {
   display: flex;
-  gap: 16px;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
 }
 .thumb {
-  flex: 1;
-  height: 100px;
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
   border-radius: 12px;
-  border: 2px solid transparent;
+  border: 2px solid #E2E8F0;
   background: #F8FAFC;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
+  transition: all 0.2s;
 }
 .thumb img { width: 100%; height: 100%; object-fit: cover; }
-.thumb.active { border-color: #E3000F; }
-.thumb-more {
-  flex: 1;
-  height: 100px;
-  border-radius: 12px;
-  background: #F1F5F9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 700;
-  color: #0F172A;
-  text-align: center;
-  cursor: pointer;
-}
+.thumb:hover { border-color: #CBD5E1; }
+.thumb.active { border-color: #E3000F; box-shadow: 0 0 0 1px #E3000F; }
 
 /* Right Column: Info */
 .product-info {
   display: flex;
   flex-direction: column;
 }
-.product-title { font-size: 36px; font-weight: 800; color: #0F172A; margin: 0 0 8px 0; }
-.product-subtitle { font-size: 16px; color: #475569; margin: 0 0 20px 0; }
-.rating-stock { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
-.rating { display: flex; align-items: center; gap: 8px; }
-.stars { display: flex; color: #F59E0B; }
-.w-5 { width: 20px; } .h-5 { height: 20px; } .opacity-50 { opacity: 0.5; }
-.text-yellow { color: #F59E0B; }
-.rating-text { font-size: 14px; color: #475569; font-weight: 500; }
-.divider { color: #E2E8F0; }
-.stock { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; }
-.text-green { color: #10B981; }
+.category-pill-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.category-pill {
+  display: inline-block;
+  background: #FEF2F2;
+  color: #E3000F;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.stock-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.stock-pill .dot { width: 8px; height: 8px; border-radius: 50%; }
+.stock-pill.in-stock { background: #ECFDF5; color: #059669; }
+.stock-pill.in-stock .dot { background: #10B981; }
+.stock-pill.out-stock { background: #FFF7ED; color: #D97706; }
+.stock-pill.out-stock .dot { background: #F59E0B; }
 
-.price-wrap { margin-bottom: 24px; }
-.price { font-size: 28px; font-weight: 800; color: #E3000F; margin-bottom: 4px; }
-.tax-info { font-size: 13px; color: #64748B; }
+.product-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.25;
+  margin: 0 0 10px 0;
+}
+.product-subtitle {
+  font-size: 15px;
+  color: #64748B;
+  margin: 0 0 20px 0;
+}
 
-.description-short { font-size: 15px; color: #475569; line-height: 1.6; margin-bottom: 30px; }
+.product-highlights {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  background: #F8FAFC;
+  border: 1px solid #F1F5F9;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 24px;
+}
+.highlight-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+}
+.highlight-item svg { width: 18px; height: 18px; color: #E3000F; flex-shrink: 0; }
 
-.feature-badges { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; margin-bottom: 30px; border-bottom: 1px solid #F1F5F9; padding-bottom: 30px; }
-.badge { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #0F172A; line-height: 1.2; }
-.badge svg { width: 32px; height: 32px; flex-shrink: 0; }
-.text-orange svg { color: #F59E0B; }
-.text-blue svg { color: #3B82F6; }
-.text-purple svg { color: #8B5CF6; }
+.description-short {
+  font-size: 15px;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
 
-.selection-group { margin-bottom: 30px; }
-.selection-title { font-size: 15px; font-weight: 700; color: #0F172A; margin: 0 0 16px 0; }
-.pack-options { display: flex; gap: 16px; }
-.pack-box { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+.feature-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.feat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #F1F5F9;
+  color: #1E293B;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+.feat-pill svg { color: #10B981; width: 14px; height: 14px; }
+
+.selection-group {
+  margin-bottom: 24px;
+}
+.selection-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0 0 10px 0;
+}
+.pack-options {
+  display: flex;
+  gap: 10px;
+}
+.pack-box {
+  padding: 8px 18px;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 10px;
+  cursor: pointer;
+  background: white;
+  transition: all 0.2s;
+}
 .pack-box:hover { border-color: #CBD5E1; }
-.pack-box.active { border-color: #E3000F; box-shadow: 0 0 0 1px #E3000F; }
-.pack-size { font-size: 16px; font-weight: 700; color: #0F172A; margin-bottom: 4px; }
-.pack-price { font-size: 12px; color: #64748B; }
+.pack-box.active {
+  border-color: #E3000F;
+  background: #FEF2F2;
+  color: #E3000F;
+}
+.pack-size { font-size: 14px; font-weight: 700; }
 
-.color-selection { display: flex; align-items: center; justify-content: space-between; }
-.color-options { display: flex; gap: 10px; }
-.color-circle { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 1px solid #E2E8F0; }
-.btn-view-colors { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.actions-group {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.btn {
+  height: 50px;
+  padding: 0 24px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: none;
+}
+.btn-red {
+  background: #E3000F;
+  color: white;
+  box-shadow: 0 6px 20px rgba(227, 0, 15, 0.25);
+  flex: 1.2;
+}
+.btn-red:hover {
+  background: #C8000D;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(227, 0, 15, 0.35);
+}
+.btn-whatsapp {
+  background: #25D366;
+  color: white;
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.25);
+  flex: 1;
+}
+.btn-whatsapp:hover {
+  background: #20BA5A;
+  transform: translateY(-2px);
+}
 
-.actions-group { display: flex; gap: 16px; margin-bottom: 30px; }
-.qty-selector { display: flex; align-items: center; border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden; }
-.qty-btn { width: 40px; height: 48px; background: white; border: none; font-size: 18px; color: #475569; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-.qty-input { width: 40px; height: 48px; border-top: none; border-bottom: none; border-left: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; text-align: center; font-size: 16px; font-weight: 600; color: #0F172A; }
-.btn { height: 48px; padding: 0 24px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; flex: 1; }
-.btn-red { background: #E3000F; color: white; border: none; box-shadow: 0 4px 12px rgba(227, 0, 15, 0.2); }
-.btn-outline-red { background: transparent; color: #E3000F; border: 1px solid #E3000F; }
-
-.trust-badges { display: flex; gap: 24px; padding-bottom: 24px; border-bottom: 1px solid #F1F5F9; margin-bottom: 24px; }
-.trust-badge { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #475569; }
-.trust-badge svg { width: 18px; height: 18px; }
-
-.share-actions { display: flex; align-items: center; gap: 16px; }
-.share-actions > span { font-size: 14px; font-weight: 600; color: #0F172A; }
-.social-icons { display: flex; gap: 12px; }
-.s-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; }
-.bg-blue { background-color: #1877F2; }
-.bg-light-blue { background-color: #1DA1F2; }
-.bg-red { background-color: #E60023; }
-.w-4 { width: 16px; } .h-4 { height: 16px; }
+.reps-box {
+  background: #F8FAFC;
+  border: 1px dashed #CBD5E1;
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: auto;
+}
+.reps-box-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #FEF2F2;
+  color: #E3000F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.reps-box-icon svg { width: 22px; height: 22px; }
+.reps-box-text { flex-grow: 1; }
+.reps-box-text strong { display: block; font-size: 13px; color: #0F172A; }
+.reps-box-text p { font-size: 12px; color: #64748B; margin: 2px 0 0; }
+.btn-rep-link {
+  color: #E3000F;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 6px 12px;
+  background: white;
+  border: 1px solid #FCA5A5;
+  border-radius: 20px;
+  transition: all 0.2s;
+}
+.btn-rep-link:hover {
+  background: #E3000F;
+  color: white;
+}
 
 /* Tabs Section */
-.product-tabs-section { padding: 40px; }
-.tabs-nav { display: flex; border-bottom: 1px solid #E2E8F0; gap: 32px; margin-bottom: 30px; overflow-x: auto; }
-.tab-btn { background: none; border-top: none; border-left: none; border-right: none; padding: 0 0 16px 0; font-size: 15px; font-weight: 600; color: #475569; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.3s; }
+.product-tabs-section {
+  padding: 40px;
+  border-top: 1px solid #F1F5F9;
+}
+.tabs-nav {
+  display: flex;
+  border-bottom: 2px solid #F1F5F9;
+  gap: 32px;
+  margin-bottom: 30px;
+  overflow-x: auto;
+}
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 0 0 16px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #64748B;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
 .tab-btn:hover { color: #0F172A; }
-.tab-btn.active { color: #E3000F; border-bottom-color: #E3000F; }
+.tab-btn.active {
+  color: #E3000F;
+  border-bottom-color: #E3000F;
+  font-weight: 700;
+}
 
-.description-pane { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
-.desc-text-col p { font-size: 15px; color: #475569; line-height: 1.6; margin-bottom: 24px; }
-.desc-features { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px; }
-.desc-features li { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; color: #0F172A; }
-.desc-img-col img { width: 100%; border-radius: 16px; object-fit: cover; }
+.content-body {
+  font-size: 15px;
+  color: #475569;
+  line-height: 1.7;
+  max-width: 900px;
+}
 
-/* Cross Sell Section */
-.cross-sell-section { margin-top: 60px; margin-bottom: 60px; }
-.section-title { font-size: 24px; font-weight: 800; color: #0F172A; margin-bottom: 30px; text-align: center; }
-.cross-sell-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-.cs-card { background: white; border: 1px solid #E2E8F0; border-radius: 16px; overflow: hidden; display: flex; align-items: center; padding: 20px; gap: 20px; transition: all 0.3s; }
-.cs-card:hover { box-shadow: 0 12px 24px rgba(0,0,0,0.06); border-color: #CBD5E1; }
-.cs-img { width: 80px; height: 80px; flex-shrink: 0; background: #F8FAFC; border-radius: 12px; display: flex; justify-content: center; align-items: center; }
-.cs-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
-.cs-info { display: flex; flex-direction: column; flex-grow: 1; }
-.cs-info h5 { font-size: 15px; font-weight: 700; color: #0F172A; margin: 0 0 4px 0; }
-.cs-info p { font-size: 12px; color: #64748B; line-height: 1.4; margin: 0 0 10px 0; }
-.cs-price { font-size: 15px; font-weight: 800; color: #0F172A; margin-bottom: 12px; }
-.btn-cs-add { height: 32px; padding: 0 16px; font-size: 12px; border-radius: 16px; }
+.features-grid-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.feat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: #F8FAFC;
+  border-radius: 12px;
+  border: 1px solid #F1F5F9;
+}
+.feat-check {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ECFDF5;
+  color: #10B981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.feat-check svg { width: 16px; height: 16px; }
+.feat-card span { font-size: 14px; font-weight: 600; color: #1E293B; }
 
-/* Features Banner */
-.shop-features { padding: 60px 0; background-color: white; border-top: 1px solid #F1F5F9; }
-.features-wrap { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
-.feature-item { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 200px; }
-.feature-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background-color: #F8FAFC; }
-.feature-icon svg { width: 24px; height: 24px; }
-.feature-text { display: flex; flex-direction: column; gap: 4px; }
-.feature-text strong { font-size: 15px; font-weight: 700; color: #0F172A; }
-.feature-text span { font-size: 13px; color: #64748B; }
+.app-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.app-step {
+  background: #F8FAFC;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #F1F5F9;
+  position: relative;
+}
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #E3000F;
+  color: white;
+  font-weight: 800;
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+.app-step h4 { font-size: 16px; font-weight: 700; color: #0F172A; margin: 0 0 8px; }
+.app-step p { font-size: 13px; color: #64748B; line-height: 1.6; margin: 0; }
+
+/* Related Section */
+.related-section {
+  margin-top: 60px;
+}
+.related-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 30px;
+}
+.sub-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #E3000F;
+  letter-spacing: 1px;
+}
+.section-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 4px 0 0;
+}
+.view-all-link {
+  font-size: 14px;
+  font-weight: 700;
+  color: #E3000F;
+  text-decoration: none;
+}
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+.product-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #F1F5F9;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
+}
+.product-img-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #F8FAFC;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  text-decoration: none;
+}
+.product-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.product-card:hover .product-img-wrap img {
+  transform: scale(1.04);
+}
+.rel-info {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.rel-cat {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #E3000F;
+  margin-bottom: 4px;
+}
+.rel-info h4 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 14px;
+  line-height: 1.4;
+  flex-grow: 1;
+}
+.rel-info h4 a {
+  color: #0F172A;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.rel-info h4 a:hover { color: #E3000F; }
+.btn-view-more {
+  display: block;
+  text-align: center;
+  padding: 8px 14px;
+  border: 1px solid #E3000F;
+  color: #E3000F;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-view-more:hover {
+  background: #E3000F;
+  color: white;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #F3F4F6;
+  border-top-color: #E3000F;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 
 @media (max-width: 991px) {
-  .product-top { grid-template-columns: 1fr; }
-  .description-pane { grid-template-columns: 1fr; }
-  .cross-sell-grid { grid-template-columns: repeat(2, 1fr); }
+  .product-top { grid-template-columns: 1fr; gap: 30px; padding: 24px; }
+  .product-highlights { grid-template-columns: 1fr; }
+  .features-grid-list { grid-template-columns: 1fr; }
+  .app-steps { grid-template-columns: 1fr; }
+  .related-grid { grid-template-columns: repeat(2, 1fr); }
 }
-@media (max-width: 768px) {
-  .cross-sell-grid { grid-template-columns: 1fr; }
-  .features-wrap { flex-direction: column; gap: 30px; }
+@media (max-width: 640px) {
+  .actions-group { flex-direction: column; }
+  .related-grid { grid-template-columns: 1fr; }
+  .product-tabs-section { padding: 24px 16px; }
+  .product-title { font-size: 24px; }
 }
 </style>
