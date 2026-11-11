@@ -52,6 +52,8 @@ jobs:
           # Ensure this path is relative to your FTP user's root. 
           # If your FTP user lands in the home directory, it should be /web_app/
           server-dir: /web_app/
+          # 10 minute timeout for stable upload of all chunk assets
+          timeout: 600000
           # Override default exclude so .output/server/node_modules gets uploaded
           exclude: |
             **/.git*
