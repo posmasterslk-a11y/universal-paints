@@ -74,12 +74,40 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  string|int  $identifier
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($identifier)
     {
-        $product = Product::findOrFail($id);
+        $product = null;
+
+        // 1. If numeric, look up by primary key ID
+        if (is_numeric($identifier)) {
+            $product = Product::find($identifier);
+        }
+
+        // 2. If not found or if string, check if slug column exists
+        if (!$product && \Illuminate\Support\Facades\Schema::hasColumn('products', 'slug')) {
+            $product = Product::where('slug', $identifier)->first();
+        }
+
+        // 3. Match by slugified name from all products
+        if (!$product) {
+            $product = Product::all()->first(function ($p) use ($identifier) {
+                return \Illuminate\Support\Str::slug($p->name) === $identifier;
+            });
+        }
+
+        // 4. Fallback: match by approximate name
+        if (!$product) {
+            $nameGuess = str_replace(['-', '_'], ' ', $identifier);
+            $product = Product::where('name', 'LIKE', "%{$nameGuess}%")->first();
+        }
+
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
         return response()->json($product);
     }
 

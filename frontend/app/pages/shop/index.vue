@@ -142,15 +142,15 @@
           </div>
           <div class="products-grid" v-if="filteredProducts && filteredProducts.length > 0">
             <div class="product-card" v-for="product in filteredProducts" :key="product.id">
-              <NuxtLink :to="`/shop/${product.id}`" class="product-img-wrap">
+              <NuxtLink :to="`/shop/${getProductSlug(product)}`" class="product-img-wrap">
                 <img :src="getProductImageUrl(product.main_image)" :alt="product.name" loading="lazy" decoding="async" />
               </NuxtLink>
               <div class="product-info">
                 <h4>
-                  <NuxtLink :to="`/shop/${product.id}`" class="product-title-link">{{ product.name }}</NuxtLink>
+                  <NuxtLink :to="`/shop/${getProductSlug(product)}`" class="product-title-link">{{ product.name }}</NuxtLink>
                 </h4>
                 <p>{{ product.subtitle || product.description?.substring(0, 75) }}</p>
-                <NuxtLink :to="`/shop/${product.id}`" class="btn btn-outline-red w-100 mt-auto text-center py-2" style="display: block; border-radius: 30px; font-weight: 600; text-decoration: none;">
+                <NuxtLink :to="`/shop/${getProductSlug(product)}`" class="btn btn-outline-red w-100 mt-auto text-center py-2" style="display: block; border-radius: 30px; font-weight: 600; text-decoration: none;">
                   View More
                 </NuxtLink>
               </div>

@@ -212,15 +212,15 @@
         </div>
         <div class="related-grid">
           <div class="product-card" v-for="rel in relatedProducts" :key="rel.id">
-            <NuxtLink :to="`/shop/${rel.id}`" class="product-img-wrap">
+            <NuxtLink :to="`/shop/${getProductSlug(rel)}`" class="product-img-wrap">
               <img :src="rel.main_image || '/images/logo/Logo.webp'" :alt="rel.name" loading="lazy" decoding="async" />
             </NuxtLink>
             <div class="rel-info">
               <span class="rel-cat">{{ rel.category || 'Coating' }}</span>
               <h4>
-                <NuxtLink :to="`/shop/${rel.id}`">{{ rel.name }}</NuxtLink>
+                <NuxtLink :to="`/shop/${getProductSlug(rel)}`">{{ rel.name }}</NuxtLink>
               </h4>
-              <NuxtLink :to="`/shop/${rel.id}`" class="btn-view-more">
+              <NuxtLink :to="`/shop/${getProductSlug(rel)}`" class="btn-view-more">
                 View More &rarr;
               </NuxtLink>
             </div>
@@ -245,29 +245,25 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
 
 const route = useRoute()
 const config = useRuntimeConfig()
 
 const cleanApiBase = computed(() => (config.public.apiBase || 'https://api.universalpaints.lk').replace(/\/api\/?$/, ''))
 
+const productIdentifier = computed(() => String(route.params.slug || route.params.id || ''))
+
 // Fetch current product with lazy: true so client route navigation occurs immediately without freezing
 const { data: productData, pending, error } = await useFetch(
-  () => `${cleanApiBase.value}/api/products/${route.params.id}`,
+  () => `${cleanApiBase.value}/api/products/${productIdentifier.value}`,
   {
-    key: `product-${route.params.id}`,
+    key: `product-${productIdentifier.value}`,
     lazy: true
   }
 )
 
-const currentProduct = computed(() => {
-  const val = productData.value
-  if (!val) return null
-  return val.data || val
-})
-
-// Fetch related products (lazy)
+// Fetch catalog list for fallback and related products
 const { data: allProductsData } = await useFetch(
   () => `${cleanApiBase.value}/api/products`,
   {
@@ -276,9 +272,37 @@ const { data: allProductsData } = await useFetch(
   }
 )
 
+const currentProduct = computed(() => {
+  const val = productData.value
+  if (val && (val.id || val.data?.id)) {
+    return val.data || val
+  }
+  // Client-side fallback if backend API by slug had any lookup lag
+  if (allProductsData.value) {
+    const list = Array.isArray(allProductsData.value) ? allProductsData.value : (allProductsData.value?.data || [])
+    const found = list.find(p => {
+      const s = getProductSlug(p)
+      return s === productIdentifier.value || String(p.id) === productIdentifier.value
+    })
+    if (found) return found
+  }
+  return null
+})
+
+// Seamlessly update URL to slug if user landed via numeric ID
+watchEffect(() => {
+  if (currentProduct.value && /^\d+$/.test(productIdentifier.value)) {
+    const s = getProductSlug(currentProduct.value)
+    if (s && s !== productIdentifier.value) {
+      navigateTo(`/shop/${s}`, { replace: true })
+    }
+  }
+})
+
 const relatedProducts = computed(() => {
   const list = Array.isArray(allProductsData.value) ? allProductsData.value : (allProductsData.value?.data || [])
-  return list.filter(p => String(p.id) !== String(route.params.id)).slice(0, 4)
+  const currentId = currentProduct.value?.id
+  return list.filter(p => p.id !== currentId).slice(0, 4)
 })
 
 // Gallery Images
@@ -387,7 +411,7 @@ const whatsappUrl = computed(() => {
 const pageTitle = computed(() => currentProduct.value?.name ? `${currentProduct.value.name} | Universal Paints Sri Lanka` : 'Paint Product Details | Universal Paints')
 const pageDesc = computed(() => currentProduct.value?.description ? currentProduct.value.description.substring(0, 160).replace(/\s+/g, ' ').trim() : 'Premium architectural and decorative coatings by Universal Paints Sri Lanka.')
 const pageImage = computed(() => displayedImage.value)
-const canonicalUrl = computed(() => `https://universalpaints.lk/shop/${route.params.id}`)
+const canonicalUrl = computed(() => `https://universalpaints.lk/shop/${getProductSlug(currentProduct.value) || productIdentifier.value}`)
 
 useSeoMeta({
   title: () => pageTitle.value,
@@ -416,7 +440,7 @@ useHead(() => ({
         name: currentProduct.value.name,
         image: galleryImages.value,
         description: pageDesc.value,
-        sku: `UP-${route.params.id}`,
+        sku: currentProduct.value ? `UP-${currentProduct.value.id}` : `UP-${productIdentifier.value}`,
         brand: {
           '@type': 'Brand',
           name: 'Universal Paints'
