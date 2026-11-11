@@ -20,7 +20,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Using Node 20 LTS
+          node-version: '22' # Using Node 22 LTS (supports Set.prototype.isSubsetOf required by postcss)
           cache: 'npm'
           cache-dependency-path: 'frontend/package-lock.json'
 
@@ -32,9 +32,7 @@ jobs:
         working-directory: ./frontend
         env:
           NUXT_PUBLIC_API_BASE: https://api.universalpaints.lk
-        run: |
-          set -o pipefail
-          npm run build 2>&1 | tee build.log || (ERR=$(tail -n 15 build.log | tr '\r\n' ' '); echo "::error file=frontend/app/pages/shop/[id].vue,title=Build Error::$ERR"; exit 1)
+        run: npm run build
 
       - name: Prepare Restart Trigger for cPanel
         working-directory: ./frontend
