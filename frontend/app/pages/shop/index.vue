@@ -45,7 +45,7 @@
 
     <!-- Category Navigation Pills -->
     <section class="shop-categories">
-      <div class="container">
+      <div class="shop-container">
         <div class="category-pills">
           <button 
             class="cat-pill"
@@ -71,7 +71,7 @@
 
     <!-- Main Shop Layout -->
     <section class="shop-main">
-      <div class="container shop-layout">
+      <div class="shop-container shop-layout">
         <!-- Sidebar Filters -->
         <aside class="shop-sidebar">
           <div class="filter-header">
@@ -553,11 +553,17 @@ useHead({
 .cat-label { font-size: 14px; color: #475569; font-weight: 500; }
 
 /* Shop Main Layout */
+.shop-container {
+  width: 100%;
+  max-width: 1720px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
 .shop-main { padding: 60px 0; background-color: #FAFAFA; }
 .shop-layout {
   display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 40px;
+  grid-template-columns: 260px 1fr;
+  gap: 32px;
 }
 
 /* Sidebar */
@@ -614,8 +620,8 @@ useHead({
 .sort-by select { border: 1px solid #E2E8F0; padding: 8px 32px 8px 12px; border-radius: 8px; background: white; color: #0F172A; outline: none; }
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
   margin-bottom: 40px;
 }
 .product-card {
@@ -788,19 +794,30 @@ useHead({
   transform: translateY(-2px);
 }
 
+@media (max-width: 1300px) {
+  .products-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+
 @media (max-width: 991px) {
+  .shop-container { padding: 0 20px; }
   .shop-layout { grid-template-columns: 1fr; }
+  .products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   .features-wrap { flex-direction: column; gap: 30px; }
   .cta-banner { flex-direction: column; text-align: center; gap: 30px; padding: 30px; }
 }
 @media (max-width: 768px) {
-  .products-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .shop-container { padding: 0 16px; }
+  .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .product-info { padding: 12px; }
   .product-info h4 { font-size: 13.5px; height: 36px; }
   .btn-outline-red { padding: 8px 12px; font-size: 13px; }
 }
 @media (max-width: 480px) {
-  .products-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .shop-container { padding: 0 12px; }
+  .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .product-card { border-radius: 12px; }
   .product-img-wrap { padding: 10px; }
   .product-info { padding: 10px 8px; }
