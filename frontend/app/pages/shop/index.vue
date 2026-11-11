@@ -143,7 +143,7 @@
           <div class="products-grid" v-if="filteredProducts && filteredProducts.length > 0">
             <div class="product-card" v-for="product in filteredProducts" :key="product.id">
               <NuxtLink :to="`/shop/${product.id}`" class="product-img-wrap">
-                <img :src="getProductImageUrl(product.main_image)" :alt="product.name" loading="lazy" />
+                <img :src="getProductImageUrl(product.main_image)" :alt="product.name" loading="lazy" decoding="async" />
               </NuxtLink>
               <div class="product-info">
                 <h4>

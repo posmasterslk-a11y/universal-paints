@@ -140,6 +140,125 @@ Route::get('/extract-admin', function (\Illuminate\Http\Request $request) {
     ]);
 });
 
+// Secure endpoint to optimize existing uncompressed images in DB to WebP
+Route::get('/optimize-legacy-images', function (\Illuminate\Http\Request $request) {
+    if ($request->query('key') !== 'universal_paints_deploy_secure_key_2026') {
+        return response()->json(['error' => 'Forbidden'], 403);
+    }
+
+    $results = [
+        'categories' => [],
+        'products' => [],
+    ];
+
+    $optimizeUrl = function ($url, $folder) {
+        if (!$url || !is_string($url) || !str_contains($url, '.png')) {
+            return null;
+        }
+
+        try {
+            $ctx = stream_context_create([
+                'http' => ['timeout' => 20],
+                'ssl' => ['verify_peer' => false, 'verify_peer_name' => false]
+            ]);
+            $contents = @file_get_contents($url, false, $ctx);
+            if (!$contents) return null;
+
+            $src = @imagecreatefromstring($contents);
+            if (!$src) return null;
+
+            $origW = imagesx($src);
+            $origH = imagesy($src);
+            if ($origW <= 0 || $origH <= 0) {
+                imagedestroy($src);
+                return null;
+            }
+
+            $maxW = 1600;
+            $newW = $origW;
+            $newH = $origH;
+            if ($newW > $maxW || $newH > $maxW) {
+                $ratio = min($maxW / $newW, $maxW / $newH);
+                $newW = (int) round($newW * $ratio);
+                $newH = (int) round($newH * $ratio);
+            }
+
+            $dst = imagecreatetruecolor($newW, $newH);
+            imagealphablending($dst, false);
+            imagesavealpha($dst, true);
+            $transparent = imagecolorallocatealpha($dst, 255, 255, 255, 127);
+            imagefilledrectangle($dst, 0, 0, $newW, $newH, $transparent);
+            imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+            imagedestroy($src);
+
+            ob_start();
+            if (function_exists('imagewebp')) {
+                imagewebp($dst, null, 80);
+            } else {
+                imagejpeg($dst, null, 85);
+            }
+            $webpData = ob_get_clean();
+            imagedestroy($dst);
+
+            if (!$webpData) return null;
+
+            $filename = \Illuminate\Support\Str::random(40) . '.webp';
+            $path = rtrim($folder, '/') . '/' . $filename;
+            \Illuminate\Support\Facades\Storage::disk('r2')->put($path, $webpData, [
+                'mimetype' => 'image/webp'
+            ]);
+
+            return \Illuminate\Support\Facades\Storage::disk('r2')->url($path);
+        } catch (\Throwable $e) {
+            return null;
+        }
+    };
+
+    // 1. Categories
+    $categories = \App\Models\Category::all();
+    foreach ($categories as $cat) {
+        if ($cat->image && str_contains($cat->image, '.png')) {
+            $newUrl = $optimizeUrl($cat->image, 'categories');
+            if ($newUrl) {
+                $old = $cat->image;
+                $cat->image = $newUrl;
+                $cat->save();
+                $results['categories'][] = [
+                    'id' => $cat->id,
+                    'name' => $cat->name,
+                    'old' => $old,
+                    'new' => $newUrl
+                ];
+            }
+        }
+    }
+
+    // 2. Products
+    $products = \App\Models\Product::all();
+    foreach ($products as $prod) {
+        if ($prod->main_image && str_contains($prod->main_image, '.png')) {
+            $newUrl = $optimizeUrl($prod->main_image, 'products');
+            if ($newUrl) {
+                $old = $prod->main_image;
+                $prod->main_image = $newUrl;
+                $prod->save();
+                $results['products'][] = [
+                    'id' => $prod->id,
+                    'name' => $prod->name,
+                    'old' => $old,
+                    'new' => $newUrl
+                ];
+            }
+        }
+    }
+
+    return response()->json([
+        'status' => 'SUCCESS',
+        'message' => 'Legacy images optimized to lightweight WebP',
+        'details' => $results
+    ]);
+});
+
 // Graceful fallback for clients calling with double /api prefix (e.g. /api/api/...)
 Route::prefix('api')->group(function () {
     Route::get('/categories', [CategoryController::class, 'index']);

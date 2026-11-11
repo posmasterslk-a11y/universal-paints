@@ -110,7 +110,7 @@
             class="category-card"
           >
             <div class="card-img">
-              <img :src="cat.image" :alt="cat.name" />
+              <img :src="cat.image" :alt="cat.name" loading="lazy" decoding="async" />
             </div>
             <div class="card-content">
               <div class="card-title-wrap">
@@ -156,7 +156,7 @@
           <div class="best-selling-card" v-for="product in bestSellingProducts" :key="product.id">
             <NuxtLink :to="`/shop/${product.id}`" class="product-card-link">
               <div class="img-wrapper" style="--splash-color: #ff003c;">
-                <img :src="product.main_image || '/images/products/paint-bucket.webp'" :alt="product.name" class="bucket-img" loading="lazy" />
+                <img :src="product.main_image || '/images/products/paint-bucket.webp'" :alt="product.name" class="bucket-img" loading="lazy" decoding="async" />
               </div>
               <div class="card-details">
                 <h4 class="product-name" :title="product.name">{{ product.name }}</h4>
@@ -183,7 +183,7 @@
     <!-- About Section -->
     <section class="about-section">
       <div class="about-image">
-        <img src="/images/home-page/about%20universal%20paint.png" alt="About Universal Paints" />
+        <img src="/images/home-page/about-universal-paint.webp" alt="About Universal Paints" loading="lazy" decoding="async" />
       </div>
       <div class="about-content">
         <div class="section-subtitle">ABOUT UNIVERSAL PAINTS</div>

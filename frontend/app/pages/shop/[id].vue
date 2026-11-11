@@ -23,7 +23,7 @@
               <button class="nav-arrow left-arrow" v-if="galleryImages.length > 1" @click="prevImage" aria-label="Previous image">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
               </button>
-              <img :src="displayedImage" :alt="currentProduct.name" class="main-image" />
+              <img :src="displayedImage" :alt="currentProduct.name" class="main-image" fetchpriority="high" decoding="async" />
               <button class="nav-arrow right-arrow" v-if="galleryImages.length > 1" @click="nextImage" aria-label="Next image">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
               </button>
@@ -38,7 +38,7 @@
                 :class="{ active: currentImageIndex === idx }"
                 @click="currentImageIndex = idx"
               >
-                <img :src="img" :alt="`${currentProduct.name} - View ${idx + 1}`" />
+                <img :src="img" :alt="`${currentProduct.name} - View ${idx + 1}`" loading="lazy" decoding="async" />
               </div>
             </div>
           </div>
@@ -213,7 +213,7 @@
         <div class="related-grid">
           <div class="product-card" v-for="rel in relatedProducts" :key="rel.id">
             <NuxtLink :to="`/shop/${rel.id}`" class="product-img-wrap">
-              <img :src="rel.main_image || '/images/logo/Logo.webp'" :alt="rel.name" loading="lazy" />
+              <img :src="rel.main_image || '/images/logo/Logo.webp'" :alt="rel.name" loading="lazy" decoding="async" />
             </NuxtLink>
             <div class="rel-info">
               <span class="rel-cat">{{ rel.category || 'Coating' }}</span>
@@ -990,18 +990,218 @@ useHead(() => ({
 }
 
 @media (max-width: 991px) {
-  .product-page { padding-top: 110px; padding-bottom: 60px; }
-  .loading-state, .error-state { padding-top: 130px; padding-bottom: 70px; }
-  .product-top { grid-template-columns: 1fr; gap: 30px; padding: 24px; }
+  .product-page { padding-top: 115px; padding-bottom: 60px; }
+  .loading-state, .error-state { padding-top: 135px; padding-bottom: 70px; }
+  .product-top { grid-template-columns: 1fr; gap: 28px; padding: 28px 24px; }
   .product-highlights { grid-template-columns: 1fr; }
   .features-grid-list { grid-template-columns: 1fr; }
   .app-steps { grid-template-columns: 1fr; }
-  .related-grid { grid-template-columns: repeat(2, 1fr); }
+  .related-section { margin-top: 45px; }
+  .related-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
 }
-@media (max-width: 640px) {
-  .actions-group { flex-direction: column; }
-  .related-grid { grid-template-columns: 1fr; }
-  .product-tabs-section { padding: 24px 16px; }
-  .product-title { font-size: 24px; }
+
+@media (max-width: 768px) {
+  .product-page { padding-top: 98px; padding-bottom: 50px; }
+  .loading-state, .error-state { padding-top: 115px; padding-bottom: 50px; }
+  .product-container { border-radius: 18px; }
+  .product-top { padding: 20px 16px; gap: 20px; }
+  
+  .breadcrumbs {
+    font-size: 12px;
+    gap: 6px;
+    margin-bottom: 12px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+  .breadcrumbs::-webkit-scrollbar { display: none; }
+  .breadcrumbs .current {
+    max-width: 170px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: bottom;
+  }
+
+  .main-image-wrap {
+    aspect-ratio: 4 / 3;
+    max-height: 380px;
+    border-radius: 16px;
+    margin-bottom: 12px;
+  }
+  .main-image { padding: 12px; }
+  .nav-arrow { width: 36px; height: 36px; }
+  .nav-arrow svg { width: 18px; height: 18px; }
+  .left-arrow { left: 10px; }
+  .right-arrow { right: 10px; }
+  .badge-best-seller {
+    top: 10px;
+    left: 10px;
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+  .thumbnails { gap: 8px; }
+  .thumb {
+    width: 62px;
+    height: 62px;
+    border-radius: 10px;
+  }
+
+  .product-title {
+    font-size: 24px;
+    line-height: 1.25;
+    margin: 0 0 8px;
+  }
+  .product-subtitle {
+    font-size: 13.5px;
+    margin: 0 0 16px;
+  }
+  .product-highlights {
+    gap: 10px;
+    padding: 12px;
+    margin-bottom: 18px;
+    border-radius: 10px;
+  }
+  .highlight-item { font-size: 12px; }
+  .description-short {
+    font-size: 13.5px;
+    line-height: 1.55;
+    margin-bottom: 18px;
+  }
+
+  .pack-options {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pack-box {
+    flex: 1 1 calc(25% - 8px);
+    min-width: 60px;
+    text-align: center;
+    padding: 9px 12px;
+  }
+  .pack-size { font-size: 13px; }
+
+  .actions-group {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .actions-group .btn {
+    width: 100%;
+    height: 48px;
+    font-size: 14.5px;
+  }
+
+  .reps-box {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 12px;
+  }
+  .reps-box-text strong { font-size: 13px; }
+  .reps-box-text p { font-size: 12px; }
+  .btn-rep-link {
+    width: 100%;
+    text-align: center;
+    padding: 9px 14px;
+    box-sizing: border-box;
+  }
+
+  .product-tabs-section {
+    padding: 24px 16px;
+  }
+  .tabs-nav {
+    gap: 16px;
+    margin-bottom: 20px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tabs-nav::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    font-size: 13.5px;
+    padding-bottom: 12px;
+  }
+  .content-body {
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .features-grid-list { gap: 10px; }
+  .feat-card {
+    padding: 12px 14px;
+    border-radius: 10px;
+  }
+  .feat-card span { font-size: 13px; }
+  .app-steps { gap: 14px; }
+  .app-step {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  .app-step h4 { font-size: 14.5px; }
+  .app-step p { font-size: 12.5px; }
+
+  .related-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .section-title { font-size: 22px; }
+  .related-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .rel-info { padding: 12px 10px; }
+  .rel-info h4 {
+    font-size: 13px;
+    height: 36px;
+    margin-bottom: 10px;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .btn-view-more {
+    font-size: 12px;
+    padding: 7px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-page { padding-top: 88px; padding-bottom: 40px; }
+  .loading-state, .error-state { padding-top: 105px; padding-bottom: 40px; }
+  .product-container { border-radius: 14px; }
+  .product-top { padding: 14px 12px; gap: 16px; }
+
+  .main-image-wrap {
+    aspect-ratio: 1 / 1;
+    max-height: 320px;
+  }
+  .thumb {
+    width: 52px;
+    height: 52px;
+  }
+  .product-title { font-size: 20px; }
+  .category-pill, .stock-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+  }
+  .pack-box {
+    flex: 1 1 calc(50% - 6px);
+  }
+  .product-tabs-section { padding: 18px 12px; }
+  .tab-btn { font-size: 12.5px; }
+  .related-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .rel-info h4 {
+    height: auto;
+    -webkit-line-clamp: unset;
+  }
 }
 </style>
