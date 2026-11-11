@@ -74,7 +74,7 @@ Route::get('/categories/{id}', [CategoryController::class, 'show']);
 
 // Public product routes (Read)
 Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/{product}', [ProductController::class, 'show']);
+Route::get('/products/{identifier}', [ProductController::class, 'show']);
 
 // Public order route
 Route::post('/orders', [OrderController::class, 'store']);
@@ -264,7 +264,7 @@ Route::prefix('api')->group(function () {
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/categories/{id}', [CategoryController::class, 'show']);
     Route::get('/products', [ProductController::class, 'index']);
-    Route::get('/products/{product}', [ProductController::class, 'show']);
+    Route::get('/products/{identifier}', [ProductController::class, 'show']);
     Route::get('/sales-reps', [\App\Http\Controllers\API\SalesRepresentativeController::class, 'index']);
     Route::get('/sales-reps/{id}', [\App\Http\Controllers\API\SalesRepresentativeController::class, 'show']);
     Route::get('/blogs', [\App\Http\Controllers\API\BlogController::class, 'index']);

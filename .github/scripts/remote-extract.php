@@ -59,10 +59,17 @@ $zip->close();
 // Delete backend.zip after successful extraction
 @unlink($zipFile);
 
-// Clear stale config cache if exists so fresh .env is loaded
-$cachedConfig = $baseDir . '/bootstrap/cache/config.php';
-if (file_exists($cachedConfig)) {
-    @unlink($cachedConfig);
+// Clear stale config, routes, and services cache if exists so fresh routes and .env are loaded
+foreach ([
+    $baseDir . '/bootstrap/cache/config.php',
+    $baseDir . '/bootstrap/cache/routes-v7.php',
+    $baseDir . '/bootstrap/cache/routes.php',
+    $baseDir . '/bootstrap/cache/packages.php',
+    $baseDir . '/bootstrap/cache/services.php',
+] as $cacheFile) {
+    if (file_exists($cacheFile)) {
+        @unlink($cacheFile);
+    }
 }
 
 echo "SUCCESS: Extracted successfully to $baseDir";

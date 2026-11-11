@@ -30,4 +30,32 @@ class Product extends Model
         }
         return Str::slug($this->name);
     }
+
+    /**
+     * Retrieve the model for a bound value (supports both numeric ID and slug).
+     *
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        if (is_numeric($value)) {
+            return $this->where($field ?? 'id', $value)->first();
+        }
+
+        if (\Illuminate\Support\Facades\Schema::hasColumn('products', 'slug')) {
+            $p = $this->where('slug', $value)->first();
+            if ($p) return $p;
+        }
+
+        $all = static::all();
+        $p = $all->first(function ($item) use ($value) {
+            return Str::slug($item->name) === $value;
+        });
+        if ($p) return $p;
+
+        $nameGuess = str_replace(['-', '_'], ' ', $value);
+        return $this->where('name', 'LIKE', "%{$nameGuess}%")->first();
+    }
 }

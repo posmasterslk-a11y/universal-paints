@@ -742,6 +742,7 @@ useHead(() => ({
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
 }
 .btn-red {
   background: #E3000F;
