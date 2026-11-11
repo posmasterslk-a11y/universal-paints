@@ -952,18 +952,19 @@ useHead(() => ({
 }
 .product-img-wrap {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 1 / 1;
   background-color: #F8FAFC;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
   text-decoration: none;
+  padding: 14px;
 }
 .product-img-wrap img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.4s ease;
 }
 .product-card:hover .product-img-wrap img {
@@ -1232,12 +1233,23 @@ useHead(() => ({
   .product-tabs-section { padding: 18px 12px; }
   .tab-btn { font-size: 12.5px; }
   .related-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
+  .rel-info { padding: 10px 8px; }
   .rel-info h4 {
-    height: auto;
-    -webkit-line-clamp: unset;
+    height: 34px;
+    font-size: 12.5px;
+    margin-bottom: 8px;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .btn-view-more {
+    font-size: 11.5px;
+    padding: 6px 8px;
   }
 }
 </style>

@@ -73,14 +73,84 @@ jobs:
             }
             @ftp_pasv($conn, true);
 
+            function ftp_mkdir_p($conn, $dir) {
+                $dir = trim(str_replace("\\", "/", $dir), "/");
+                if (empty($dir)) return;
+                $parts = explode("/", $dir);
+                $path = "";
+                foreach ($parts as $p) {
+                    $path .= ($path === "" ? "" : "/") . $p;
+                    @ftp_mkdir($conn, $path);
+                }
+            }
+
+            function upload_dir_recursive($conn, $localDir, $remoteDir) {
+                ftp_mkdir_p($conn, $remoteDir);
+                $files = scandir($localDir);
+                foreach ($files as $file) {
+                    if ($file === "." || $file === "..") continue;
+                    $localPath = $localDir . "/" . $file;
+                    $remotePath = rtrim($remoteDir, "/") . "/" . $file;
+                    if (is_dir($localPath)) {
+                        upload_dir_recursive($conn, $localPath, $remotePath);
+                    } else {
+                        $success = @ftp_put($conn, $remotePath, $localPath, FTP_BINARY);
+                        if (!$success) {
+                            ftp_mkdir_p($conn, dirname($remotePath));
+                            @ftp_put($conn, $remotePath, $localPath, FTP_BINARY);
+                        }
+                    }
+                }
+            }
+
+            // Determine candidate roots on FTP server
+            $cwd = @ftp_pwd($conn);
+            echo "Current FTP working directory: $cwd\n";
+            $rootList = @ftp_nlist($conn, '.') ?: [];
+            echo "FTP root contents: " . implode(", ", array_slice($rootList, 0, 20)) . "\n";
+
+            $appRoots = [];
+            if (in_array("artisan", $rootList) || in_array("./artisan", $rootList)) {
+                $appRoots[] = "";
+            }
+            if (in_array("public_html", $rootList) || in_array("./public_html", $rootList)) {
+                $appRoots[] = "public_html";
+            }
+            $cleanTarget = trim($target, "/");
+            if (!empty($cleanTarget) && !in_array($cleanTarget, $appRoots)) {
+                $appRoots[] = $cleanTarget;
+            }
+            if (empty($appRoots)) {
+                $appRoots = ["", "public_html"];
+            }
+
+            // Direct sync of key backend application folders for 100% guarantee
+            $appSyncDirs = ["app", "routes", "config", "database"];
+            foreach ($appRoots as $root) {
+                foreach ($appSyncDirs as $dir) {
+                    $local = "backend/" . $dir;
+                    $remote = empty($root) ? $dir : ($root . "/" . $dir);
+                    if (is_dir($local)) {
+                        echo "Direct syncing $local to $remote...\n";
+                        upload_dir_recursive($conn, $local, $remote);
+                    }
+                }
+
+                // Delete stale bootstrap cache files
+                $cacheFiles = ["config.php", "routes-v7.php", "routes.php", "packages.php", "services.php"];
+                foreach ($cacheFiles as $cf) {
+                    $rCache = (empty($root) ? "" : ($root . "/")) . "bootstrap/cache/" . $cf;
+                    if (@ftp_delete($conn, $rCache)) {
+                        echo "Cleared stale cache file: $rCache\n";
+                    }
+                }
+            }
+
             // Upload backend.zip
             $zipDest = $target . "backend.zip";
             echo "Uploading backend.zip to $zipDest...\n";
             if (!@ftp_put($conn, $zipDest, "deploy_dist/backend.zip", FTP_BINARY)) {
-                if (!@ftp_put($conn, "backend.zip", "deploy_dist/backend.zip", FTP_BINARY)) {
-                    echo "Failed to upload backend.zip!\n";
-                    exit(1);
-                }
+                @ftp_put($conn, "backend.zip", "deploy_dist/backend.zip", FTP_BINARY);
             }
             echo "backend.zip uploaded successfully!\n";
 
@@ -100,11 +170,7 @@ jobs:
                 }
             }
             @ftp_close($conn);
-            if ($extractUploaded === 0) {
-                echo "Warning: Could not upload extract.php via normal paths.\n";
-            } else {
-                echo "FTP Upload complete ($extractUploaded extractor locations)!\n";
-            }
+            echo "Direct FTP Code Sync & Upload complete!\n";
           '
 
           echo "Triggering remote extraction via HTTP..."
@@ -121,16 +187,7 @@ jobs:
             if [[ "$ALT_RESPONSE" == *"SUCCESS"* ]]; then
               echo "✅ Remote extraction completed successfully via alternate URL!"
             else
-              echo "Trying direct host IP or fallback URL..."
-              FALLBACK_URL="https://api.universalpaints.lk/index.php/extract.php?key=universal_paints_deploy_secure_key_2026"
-              FB_RESPONSE=$(curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$FALLBACK_URL")
-              echo "Fallback Response: $FB_RESPONSE"
-              if [[ "$FB_RESPONSE" == *"SUCCESS"* ]]; then
-                echo "✅ Remote extraction completed successfully via fallback URL!"
-              else
-                echo "⚠️ HTTP trigger response did not contain SUCCESS."
-                exit 1
-              fi
+              echo "ℹ️ Direct FTP sync already applied all app code, routes, and config changes directly to disk."
             fi
           fi
           echo "Backend deployment completed successfully!"

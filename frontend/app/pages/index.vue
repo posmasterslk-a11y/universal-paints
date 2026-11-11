@@ -765,9 +765,10 @@ onUnmounted(() => {
 .img-wrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 1 / 1;
   height: auto;
-  min-height: 135px;
+  min-height: 180px;
+  padding: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
