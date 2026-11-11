@@ -1,243 +1,246 @@
 <template>
-  <div class="product-page" v-if="currentProduct">
-    <div class="container product-container">
-      
-      <!-- Top Section -->
-      <div class="product-top">
-        <!-- Left Column: Gallery -->
-        <div class="product-gallery">
-          <div class="breadcrumbs">
-            <NuxtLink to="/">Home</NuxtLink>
-            <span class="sep">&gt;</span>
-            <NuxtLink to="/shop">Products</NuxtLink>
-            <span class="sep">&gt;</span>
-            <NuxtLink :to="'/shop?category=' + encodeURIComponent(currentProduct.category || '')">{{ currentProduct.category || 'Coatings' }}</NuxtLink>
-            <span class="sep">&gt;</span>
-            <span class="current">{{ currentProduct.name }}</span>
-          </div>
-
-          <div class="main-image-wrap">
-            <div class="badge-best-seller" v-if="currentProduct.is_best_seller">FEATURED</div>
-            <button class="nav-arrow left-arrow" v-if="galleryImages.length > 1" @click="prevImage">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
-            </button>
-            <img :src="displayedImage" :alt="currentProduct.name" class="main-image" />
-            <button class="nav-arrow right-arrow" v-if="galleryImages.length > 1" @click="nextImage">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-            </button>
-          </div>
-
-          <!-- Thumbnails -->
-          <div class="thumbnails" v-if="galleryImages.length > 1">
-            <div 
-              class="thumb" 
-              v-for="(img, idx) in galleryImages" 
-              :key="idx"
-              :class="{ active: currentImageIndex === idx }"
-              @click="currentImageIndex = idx"
-            >
-              <img :src="img" :alt="`${currentProduct.name} - View ${idx + 1}`" />
+  <div class="product-details-page-root">
+    <!-- Main product details when loaded -->
+    <div class="product-page" v-if="currentProduct">
+      <div class="container product-container">
+        
+        <!-- Top Section -->
+        <div class="product-top">
+          <!-- Left Column: Gallery -->
+          <div class="product-gallery">
+            <div class="breadcrumbs">
+              <NuxtLink to="/">Home</NuxtLink>
+              <span class="sep">&gt;</span>
+              <NuxtLink to="/shop">Products</NuxtLink>
+              <span class="sep">&gt;</span>
+              <NuxtLink :to="'/shop?category=' + encodeURIComponent(currentProduct.category || '')">{{ currentProduct.category || 'Coatings' }}</NuxtLink>
+              <span class="sep">&gt;</span>
+              <span class="current">{{ currentProduct.name }}</span>
             </div>
-          </div>
-        </div>
 
-        <!-- Right Column: Info -->
-        <div class="product-info">
-          <div class="category-pill-wrap">
-            <span class="category-pill">{{ currentProduct.category || 'Universal Coating' }}</span>
-            <span class="stock-pill" :class="currentProduct.is_in_stock ? 'in-stock' : 'out-stock'">
-              <span class="dot"></span> {{ currentProduct.is_in_stock ? 'In Stock & Available' : 'Made to Order' }}
-            </span>
-          </div>
-
-          <h1 class="product-title">{{ currentProduct.name }}</h1>
-          <p class="product-subtitle" v-if="currentProduct.subtitle">{{ currentProduct.subtitle }}</p>
-
-          <!-- Highlights Bar -->
-          <div class="product-highlights">
-            <div class="highlight-item">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-              <span>100% Original Formula</span>
+            <div class="main-image-wrap">
+              <div class="badge-best-seller" v-if="currentProduct.is_best_seller">FEATURED</div>
+              <button class="nav-arrow left-arrow" v-if="galleryImages.length > 1" @click="prevImage" aria-label="Previous image">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+              </button>
+              <img :src="displayedImage" :alt="currentProduct.name" class="main-image" />
+              <button class="nav-arrow right-arrow" v-if="galleryImages.length > 1" @click="nextImage" aria-label="Next image">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+              </button>
             </div>
-            <div class="highlight-item">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
-              <span>Islandwide Delivery</span>
-            </div>
-            <div class="highlight-item">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-              <span>Wholesale & Trade Rates</span>
-            </div>
-          </div>
 
-          <!-- Short Description -->
-          <p class="description-short">{{ shortDescription }}</p>
-
-          <!-- Key Feature Pills -->
-          <div class="feature-pills" v-if="currentProduct.features && currentProduct.features.length > 0">
-            <span class="feat-pill" v-for="(feat, idx) in currentProduct.features.slice(0, 6)" :key="idx">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
-              {{ feat }}
-            </span>
-          </div>
-
-          <!-- Pack Sizes -->
-          <div class="selection-group" v-if="packSizes.length > 0">
-            <h4 class="selection-title">Available Pack Sizes:</h4>
-            <div class="pack-options">
+            <!-- Thumbnails -->
+            <div class="thumbnails" v-if="galleryImages.length > 1">
               <div 
-                class="pack-box" 
-                v-for="pack in packSizes" 
-                :key="pack"
-                :class="{ active: selectedPack === pack }"
-                @click="selectedPack = pack"
+                class="thumb" 
+                v-for="(img, idx) in galleryImages" 
+                :key="idx"
+                :class="{ active: currentImageIndex === idx }"
+                @click="currentImageIndex = idx"
               >
-                <span class="pack-size">{{ pack }}</span>
+                <img :src="img" :alt="`${currentProduct.name} - View ${idx + 1}`" />
               </div>
             </div>
           </div>
 
-          <!-- CTA Buttons -->
-          <div class="actions-group">
-            <button class="btn btn-red btn-quote" @click="openQuoteModal">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a.75.75 0 0 1-.974-.94 4.053 4.053 0 0 0 .546-1.382A8.957 8.957 0 0 1 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" /></svg>
-              Request a Free Quote
+          <!-- Right Column: Info -->
+          <div class="product-info">
+            <div class="category-pill-wrap">
+              <span class="category-pill">{{ currentProduct.category || 'Universal Coating' }}</span>
+              <span class="stock-pill" :class="currentProduct.is_in_stock ? 'in-stock' : 'out-stock'">
+                <span class="dot"></span> {{ currentProduct.is_in_stock ? 'In Stock & Available' : 'Made to Order' }}
+              </span>
+            </div>
+
+            <h1 class="product-title">{{ currentProduct.name }}</h1>
+            <p class="product-subtitle" v-if="currentProduct.subtitle">{{ currentProduct.subtitle }}</p>
+
+            <!-- Highlights Bar -->
+            <div class="product-highlights">
+              <div class="highlight-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                <span>100% Original Formula</span>
+              </div>
+              <div class="highlight-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
+                <span>Islandwide Delivery</span>
+              </div>
+              <div class="highlight-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                <span>Wholesale & Trade Rates</span>
+              </div>
+            </div>
+
+            <!-- Short Description -->
+            <p class="description-short">{{ shortDescription }}</p>
+
+            <!-- Key Feature Pills -->
+            <div class="feature-pills" v-if="featuresList.length > 0">
+              <span class="feat-pill" v-for="(feat, idx) in featuresList.slice(0, 6)" :key="idx">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" /></svg>
+                {{ feat }}
+              </span>
+            </div>
+
+            <!-- Pack Sizes -->
+            <div class="selection-group" v-if="packSizes.length > 0">
+              <h4 class="selection-title">Available Pack Sizes:</h4>
+              <div class="pack-options">
+                <div 
+                  class="pack-box" 
+                  v-for="pack in packSizes" 
+                  :key="pack"
+                  :class="{ active: selectedPack === pack }"
+                  @click="selectedPack = pack"
+                >
+                  <span class="pack-size">{{ pack }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="actions-group">
+              <button class="btn btn-red btn-quote" @click="openQuoteModal">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a.75.75 0 0 1-.974-.94 4.053 4.053 0 0 0 .546-1.382A8.957 8.957 0 0 1 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" /></svg>
+                Request a Free Quote
+              </button>
+              <a :href="whatsappUrl" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">
+                <i class="fa-brands fa-whatsapp text-lg"></i>
+                WhatsApp Inquiry
+              </a>
+            </div>
+
+            <!-- Sales Rep Locator Link -->
+            <div class="reps-box">
+              <div class="reps-box-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
+              </div>
+              <div class="reps-box-text">
+                <strong>Need trade pricing or delivery in your area?</strong>
+                <p>Connect with your assigned Universal Paints district representative.</p>
+              </div>
+              <NuxtLink to="/sales-representatives" class="btn-rep-link">
+                Find Rep &rarr;
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs Section -->
+        <div class="product-tabs-section">
+          <div class="tabs-nav">
+            <button 
+              class="tab-btn" 
+              :class="{ active: activeTab === 'description' }"
+              @click="activeTab = 'description'"
+            >
+              Description & Overview
             </button>
-            <a :href="whatsappUrl" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">
-              <i class="fa-brands fa-whatsapp text-lg"></i>
-              WhatsApp Inquiry
-            </a>
+            <button 
+              class="tab-btn" 
+              :class="{ active: activeTab === 'features' }"
+              @click="activeTab = 'features'"
+            >
+              Key Features ({{ featuresList.length }})
+            </button>
+            <button 
+              class="tab-btn" 
+              :class="{ active: activeTab === 'application' }"
+              @click="activeTab = 'application'"
+            >
+              Application & Preparation
+            </button>
           </div>
 
-          <!-- Sales Rep Locator Link -->
-          <div class="reps-box">
-            <div class="reps-box-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
+          <div class="tab-content">
+            <!-- Description Tab -->
+            <div class="tab-pane" v-if="activeTab === 'description'">
+              <div class="content-body" v-html="formattedDescription"></div>
             </div>
-            <div class="reps-box-text">
-              <strong>Need trade pricing or delivery in your area?</strong>
-              <p>Connect with your assigned Universal Paints district representative.</p>
+
+            <!-- Key Features Tab -->
+            <div class="tab-pane" v-if="activeTab === 'features'">
+              <div class="features-grid-list" v-if="featuresList.length > 0">
+                <div class="feat-card" v-for="(feat, idx) in featuresList" :key="idx">
+                  <div class="feat-check">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                  </div>
+                  <span>{{ feat }}</span>
+                </div>
+              </div>
+              <p v-else class="text-gray-500">Contact our technical department for detailed specifications.</p>
             </div>
-            <NuxtLink to="/sales-representatives" class="btn-rep-link">
-              Find Rep &rarr;
+
+            <!-- Application Tab -->
+            <div class="tab-pane" v-if="activeTab === 'application'">
+              <div class="app-steps">
+                <div class="app-step">
+                  <span class="step-num">1</span>
+                  <div>
+                    <h4>Surface Preparation</h4>
+                    <p>Ensure the substrate is clean, dry, and free of dirt, oil, efflorescence, grease, and loose paint flakes. Repair cracks with Universal Paints Premium Wall Filler.</p>
+                  </div>
+                </div>
+                <div class="app-step">
+                  <span class="step-num">2</span>
+                  <div>
+                    <h4>Primer Application</h4>
+                    <p>Apply one coat of suitable Universal Paints Primer / Undercoat to seal porous masonry surfaces and ensure maximum adhesion and topcoat longevity.</p>
+                  </div>
+                </div>
+                <div class="app-step">
+                  <span class="step-num">3</span>
+                  <div>
+                    <h4>Topcoat Application</h4>
+                    <p>Stir paint thoroughly before use. Apply 2 uniform coats using roller, brush, or spray equipment. Allow 3 to 4 hours drying time between coats.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Related Products -->
+      <section class="related-section container" v-if="relatedProducts.length > 0">
+        <div class="related-header">
+          <div>
+            <span class="sub-label">Recommended for you</span>
+            <h2 class="section-title">Explore Related Coatings</h2>
+          </div>
+          <NuxtLink to="/shop" class="view-all-link">View Full Catalog &rarr;</NuxtLink>
+        </div>
+        <div class="related-grid">
+          <div class="product-card" v-for="rel in relatedProducts" :key="rel.id">
+            <NuxtLink :to="`/shop/${rel.id}`" class="product-img-wrap">
+              <img :src="rel.main_image || '/images/logo/Logo.webp'" :alt="rel.name" loading="lazy" />
             </NuxtLink>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tabs Section -->
-      <div class="product-tabs-section">
-        <div class="tabs-nav">
-          <button 
-            class="tab-btn" 
-            :class="{ active: activeTab === 'description' }"
-            @click="activeTab = 'description'"
-          >
-            Description & Overview
-          </button>
-          <button 
-            class="tab-btn" 
-            :class="{ active: activeTab === 'features' }"
-            @click="activeTab = 'features'"
-          >
-            Key Features ({{ currentProduct.features?.length || 0 }})
-          </button>
-          <button 
-            class="tab-btn" 
-            :class="{ active: activeTab === 'application' }"
-            @click="activeTab = 'application'"
-          >
-            Application & Preparation
-          </button>
-        </div>
-
-        <div class="tab-content">
-          <!-- Description Tab -->
-          <div class="tab-pane" v-if="activeTab === 'description'">
-            <div class="content-body" v-html="formattedDescription"></div>
-          </div>
-
-          <!-- Key Features Tab -->
-          <div class="tab-pane" v-if="activeTab === 'features'">
-            <div class="features-grid-list" v-if="currentProduct.features && currentProduct.features.length > 0">
-              <div class="feat-card" v-for="(feat, idx) in currentProduct.features" :key="idx">
-                <div class="feat-check">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
-                </div>
-                <span>{{ feat }}</span>
-              </div>
-            </div>
-            <p v-else class="text-gray-500">Contact our technical department for detailed specifications.</p>
-          </div>
-
-          <!-- Application Tab -->
-          <div class="tab-pane" v-if="activeTab === 'application'">
-            <div class="app-steps">
-              <div class="app-step">
-                <span class="step-num">1</span>
-                <div>
-                  <h4>Surface Preparation</h4>
-                  <p>Ensure the substrate is clean, dry, and free of dirt, oil, efflorescence, grease, and loose paint flakes. Repair cracks with Universal Paints Premium Wall Filler.</p>
-                </div>
-              </div>
-              <div class="app-step">
-                <span class="step-num">2</span>
-                <div>
-                  <h4>Primer Application</h4>
-                  <p>Apply one coat of suitable Universal Paints Primer / Undercoat to seal porous masonry surfaces and ensure maximum adhesion and topcoat longevity.</p>
-                </div>
-              </div>
-              <div class="app-step">
-                <span class="step-num">3</span>
-                <div>
-                  <h4>Topcoat Application</h4>
-                  <p>Stir paint thoroughly before use. Apply 2 uniform coats using roller, brush, or spray equipment. Allow 3 to 4 hours drying time between coats.</p>
-                </div>
-              </div>
+            <div class="rel-info">
+              <span class="rel-cat">{{ rel.category || 'Coating' }}</span>
+              <h4>
+                <NuxtLink :to="`/shop/${rel.id}`">{{ rel.name }}</NuxtLink>
+              </h4>
+              <NuxtLink :to="`/shop/${rel.id}`" class="btn-view-more">
+                View More &rarr;
+              </NuxtLink>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
-    
-    <!-- Related Products -->
-    <section class="related-section container" v-if="relatedProducts.length > 0">
-      <div class="related-header">
-        <div>
-          <span class="sub-label">Recommended for you</span>
-          <h2 class="section-title">Explore Related Coatings</h2>
-        </div>
-        <NuxtLink to="/shop" class="view-all-link">View Full Catalog &rarr;</NuxtLink>
-      </div>
-      <div class="related-grid">
-        <div class="product-card" v-for="rel in relatedProducts" :key="rel.id">
-          <NuxtLink :to="`/shop/${rel.id}`" class="product-img-wrap">
-            <img :src="rel.main_image || '/images/logo/Logo.webp'" :alt="rel.name" loading="lazy" />
-          </NuxtLink>
-          <div class="rel-info">
-            <span class="rel-cat">{{ rel.category || 'Coating' }}</span>
-            <h4>
-              <NuxtLink :to="`/shop/${rel.id}`">{{ rel.name }}</NuxtLink>
-            </h4>
-            <NuxtLink :to="`/shop/${rel.id}`" class="btn-view-more">
-              View More &rarr;
-            </NuxtLink>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
 
-  <!-- Loading State -->
-  <div class="loading-state container py-20 text-center" v-else-if="pending">
-    <div class="spinner"></div>
-    <p class="mt-4 text-gray-600 font-semibold">Loading product details...</p>
-  </div>
+    <!-- Loading State -->
+    <div class="loading-state container py-20 text-center" v-else-if="pending">
+      <div class="spinner"></div>
+      <p class="mt-4 text-gray-600 font-semibold">Loading product details...</p>
+    </div>
 
-  <!-- Error State -->
-  <div class="error-state container py-20 text-center" v-else>
-    <h2 class="text-2xl font-bold text-gray-900 mb-2">Product Not Found</h2>
-    <p class="text-gray-500 mb-6">The requested product could not be loaded or may have been updated.</p>
-    <NuxtLink to="/shop" class="btn btn-red inline-block">Return to Catalog</NuxtLink>
+    <!-- Error State -->
+    <div class="error-state container py-20 text-center" v-else>
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">Product Not Found</h2>
+      <p class="text-gray-500 mb-6">The requested product could not be loaded or may have been updated.</p>
+      <NuxtLink to="/shop" class="btn btn-red inline-block">Return to Catalog</NuxtLink>
+    </div>
   </div>
 </template>
 
@@ -249,18 +252,28 @@ const config = useRuntimeConfig()
 
 const cleanApiBase = computed(() => (config.public.apiBase || 'https://api.universalpaints.lk').replace(/\/api\/?$/, ''))
 
-// Fetch current product
+// Fetch current product with lazy: true so client route navigation occurs immediately without freezing
 const { data: productData, pending, error } = await useFetch(
   () => `${cleanApiBase.value}/api/products/${route.params.id}`,
-  { key: `product-${route.params.id}` }
+  {
+    key: `product-${route.params.id}`,
+    lazy: true
+  }
 )
 
-const currentProduct = computed(() => productData.value?.data || productData.value || null)
+const currentProduct = computed(() => {
+  const val = productData.value
+  if (!val) return null
+  return val.data || val
+})
 
-// Fetch related products
+// Fetch related products (lazy)
 const { data: allProductsData } = await useFetch(
   () => `${cleanApiBase.value}/api/products`,
-  { key: 'all-products-for-related' }
+  {
+    key: 'all-products-for-related',
+    lazy: true
+  }
 )
 
 const relatedProducts = computed(() => {
@@ -271,13 +284,21 @@ const relatedProducts = computed(() => {
 // Gallery Images
 const currentImageIndex = ref(0)
 const galleryImages = computed(() => {
-  if (!currentProduct.value) return []
+  if (!currentProduct.value) return ['/images/logo/Logo.webp']
   const imgs = []
   if (currentProduct.value.main_image) {
     imgs.push(currentProduct.value.main_image)
   }
-  if (Array.isArray(currentProduct.value.gallery)) {
-    currentProduct.value.gallery.forEach(img => {
+  let gallery = currentProduct.value.gallery
+  if (typeof gallery === 'string') {
+    try {
+      gallery = JSON.parse(gallery)
+    } catch (e) {
+      gallery = []
+    }
+  }
+  if (Array.isArray(gallery)) {
+    gallery.forEach(img => {
       if (img && !imgs.includes(img)) imgs.push(img)
     })
   }
@@ -301,11 +322,33 @@ const prevImage = () => {
 // Active Tab
 const activeTab = ref('description')
 
+// Features
+const featuresList = computed(() => {
+  if (!currentProduct.value) return []
+  let feats = currentProduct.value.features
+  if (typeof feats === 'string') {
+    try {
+      feats = JSON.parse(feats)
+    } catch (e) {
+      feats = []
+    }
+  }
+  return Array.isArray(feats) ? feats : []
+})
+
 // Pack sizes
 const packSizes = computed(() => {
-  if (!currentProduct.value) return []
-  if (Array.isArray(currentProduct.value.pack_sizes) && currentProduct.value.pack_sizes.length > 0) {
-    return currentProduct.value.pack_sizes.map(p => typeof p === 'object' ? p.size : String(p))
+  if (!currentProduct.value) return ['1L', '4L', '10L', '20L']
+  let packs = currentProduct.value.pack_sizes
+  if (typeof packs === 'string') {
+    try {
+      packs = JSON.parse(packs)
+    } catch (e) {
+      packs = []
+    }
+  }
+  if (Array.isArray(packs) && packs.length > 0) {
+    return packs.map(p => typeof p === 'object' && p ? p.size || String(p) : String(p))
   }
   return ['1L', '4L', '10L', '20L']
 })
@@ -347,30 +390,30 @@ const pageImage = computed(() => displayedImage.value)
 const canonicalUrl = computed(() => `https://universalpaints.lk/shop/${route.params.id}`)
 
 useSeoMeta({
-  title: () => currentProduct.value?.name || 'Product Details',
-  ogTitle: pageTitle,
-  description: pageDesc,
-  ogDescription: pageDesc,
-  ogImage: pageImage,
-  ogUrl: canonicalUrl,
+  title: () => pageTitle.value,
+  ogTitle: () => pageTitle.value,
+  description: () => pageDesc.value,
+  ogDescription: () => pageDesc.value,
+  ogImage: () => pageImage.value,
+  ogUrl: () => canonicalUrl.value,
   ogType: 'product',
   twitterCard: 'summary_large_image',
-  twitterTitle: pageTitle,
-  twitterDescription: pageDesc,
-  twitterImage: pageImage
+  twitterTitle: () => pageTitle.value,
+  twitterDescription: () => pageDesc.value,
+  twitterImage: () => pageImage.value
 })
 
-useHead({
+useHead(() => ({
   link: [
-    { rel: 'canonical', href: canonicalUrl }
+    { rel: 'canonical', href: canonicalUrl.value }
   ],
-  script: [
+  script: currentProduct.value ? [
     {
       type: 'application/ld+json',
-      children: computed(() => JSON.stringify({
+      innerHTML: JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'Product',
-        name: currentProduct.value?.name || 'Universal Paints Product',
+        name: currentProduct.value.name,
         image: galleryImages.value,
         description: pageDesc.value,
         sku: `UP-${route.params.id}`,
@@ -381,17 +424,17 @@ useHead({
         offers: {
           '@type': 'AggregateOffer',
           priceCurrency: 'LKR',
-          availability: currentProduct.value?.is_in_stock ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder',
+          availability: currentProduct.value.is_in_stock ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder',
           seller: {
             '@type': 'Organization',
             name: 'Universal Paints (Pvt) Ltd',
             url: 'https://universalpaints.lk'
           }
         }
-      }))
+      })
     }
-  ]
-})
+  ] : []
+}))
 </script>
 
 <style scoped>
