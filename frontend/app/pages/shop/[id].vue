@@ -438,9 +438,18 @@ useHead(() => ({
 </script>
 
 <style scoped>
-.product-page {
-  padding: 50px 0 80px;
+.product-details-page-root {
   background-color: #F8FAFC;
+  min-height: calc(100vh - 100px);
+}
+.product-page {
+  padding: 135px 0 90px;
+  background-color: #F8FAFC;
+}
+.loading-state,
+.error-state {
+  padding-top: 160px;
+  padding-bottom: 120px;
 }
 .product-container {
   background: white;
@@ -981,6 +990,8 @@ useHead(() => ({
 }
 
 @media (max-width: 991px) {
+  .product-page { padding-top: 110px; padding-bottom: 60px; }
+  .loading-state, .error-state { padding-top: 130px; padding-bottom: 70px; }
   .product-top { grid-template-columns: 1fr; gap: 30px; padding: 24px; }
   .product-highlights { grid-template-columns: 1fr; }
   .features-grid-list { grid-template-columns: 1fr; }
