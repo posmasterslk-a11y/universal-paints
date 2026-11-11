@@ -726,10 +726,10 @@ useHead(() => ({
   margin-bottom: 24px;
 }
 .btn {
-  height: 50px;
+  height: 52px;
   padding: 0 24px;
   border-radius: 30px;
-  font-size: 15px;
+  font-size: 15.5px;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
@@ -1055,6 +1055,24 @@ useHead(() => ({
   .product-highlights { grid-template-columns: 1fr; }
   .features-grid-list { grid-template-columns: 1fr; }
   .app-steps { grid-template-columns: 1fr; }
+  .actions-group {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 22px;
+  }
+  .actions-group .btn {
+    flex: none;
+    width: 100%;
+    height: 52px;
+    min-height: 52px;
+    font-size: 15.5px;
+    font-weight: 700;
+  }
+  .actions-group .btn svg {
+    width: 21px;
+    height: 21px;
+  }
   .related-section { margin-top: 45px; }
   .related-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
 }
@@ -1145,13 +1163,26 @@ useHead(() => ({
 
   .actions-group {
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 22px;
   }
   .actions-group .btn {
+    flex: none;
     width: 100%;
-    height: 48px;
-    font-size: 14.5px;
+    height: 52px;
+    min-height: 52px;
+    font-size: 15.5px;
+    font-weight: 700;
+    border-radius: 30px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  }
+  .actions-group .btn svg {
+    width: 21px;
+    height: 21px;
+    flex-shrink: 0;
   }
 
   .reps-box {
@@ -1251,6 +1282,29 @@ useHead(() => ({
   }
   .pack-box {
     flex: 1 1 calc(50% - 6px);
+  }
+  .actions-group {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 22px;
+  }
+  .actions-group .btn {
+    flex: none;
+    width: 100%;
+    height: 52px;
+    min-height: 52px;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 0 16px;
+    border-radius: 30px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  }
+  .actions-group .btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
   }
   .product-tabs-section { padding: 18px 12px; }
   .tab-btn { font-size: 12.5px; }
