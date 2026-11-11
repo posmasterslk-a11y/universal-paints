@@ -74,6 +74,27 @@ foreach ([
 
 echo "SUCCESS: Extracted successfully to $baseDir";
 
+// Reset OPcache and file stat cache
+if (function_exists('opcache_reset')) {
+    @opcache_reset();
+}
+if (function_exists('clearstatcache')) {
+    @clearstatcache(true);
+}
+if (file_exists($baseDir . '/public/.htaccess')) {
+    @touch($baseDir . '/public/.htaccess');
+}
+if (file_exists($baseDir . '/.htaccess')) {
+    @touch($baseDir . '/.htaccess');
+}
+
+// Safely execute pending database migrations
+try {
+    if (file_exists($baseDir . '/artisan')) {
+        @exec('php ' . escapeshellarg($baseDir . '/artisan') . ' migrate --force 2>&1');
+    }
+} catch (\Throwable $e) {}
+
 // Self delete extractor script
 @unlink(__FILE__);
 

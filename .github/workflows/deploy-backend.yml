@@ -84,15 +84,27 @@ jobs:
             }
             echo "backend.zip uploaded successfully!\n";
 
-            // Upload extractor
-            $extractDest = $target . "extract.php";
+            // Upload extractor to all candidate locations
             echo "Uploading extract.php...\n";
-            if (!@ftp_put($conn, $extractDest, "deploy_dist/extract.php", FTP_BINARY)) {
-                @ftp_put($conn, "extract.php", "deploy_dist/extract.php", FTP_BINARY);
+            $extractCandidates = [
+                "public/extract.php",
+                "extract.php",
+                $target . "public/extract.php",
+                $target . "extract.php",
+            ];
+            $extractUploaded = 0;
+            foreach ($extractCandidates as $dest) {
+                if (@ftp_put($conn, $dest, "deploy_dist/extract.php", FTP_BINARY)) {
+                    echo "Uploaded extractor to $dest\n";
+                    $extractUploaded++;
+                }
             }
-            @ftp_put($conn, $target . "public/extract.php", "deploy_dist/extract.php", FTP_BINARY);
             @ftp_close($conn);
-            echo "FTP Upload complete!\n";
+            if ($extractUploaded === 0) {
+                echo "Warning: Could not upload extract.php via normal paths.\n";
+            } else {
+                echo "FTP Upload complete ($extractUploaded extractor locations)!\n";
+            }
           '
 
           echo "Triggering remote extraction via HTTP..."
@@ -109,8 +121,16 @@ jobs:
             if [[ "$ALT_RESPONSE" == *"SUCCESS"* ]]; then
               echo "✅ Remote extraction completed successfully via alternate URL!"
             else
-              echo "⚠️ HTTP trigger response did not contain SUCCESS (Cloudflare challenge may be active)."
-              echo "The ZIP was uploaded successfully via FTP."
+              echo "Trying direct host IP or fallback URL..."
+              FALLBACK_URL="https://api.universalpaints.lk/index.php/extract.php?key=universal_paints_deploy_secure_key_2026"
+              FB_RESPONSE=$(curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$FALLBACK_URL")
+              echo "Fallback Response: $FB_RESPONSE"
+              if [[ "$FB_RESPONSE" == *"SUCCESS"* ]]; then
+                echo "✅ Remote extraction completed successfully via fallback URL!"
+              else
+                echo "⚠️ HTTP trigger response did not contain SUCCESS."
+                exit 1
+              fi
             fi
           fi
           echo "Backend deployment completed successfully!"
