@@ -32,7 +32,9 @@ jobs:
         working-directory: ./frontend
         env:
           NUXT_PUBLIC_API_BASE: https://api.universalpaints.lk
-        run: npm run build
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee build.log || (ERR=$(tail -n 15 build.log | tr '\r\n' ' '); echo "::error file=frontend/app/pages/shop/[id].vue,title=Build Error::$ERR"; exit 1)
 
       - name: Prepare Restart Trigger for cPanel
         working-directory: ./frontend
