@@ -101,11 +101,11 @@
             <!-- CTA Buttons -->
             <div class="actions-group">
               <button class="btn btn-red btn-quote" @click="openQuoteModal">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a.75.75 0 0 1-.974-.94 4.053 4.053 0 0 0 .546-1.382A8.957 8.957 0 0 1 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" /></svg>
+                <i class="fa-solid fa-file-invoice"></i>
                 Request a Free Quote
               </button>
               <a :href="whatsappUrl" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">
-                <i class="fa-brands fa-whatsapp text-lg"></i>
+                <i class="fa-brands fa-whatsapp"></i>
                 WhatsApp Inquiry
               </a>
             </div>
@@ -707,6 +707,17 @@ useHead(() => ({
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   border: none;
+}
+.btn i, .btn svg {
+  font-size: 18px;
+  width: 20px;
+  height: 20px;
+  max-width: 20px;
+  max-height: 20px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .btn-red {
   background: #E3000F;
