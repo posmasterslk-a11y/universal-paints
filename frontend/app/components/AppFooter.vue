@@ -23,7 +23,7 @@
           <ul>
             <li><NuxtLink to="/">Home</NuxtLink></li>
             <li><NuxtLink to="/shop">Products</NuxtLink></li>
-            <li><NuxtLink to="/sales-representatives">Sales Representatives</NuxtLink></li>
+            <li><NuxtLink to="/sales-representatives">Our Network</NuxtLink></li>
             <li><NuxtLink to="/about">About Us</NuxtLink></li>
             <li><NuxtLink to="/blog">Blog</NuxtLink></li>
             <li><NuxtLink to="/contact">Contact Us</NuxtLink></li>

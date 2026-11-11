@@ -11,7 +11,7 @@
           <li><NuxtLink to="/" exact-active-class="active">Home</NuxtLink></li>
           <li><NuxtLink to="/about" exact-active-class="active">About Us</NuxtLink></li>
           <li><NuxtLink to="/shop" exact-active-class="active">Products</NuxtLink></li>
-          <li><NuxtLink to="/sales-representatives" exact-active-class="active">Sales Reps</NuxtLink></li>
+          <li><NuxtLink to="/sales-representatives" exact-active-class="active">Our Network</NuxtLink></li>
           <li><NuxtLink to="/blog" exact-active-class="active">Blog</NuxtLink></li>
           <li><NuxtLink to="/contact" exact-active-class="active">Contact Us</NuxtLink></li>
         </ul>
@@ -48,7 +48,7 @@
         <li><NuxtLink to="/" exact-active-class="active" @click="toggleMobileMenu">Home</NuxtLink></li>
         <li><NuxtLink to="/about" exact-active-class="active" @click="toggleMobileMenu">About Us</NuxtLink></li>
         <li><NuxtLink to="/shop" exact-active-class="active" @click="toggleMobileMenu">Products</NuxtLink></li>
-        <li><NuxtLink to="/sales-representatives" exact-active-class="active" @click="toggleMobileMenu">Sales Representatives</NuxtLink></li>
+        <li><NuxtLink to="/sales-representatives" exact-active-class="active" @click="toggleMobileMenu">Our Network</NuxtLink></li>
         <li><NuxtLink to="/blog" exact-active-class="active" @click="toggleMobileMenu">Blog</NuxtLink></li>
         <li><NuxtLink to="/contact" exact-active-class="active" @click="toggleMobileMenu">Contact Us</NuxtLink></li>
       </ul>
