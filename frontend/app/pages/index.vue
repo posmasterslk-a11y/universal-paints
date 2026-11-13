@@ -270,7 +270,7 @@
     </section>
 
     <!-- News & Events Section -->
-    <section class="news-section">
+    <section class="news-section" v-if="latestArticles && latestArticles.length > 0">
       <div class="container">
         <div class="news-header">
           <div class="news-header-text">
@@ -438,48 +438,12 @@ const bestSellingProducts = computed(() => {
 // Fetch active categories from backend
 const { data: backendCategories } = await useFetch(() => `${cleanApiBase.value}/api/categories?active_only=true`, { key: 'home-categories' })
 
-// Fetch latest blog articles for News & Events section
+// Fetch latest blog articles for News & Events section directly from backend API
 const { data: allBlogs } = await useFetch(() => `${cleanApiBase.value}/api/blogs`, { key: 'home-latest-blogs' })
-
-const defaultArticles = [
-  {
-    id: 1,
-    title: 'Universal Paints Launches Advanced Hybrid Aquamax Waterproofing Technology',
-    slug: 'universal-paints-launches-advanced-hybrid-aquamax-waterproofing-technology',
-    content: 'Universal Paints is proud to unveil its latest breakthrough in architectural protection: Hybrid Aquamax Waterproofing Paint with 8-in-1 protective performance for exterior concrete, roofs, and masonry.',
-    image: '/images/about-us-page/lab-test.webp',
-    published_at: '2026-11-01',
-    created_at: '2026-11-01',
-    category: 'Innovation'
-  },
-  {
-    id: 2,
-    title: 'Color Trends & Architectural Finishes: Elevating Modern Sri Lankan Spaces',
-    slug: 'color-trends-and-architectural-finishes-elevating-modern-sri-lankan-spaces',
-    content: 'Explore curated modern interior and exterior color palettes designed by Universal Paints color consultants to withstand Sri Lanka’s climate while enhancing modern tropical living spaces.',
-    image: '/images/about-us-page/production-line.webp',
-    published_at: '2026-10-25',
-    created_at: '2026-10-25',
-    category: 'Design Trends'
-  },
-  {
-    id: 3,
-    title: 'Expanding Nationwide: Universal Paints Deepens Distribution Across 25 Districts',
-    slug: 'expanding-nationwide-universal-paints-deepens-distribution-across-25-districts',
-    content: 'With an expanded fleet and dedicated technical sales representatives, Universal Paints ensures same-day dealer replenishment and direct on-site support across Sri Lanka.',
-    image: '/images/about-us-page/truck.webp',
-    published_at: '2026-10-18',
-    created_at: '2026-10-18',
-    category: 'Network & Events'
-  }
-]
 
 const latestArticles = computed(() => {
   const list = Array.isArray(allBlogs.value) ? allBlogs.value : (allBlogs.value?.data || [])
-  if (list && list.length > 0) {
-    return list.slice(0, 3)
-  }
-  return defaultArticles
+  return list.slice(0, 3)
 })
 
 const getArticleImageUrl = (path) => {
