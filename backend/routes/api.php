@@ -194,6 +194,28 @@ Route::get('/run-migrations', function (\Illuminate\Http\Request $request) {
                     $logs[] = "Registered existing migration: $migrationName";
                 }
             }
+
+            if (\Illuminate\Support\Facades\Schema::hasColumn('categories', 'show_on_home') && !in_array('2026_11_10_050251_add_show_on_home_to_categories_table', $existing)) {
+                \Illuminate\Support\Facades\DB::table('migrations')->insert([
+                    'migration' => '2026_11_10_050251_add_show_on_home_to_categories_table',
+                    'batch' => $batch
+                ]);
+                $logs[] = "Registered: 2026_11_10_050251_add_show_on_home_to_categories_table";
+            }
+            if (\Illuminate\Support\Facades\Schema::hasColumn('products', 'slug') && !in_array('2026_11_11_083500_add_slug_to_products_table', $existing)) {
+                \Illuminate\Support\Facades\DB::table('migrations')->insert([
+                    'migration' => '2026_11_11_083500_add_slug_to_products_table',
+                    'batch' => $batch
+                ]);
+                $logs[] = "Registered: 2026_11_11_083500_add_slug_to_products_table";
+            }
+            if (\Illuminate\Support\Facades\Schema::hasColumn('blogs', 'category') && !in_array('2026_11_13_000001_add_category_to_blogs_table', $existing)) {
+                \Illuminate\Support\Facades\DB::table('migrations')->insert([
+                    'migration' => '2026_11_13_000001_add_category_to_blogs_table',
+                    'batch' => $batch
+                ]);
+                $logs[] = "Registered: 2026_11_13_000001_add_category_to_blogs_table";
+            }
         }
     } catch (\Throwable $e) {
         $logs[] = "Migration table sync warning: " . $e->getMessage();
