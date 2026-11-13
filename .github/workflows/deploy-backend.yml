@@ -78,4 +78,10 @@ jobs:
               echo "ℹ️ Direct FTP sync applied all app code, routes, and config changes directly to disk."
             fi
           fi
+
+          echo "Triggering database migrations check..."
+          MIGRATE_URL="https://api.universalpaints.lk/api/run-migrations?key=universal_paints_deploy_secure_key_2026"
+          MIGRATE_RES=$(curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$MIGRATE_URL")
+          echo "Migrate Output: $MIGRATE_RES"
+
           echo "Backend deployment completed successfully!"

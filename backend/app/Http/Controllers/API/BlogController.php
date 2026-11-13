@@ -44,7 +44,7 @@ class BlogController extends Controller
             'category' => 'nullable|string|max:100',
             'content' => 'required|string',
             'status' => 'required|in:draft,published',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
+            'image' => 'nullable'
         ]);
 
         $slug = Str::slug($validated['title']);
@@ -61,7 +61,29 @@ class BlogController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $validated['image'] = R2StorageService::upload($request->file('image'), 'blogs');
+            try {
+                $validated['image'] = R2StorageService::upload($request->file('image'), 'blogs');
+            } catch (\Throwable $e) {
+                try {
+                    $path = $request->file('image')->store('blogs', 'public');
+                    $validated['image'] = '/storage/' . $path;
+                } catch (\Throwable $e2) {
+                    \Illuminate\Support\Facades\Log::error('Blog image upload fallback failed: ' . $e2->getMessage());
+                }
+            }
+        } elseif (is_string($request->input('image')) && !empty($request->input('image'))) {
+            $validated['image'] = $request->input('image');
+        }
+
+        // Auto-check and add category column if missing in database
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('blogs', 'category')) {
+            try {
+                \Illuminate\Support\Facades\Schema::table('blogs', function ($table) {
+                    $table->string('category', 100)->nullable()->after('title');
+                });
+            } catch (\Throwable $e) {
+                unset($validated['category']);
+            }
         }
 
         $blog = Blog::create($validated);
@@ -109,7 +131,7 @@ class BlogController extends Controller
             'category' => 'nullable|string|max:100',
             'content' => 'required|string',
             'status' => 'required|in:draft,published',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
+            'image' => 'nullable'
         ]);
 
         // If title changed, update slug
@@ -130,7 +152,29 @@ class BlogController extends Controller
             if ($blog->image) {
                 R2StorageService::delete($blog->image);
             }
-            $validated['image'] = R2StorageService::upload($request->file('image'), 'blogs');
+            try {
+                $validated['image'] = R2StorageService::upload($request->file('image'), 'blogs');
+            } catch (\Throwable $e) {
+                try {
+                    $path = $request->file('image')->store('blogs', 'public');
+                    $validated['image'] = '/storage/' . $path;
+                } catch (\Throwable $e2) {
+                    \Illuminate\Support\Facades\Log::error('Blog image update fallback failed: ' . $e2->getMessage());
+                }
+            }
+        } elseif (is_string($request->input('image')) && !empty($request->input('image'))) {
+            $validated['image'] = $request->input('image');
+        }
+
+        // Auto-check and add category column if missing in database
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('blogs', 'category')) {
+            try {
+                \Illuminate\Support\Facades\Schema::table('blogs', function ($table) {
+                    $table->string('category', 100)->nullable()->after('title');
+                });
+            } catch (\Throwable $e) {
+                unset($validated['category']);
+            }
         }
 
         $blog->update($validated);

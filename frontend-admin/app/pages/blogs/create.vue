@@ -119,6 +119,7 @@
         <div v-show="editorMode === 'visual'" class="border border-slate-200 rounded-lg overflow-hidden bg-white quill-wrapper">
           <ClientOnly>
             <QuillEditor 
+              ref="quillEditorRef"
               v-model:content="form.content" 
               contentType="html" 
               theme="snow" 
@@ -180,6 +181,7 @@ const isSubmitting = ref(false)
 const imageFile = ref(null)
 const imagePreview = ref(null)
 const editorMode = ref('visual')
+const quillEditorRef = ref(null)
 
 const presetCategories = [
   'Innovation & Technology',
@@ -204,9 +206,26 @@ const handleImage = (e) => {
 }
 
 const submitForm = async () => {
-  const contentStr = form.value.content ? form.value.content.trim() : ''
-  if (!contentStr || contentStr === '<p><br></p>' || contentStr === '<p></p>') {
-    alert('Please enter blog content')
+  // Synchronize content from visual editor or textarea
+  let finalContent = form.value.content || ''
+  if (quillEditorRef.value && typeof quillEditorRef.value.getHTML === 'function') {
+    const qHtml = quillEditorRef.value.getHTML()
+    if (qHtml && qHtml !== '<p><br></p>') {
+      finalContent = qHtml
+      form.value.content = qHtml
+    }
+  }
+
+  const plainText = finalContent ? finalContent.replace(/<[^>]*>/g, '').trim() : ''
+  if (!plainText && (!finalContent || finalContent === '<p><br></p>' || finalContent === '<p></p>')) {
+    alert('Please enter blog content before saving.')
+    return
+  }
+
+  const authToken = token.value || (process.client ? localStorage.getItem('auth_token') : '')
+  if (!authToken) {
+    alert('Your session has expired. Please log in again to save.')
+    router.push('/login')
     return
   }
   
@@ -214,10 +233,10 @@ const submitForm = async () => {
   
   try {
     const formData = new FormData()
-    formData.append('title', form.value.title)
-    formData.append('category', form.value.category || '')
+    formData.append('title', form.value.title ? form.value.title.trim() : '')
+    formData.append('category', form.value.category ? form.value.category.trim() : '')
     formData.append('status', form.value.status)
-    formData.append('content', form.value.content)
+    formData.append('content', finalContent)
     
     if (imageFile.value) {
       formData.append('image', imageFile.value)
@@ -226,15 +245,19 @@ const submitForm = async () => {
     await $fetch(`${config.public.apiBase}/api/blogs`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${token.value}`
+        Authorization: `Bearer ${authToken}`,
+        Accept: 'application/json'
       },
       body: formData
     })
     
     router.push('/blogs')
   } catch (err) {
-    alert('Error saving blog post: ' + (err.data?.message || err.message))
-    console.error(err)
+    const errorDetails = err.data?.errors
+      ? Object.values(err.data.errors).flat().join('\n')
+      : (err.data?.message || err.message || 'Unknown server error')
+    alert('Error saving blog post:\n' + errorDetails)
+    console.error('Error saving blog post:', err)
   } finally {
     isSubmitting.value = false
   }

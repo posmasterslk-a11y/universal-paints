@@ -142,6 +142,27 @@ Route::get('/extract-admin', function (\Illuminate\Http\Request $request) {
     ]);
 });
 
+// Secure endpoint to run pending database migrations safely in-process via Artisan
+Route::get('/run-migrations', function (\Illuminate\Http\Request $request) {
+    if ($request->query('key') !== 'universal_paints_deploy_secure_key_2026') {
+        return response()->json(['error' => 'Forbidden'], 403);
+    }
+
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        return response()->json([
+            'status' => 'SUCCESS',
+            'output' => $output
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => 'ERROR',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+
 // Secure endpoint to optimize existing uncompressed images in DB to WebP
 Route::get('/optimize-legacy-images', function (\Illuminate\Http\Request $request) {
     if ($request->query('key') !== 'universal_paints_deploy_secure_key_2026') {

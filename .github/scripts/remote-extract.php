@@ -95,6 +95,15 @@ try {
     }
 } catch (\Throwable $e) {}
 
+try {
+    if (file_exists($baseDir . '/bootstrap/app.php')) {
+        $app = require_once $baseDir . '/bootstrap/app.php';
+        $kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
+        $kernel->bootstrap();
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+    }
+} catch (\Throwable $e) {}
+
 // Self delete extractor script
 @unlink(__FILE__);
 
