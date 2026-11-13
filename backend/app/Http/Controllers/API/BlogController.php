@@ -71,8 +71,8 @@ class BlogController extends Controller
                     \Illuminate\Support\Facades\Log::error('Blog image upload fallback failed: ' . $e2->getMessage());
                 }
             }
-        } elseif (is_string($request->input('image')) && !empty($request->input('image'))) {
-            $validated['image'] = $request->input('image');
+        } elseif ($request->has('image')) {
+            $validated['image'] = $request->input('image') ?: null;
         }
 
         // Auto-check and add category column if missing in database
@@ -162,8 +162,12 @@ class BlogController extends Controller
                     \Illuminate\Support\Facades\Log::error('Blog image update fallback failed: ' . $e2->getMessage());
                 }
             }
-        } elseif (is_string($request->input('image')) && !empty($request->input('image'))) {
-            $validated['image'] = $request->input('image');
+        } elseif ($request->has('image')) {
+            $newImage = $request->input('image') ?: null;
+            if ($blog->image && $newImage !== $blog->image && empty($newImage)) {
+                R2StorageService::delete($blog->image);
+            }
+            $validated['image'] = $newImage;
         }
 
         // Auto-check and add category column if missing in database

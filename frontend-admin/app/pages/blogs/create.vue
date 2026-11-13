@@ -79,14 +79,34 @@
         <!-- Cover Image -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-2">Cover Image</label>
-          <input 
-            type="file" 
-            @change="handleImage" 
-            accept="image/*"
-            class="w-full px-3 py-2.5 rounded-lg border border-slate-200 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 transition text-sm"
-          />
-          <div v-if="imagePreview" class="mt-2 relative w-20 h-14 rounded-md overflow-hidden border border-slate-200">
-            <img :src="imagePreview" alt="Preview" class="w-full h-full object-cover" />
+          <div class="space-y-2">
+            <!-- Preview Box if image present -->
+            <div v-if="form.image" class="relative w-32 h-20 rounded-lg border border-slate-200 overflow-hidden bg-slate-50 group">
+              <img :src="form.image" alt="Cover preview" class="w-full h-full object-cover" />
+              <button 
+                type="button" 
+                @click="form.image = ''" 
+                class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center shadow hover:bg-red-700 text-xs cursor-pointer"
+                title="Remove image"
+              >
+                <i class="fa-solid fa-xmark text-[10px]"></i>
+              </button>
+            </div>
+
+            <!-- Upload + URL Input -->
+            <div class="flex items-center gap-2">
+              <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2 px-3 rounded-lg border border-slate-300 transition flex items-center gap-1.5 shrink-0">
+                <i class="fa-solid fa-cloud-arrow-up text-red-600"></i>
+                <span>{{ isUploadingImage ? 'Uploading...' : 'Upload Image' }}</span>
+                <input type="file" accept="image/*" class="hidden" :disabled="isUploadingImage" @change="handleImageUpload" />
+              </label>
+              <input 
+                type="text" 
+                v-model="form.image" 
+                placeholder="Or paste image URL" 
+                class="flex-1 px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition"
+              >
+            </div>
           </div>
         </div>
       </div>
@@ -116,7 +136,7 @@
         </div>
 
         <!-- Visual Editor (Quill) -->
-        <div v-show="editorMode === 'visual'" class="border border-slate-200 rounded-lg overflow-hidden bg-white quill-wrapper">
+        <div v-show="editorMode === 'visual'" class="border border-slate-200 rounded-lg overflow-hidden bg-white quill-wrapper [&_.ql-toolbar]:!border-0 [&_.ql-toolbar]:!border-b [&_.ql-toolbar]:!border-slate-200 [&_.ql-toolbar]:!bg-slate-50 [&_.ql-container]:!border-0">
           <ClientOnly>
             <QuillEditor 
               ref="quillEditorRef"
@@ -156,7 +176,7 @@
         </NuxtLink>
         <button 
           type="submit" 
-          :disabled="isSubmitting"
+          :disabled="isSubmitting || isUploadingImage"
           class="bg-red-600 hover:bg-red-700 text-white px-7 py-2.5 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
         >
           <i class="fa-solid fa-spinner fa-spin" v-if="isSubmitting"></i>
@@ -172,14 +192,14 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import { compressImage } from '~/utils/imageCompressor'
 
 const config = useRuntimeConfig()
 const { token } = useAuth()
 const router = useRouter()
 
 const isSubmitting = ref(false)
-const imageFile = ref(null)
-const imagePreview = ref(null)
+const isUploadingImage = ref(false)
 const editorMode = ref('visual')
 const quillEditorRef = ref(null)
 
@@ -194,14 +214,38 @@ const presetCategories = [
 const form = ref({
   title: '',
   category: 'Innovation & Technology',
-  status: 'draft',
+  status: 'published',
+  image: '',
   content: ''
 })
 
-const handleImage = (e) => {
-  if (e.target.files && e.target.files[0]) {
-    imageFile.value = e.target.files[0]
-    imagePreview.value = URL.createObjectURL(e.target.files[0])
+const handleImageUpload = async (e) => {
+  const rawFile = e.target.files?.[0]
+  if (!rawFile) return
+
+  isUploadingImage.value = true
+  try {
+    const file = await compressImage(rawFile)
+    const formData = new FormData()
+    formData.append('image', file)
+    formData.append('folder', 'blogs')
+
+    const res = await $fetch(`${config.public.apiBase}/api/upload`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${token.value || (process.client ? localStorage.getItem('auth_token') : '')}`
+      }
+    })
+    if (res && res.url) {
+      form.value.image = res.url
+    }
+  } catch (err) {
+    alert('Failed to upload image: ' + (err.data?.message || err.message))
+    console.error('Image upload error:', err)
+  } finally {
+    isUploadingImage.value = false
+    e.target.value = ''
   }
 }
 
@@ -237,10 +281,7 @@ const submitForm = async () => {
     formData.append('category', form.value.category ? form.value.category.trim() : '')
     formData.append('status', form.value.status)
     formData.append('content', finalContent)
-    
-    if (imageFile.value) {
-      formData.append('image', imageFile.value)
-    }
+    formData.append('image', form.value.image || '')
 
     await $fetch(`${config.public.apiBase}/api/blogs`, {
       method: 'POST',
@@ -265,21 +306,11 @@ const submitForm = async () => {
 </script>
 
 <style scoped>
-.quill-wrapper :deep(.ql-toolbar.ql-snow) {
-  border-width: 0 0 1px 0;
-  border-style: solid;
-  border-color: #e2e8f0;
-  background-color: #f8fafc;
-  padding: 10px 12px;
-}
-.quill-wrapper :deep(.ql-container.ql-snow) {
-  border-width: 0;
-  font-size: 15px;
-  line-height: 1.6;
-}
 .quill-wrapper :deep(.ql-editor) {
   min-height: 260px;
   padding: 16px;
+  font-size: 15px;
+  line-height: 1.6;
 }
 .quill-wrapper :deep(.ql-editor.ql-blank::before) {
   color: #94a3b8;

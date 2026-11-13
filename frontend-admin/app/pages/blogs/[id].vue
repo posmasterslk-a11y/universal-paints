@@ -86,18 +86,34 @@
         <!-- Cover Image -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-2">Cover Image</label>
-          <input 
-            type="file" 
-            @change="handleImage" 
-            accept="image/*"
-            class="w-full px-3 py-2.5 rounded-lg border border-slate-200 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 transition text-sm"
-          />
-          <div class="mt-2 flex items-center gap-3">
-            <div v-if="imagePreview || existingImage" class="relative w-20 h-14 rounded-md overflow-hidden border border-slate-200 bg-slate-50">
-              <img :src="imagePreview || getExistingImageUrl(existingImage)" alt="Cover" class="w-full h-full object-cover" />
+          <div class="space-y-2">
+            <!-- Preview Box if image present -->
+            <div v-if="form.image" class="relative w-32 h-20 rounded-lg border border-slate-200 overflow-hidden bg-slate-50 group">
+              <img :src="getCoverImageUrl(form.image)" alt="Cover preview" class="w-full h-full object-cover" />
+              <button 
+                type="button" 
+                @click="form.image = ''" 
+                class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center shadow hover:bg-red-700 text-xs cursor-pointer"
+                title="Remove image"
+              >
+                <i class="fa-solid fa-xmark text-[10px]"></i>
+              </button>
             </div>
-            <span v-if="existingImage && !imagePreview" class="text-xs text-slate-500">Current image active</span>
-            <span v-if="imagePreview" class="text-xs text-green-600 font-medium">New image selected</span>
+
+            <!-- Upload + URL Input -->
+            <div class="flex items-center gap-2">
+              <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2 px-3 rounded-lg border border-slate-300 transition flex items-center gap-1.5 shrink-0">
+                <i class="fa-solid fa-cloud-arrow-up text-red-600"></i>
+                <span>{{ isUploadingImage ? 'Uploading...' : 'Upload Image' }}</span>
+                <input type="file" accept="image/*" class="hidden" :disabled="isUploadingImage" @change="handleImageUpload" />
+              </label>
+              <input 
+                type="text" 
+                v-model="form.image" 
+                placeholder="Or paste image URL" 
+                class="flex-1 px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition"
+              >
+            </div>
           </div>
         </div>
       </div>
@@ -127,14 +143,14 @@
         </div>
 
         <!-- Visual Editor (Quill) -->
-        <div v-show="editorMode === 'visual'" class="border border-slate-200 rounded-lg overflow-hidden bg-white quill-wrapper">
+        <div v-show="editorMode === 'visual'" class="border border-slate-200 rounded-lg overflow-hidden bg-white quill-wrapper [&_.ql-toolbar]:!border-0 [&_.ql-toolbar]:!border-b [&_.ql-toolbar]:!border-slate-200 [&_.ql-toolbar]:!bg-slate-50 [&_.ql-container]:!border-0">
           <ClientOnly>
             <QuillEditor 
               ref="quillEditorRef"
               v-model:content="form.content" 
               contentType="html" 
               theme="snow" 
-              placeholder="Article content..."
+              placeholder="Write your article content here..."
               class="bg-white"
             />
             <template #fallback>
@@ -150,13 +166,13 @@
         <div v-show="editorMode === 'code'">
           <textarea 
             v-model="form.content" 
-            rows="14" 
+            rows="12" 
             placeholder="<p>Enter HTML content here...</p>"
             class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition font-mono text-sm leading-relaxed text-slate-800"
           ></textarea>
         </div>
         <p class="text-xs text-slate-400 mt-1.5">
-          You can format text visually with bold, headings, and lists, or toggle to HTML Code to paste formatted code directly.
+          Tip: You can format headings, lists, bold text, links, and blockquotes using the visual editor, or switch to HTML Code to paste formatted code directly.
         </p>
       </div>
 
@@ -167,50 +183,33 @@
         </NuxtLink>
         <button 
           type="submit" 
-          :disabled="isSubmitting"
+          :disabled="isSubmitting || isUploadingImage"
           class="bg-red-600 hover:bg-red-700 text-white px-7 py-2.5 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
         >
           <i class="fa-solid fa-spinner fa-spin" v-if="isSubmitting"></i>
-          {{ isSubmitting ? 'Saving Changes...' : 'Update Blog Post' }}
+          {{ isSubmitting ? 'Updating...' : 'Update Blog Post' }}
         </button>
       </div>
     </form>
-    
-    <!-- Error / Not Found State -->
-    <div v-else class="text-center py-16 bg-white rounded-xl border border-slate-200 space-y-4">
-      <div class="w-16 h-16 mx-auto rounded-full bg-red-50 text-red-600 flex items-center justify-center text-2xl">
-        <i class="fa-solid fa-circle-exclamation"></i>
-      </div>
-      <div>
-        <h2 class="text-lg font-bold text-slate-800">Blog post not found!</h2>
-        <p class="text-sm text-slate-500 mt-1">The blog ID {{ id }} could not be retrieved from the server.</p>
-      </div>
-      <NuxtLink to="/blogs" class="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition text-sm">
-        <i class="fa-solid fa-arrow-left"></i>
-        Back to Blogs List
-      </NuxtLink>
-    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import { compressImage } from '~/utils/imageCompressor'
 
 const config = useRuntimeConfig()
 const { token } = useAuth()
-const router = useRouter()
 const route = useRoute()
+const router = useRouter()
 
 const id = route.params.id
-
 const pending = ref(true)
 const isSubmitting = ref(false)
-const imageFile = ref(null)
-const imagePreview = ref(null)
-const existingImage = ref(null)
+const isUploadingImage = ref(false)
 const editorMode = ref('visual')
 const quillEditorRef = ref(null)
 
@@ -222,13 +221,49 @@ const presetCategories = [
   'Architectural Finishes'
 ]
 
-const form = ref(null)
+const form = ref({
+  title: '',
+  category: 'Innovation & Technology',
+  status: 'draft',
+  image: '',
+  content: ''
+})
 
-const getExistingImageUrl = (img) => {
+const getCoverImageUrl = (img) => {
   if (!img) return ''
   if (img.startsWith('http://') || img.startsWith('https://')) return img
   if (img.startsWith('/images/')) return img
   return `${config.public.apiBase}${img}`
+}
+
+const handleImageUpload = async (e) => {
+  const rawFile = e.target.files?.[0]
+  if (!rawFile) return
+
+  isUploadingImage.value = true
+  try {
+    const file = await compressImage(rawFile)
+    const formData = new FormData()
+    formData.append('image', file)
+    formData.append('folder', 'blogs')
+
+    const res = await $fetch(`${config.public.apiBase}/api/upload`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${token.value || (process.client ? localStorage.getItem('auth_token') : '')}`
+      }
+    })
+    if (res && res.url) {
+      form.value.image = res.url
+    }
+  } catch (err) {
+    alert('Failed to upload image: ' + (err.data?.message || err.message))
+    console.error('Image upload error:', err)
+  } finally {
+    isUploadingImage.value = false
+    e.target.value = ''
+  }
 }
 
 onMounted(async () => {
@@ -262,9 +297,9 @@ onMounted(async () => {
         title: blog.title || '',
         category: blog.category || 'Innovation & Technology',
         status: blog.status || 'draft',
+        image: blog.image || '',
         content: blog.content || ''
       }
-      existingImage.value = blog.image
     }
   } catch (err) {
     console.error('Failed to load blog:', err)
@@ -272,13 +307,6 @@ onMounted(async () => {
     pending.value = false
   }
 })
-
-const handleImage = (e) => {
-  if (e.target.files && e.target.files[0]) {
-    imageFile.value = e.target.files[0]
-    imagePreview.value = URL.createObjectURL(e.target.files[0])
-  }
-}
 
 const submitForm = async () => {
   // Synchronize content from visual editor or textarea
@@ -312,13 +340,10 @@ const submitForm = async () => {
     formData.append('category', form.value.category ? form.value.category.trim() : '')
     formData.append('status', form.value.status)
     formData.append('content', finalContent)
+    formData.append('image', form.value.image || '')
     
     // Support Laravel PUT method spoofing via POST
     formData.append('_method', 'PUT')
-    
-    if (imageFile.value) {
-      formData.append('image', imageFile.value)
-    }
 
     await $fetch(`${config.public.apiBase}/api/blogs/${id}`, {
       method: 'POST', // using POST with _method=PUT for multipart/form-data
@@ -343,21 +368,11 @@ const submitForm = async () => {
 </script>
 
 <style scoped>
-.quill-wrapper :deep(.ql-toolbar.ql-snow) {
-  border-width: 0 0 1px 0;
-  border-style: solid;
-  border-color: #e2e8f0;
-  background-color: #f8fafc;
-  padding: 10px 12px;
-}
-.quill-wrapper :deep(.ql-container.ql-snow) {
-  border-width: 0;
-  font-size: 15px;
-  line-height: 1.6;
-}
 .quill-wrapper :deep(.ql-editor) {
   min-height: 280px;
   padding: 16px;
+  font-size: 15px;
+  line-height: 1.6;
 }
 .quill-wrapper :deep(.ql-editor.ql-blank::before) {
   color: #94a3b8;

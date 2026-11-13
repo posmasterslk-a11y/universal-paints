@@ -39,12 +39,13 @@
           <tbody class="divide-y divide-slate-100">
             <tr v-for="blog in blogList" :key="blog.id" class="hover:bg-slate-50 transition">
               <td class="p-4">
-                <div class="w-16 h-12 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden shrink-0">
+                <div class="w-16 h-12 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
                   <img 
-                    v-if="blog.image" 
+                    v-if="blog.image && !brokenImages[blog.id]" 
                     :src="getBlogImage(blog.image)" 
                     :alt="blog.title" 
                     class="w-full h-full object-cover" 
+                    @error="brokenImages[blog.id] = true"
                   />
                   <div v-else class="w-full h-full flex items-center justify-center text-slate-300">
                     <i class="fa-solid fa-image text-lg"></i>
@@ -103,10 +104,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 
 const config = useRuntimeConfig()
 const { token } = useAuth()
+const brokenImages = ref({})
 
 const { data: blogs, pending, error, refresh } = await useFetch(`${config.public.apiBase}/api/blogs`, {
   headers: {
