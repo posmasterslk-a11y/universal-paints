@@ -31,6 +31,7 @@
         >
           <div class="blog-card-img">
             <img :src="getBlogImg(blog)" :alt="blog.title" loading="lazy" decoding="async" />
+            <span class="blog-category-badge">{{ getBlogCategory(blog) }}</span>
           </div>
           <div class="blog-card-content">
             <div class="blog-meta">
@@ -57,6 +58,7 @@ const defaultBlogs = [
   {
     id: 1,
     title: 'Universal Paints Launches Advanced Hybrid Aquamax Waterproofing Technology',
+    category: 'Innovation & Technology',
     slug: 'universal-paints-launches-advanced-hybrid-aquamax-waterproofing-technology',
     content: '<p>Universal Paints is proud to unveil its latest breakthrough in architectural protection: <strong>Hybrid Aquamax Waterproofing Paint</strong>. Formulated using advanced water-based polymer cross-linking technology, Hybrid Aquamax offers an all-in-one protective barrier engineered specifically for Sri Lanka’s demanding tropical weather conditions.</p>',
     image: '/images/about-us-page/lab-test.webp',
@@ -66,6 +68,7 @@ const defaultBlogs = [
   {
     id: 2,
     title: 'Color Trends & Architectural Finishes: Elevating Modern Sri Lankan Spaces',
+    category: 'Color Trends & Design',
     slug: 'color-trends-and-architectural-finishes-elevating-modern-sri-lankan-spaces',
     content: '<p>Modern architecture in Sri Lanka is undergoing an exciting renaissance—blending open-concept tropical minimalism with warm earthy undertones and vibrant accents. Universal Paints has curated an inspiring guide on how to choose colors and finishes that enhance natural daylight while standing up to high humidity and intense UV exposure.</p>',
     image: '/images/about-us-page/production-line.webp',
@@ -75,6 +78,7 @@ const defaultBlogs = [
   {
     id: 3,
     title: 'Expanding Nationwide: Universal Paints Deepens Distribution Across 25 Districts',
+    category: 'Company News & Events',
     slug: 'expanding-nationwide-universal-paints-deepens-distribution-across-25-districts',
     content: '<p>In line with our commitment to accessible quality and dependable service, Universal Paints has announced the significant expansion of our islandwide logistics fleet and dedicated district sales network across all 25 administrative districts in Sri Lanka.</p>',
     image: '/images/about-us-page/truck.webp',
@@ -88,6 +92,20 @@ const displayBlogs = computed(() => {
   if (list && list.length > 0) return list
   return defaultBlogs
 })
+
+const getBlogCategory = (b) => {
+  if (b?.category) return b.category
+  if (b?.title?.toLowerCase().includes('waterproof') || b?.title?.toLowerCase().includes('technolog')) {
+    return 'Innovation & Technology'
+  }
+  if (b?.title?.toLowerCase().includes('color') || b?.title?.toLowerCase().includes('trend')) {
+    return 'Color Trends & Design'
+  }
+  if (b?.title?.toLowerCase().includes('nationwide') || b?.title?.toLowerCase().includes('distribution')) {
+    return 'Company News & Events'
+  }
+  return 'News & Events'
+}
 
 const getBlogImg = (b) => {
   if (!b?.image) return '/images/about-us-page/hero.webp'
@@ -181,8 +199,25 @@ useHead({
 }
 
 .blog-card-img {
+  position: relative;
   height: 220px;
   overflow: hidden;
+}
+.blog-category-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 4px 11px;
+  border-radius: 20px;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 .blog-card-img img {
   width: 100%;

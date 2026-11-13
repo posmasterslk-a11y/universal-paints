@@ -22,7 +22,8 @@ class BlogController extends Controller
         // If request is from admin panel (has token), show all. Otherwise, only published.
         $query = Blog::query();
         
-        if (!$request->user()) {
+        $user = $request->user() ?? auth('sanctum')->user();
+        if (!$user) {
             $query->where('status', 'published');
         }
 
@@ -40,6 +41,7 @@ class BlogController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'category' => 'nullable|string|max:100',
             'content' => 'required|string',
             'status' => 'required|in:draft,published',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
@@ -73,14 +75,21 @@ class BlogController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  string  $slug
+     * @param  string|int  $identifier
      * @return \Illuminate\Http\Response
      */
-    public function show($slug)
+    public function show($identifier)
     {
-        $blog = Blog::where('slug', $slug)->firstOrFail();
+        if (is_numeric($identifier)) {
+            $blog = Blog::find($identifier);
+        } else {
+            $blog = Blog::where('slug', $identifier)->first();
+        }
         
-        // Optionally, check if it's published unless user is admin, but keeping it simple for now.
+        if (!$blog) {
+            return response()->json(['message' => 'Blog post not found'], 404);
+        }
+
         return response()->json($blog);
     }
 
@@ -97,6 +106,7 @@ class BlogController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'category' => 'nullable|string|max:100',
             'content' => 'required|string',
             'status' => 'required|in:draft,published',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
