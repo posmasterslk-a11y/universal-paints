@@ -269,6 +269,89 @@
       </div>
     </section>
 
+    <!-- News & Events Section -->
+    <section class="news-section">
+      <div class="container">
+        <div class="news-header">
+          <div class="news-header-text">
+            <div class="section-subtitle">LATEST UPDATES</div>
+            <h2 class="section-title">News &amp; Events</h2>
+            <p class="news-subtitle-desc">
+              Discover company announcements, industry insights, technical innovations, and the latest happenings at Universal Paints.
+            </p>
+          </div>
+          <div class="news-header-cta">
+            <NuxtLink to="/blog" class="btn btn-outline-red btn-view-all-news">
+              <span>View All News &amp; Events</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="btn-arrow-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            </NuxtLink>
+          </div>
+        </div>
+
+        <div class="news-grid">
+          <article 
+            v-for="article in latestArticles" 
+            :key="article.id || article.slug" 
+            class="news-card"
+          >
+            <NuxtLink :to="`/blog/${article.slug}`" class="news-card-link">
+              <div class="news-img-wrap">
+                <img 
+                  :src="getArticleImageUrl(article.image)" 
+                  :alt="article.title" 
+                  loading="lazy" 
+                  decoding="async" 
+                />
+                <span class="news-tag-badge">{{ getArticleCategory(article) }}</span>
+              </div>
+              <div class="news-card-content">
+                <div class="news-meta">
+                  <span class="news-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-3.5 h-3.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                    </svg>
+                    {{ formatArticleDate(article.published_at || article.created_at) }}
+                  </span>
+                  <span class="news-meta-dot">•</span>
+                  <span class="news-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-3.5 h-3.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    4 min read
+                  </span>
+                </div>
+                <h3 class="news-card-title" :title="article.title">
+                  {{ article.title }}
+                </h3>
+                <p class="news-card-excerpt">
+                  {{ getArticleExcerpt(article.content) }}
+                </p>
+                <div class="news-card-footer">
+                  <span class="news-read-more">
+                    <span>Read Article</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="btn-arrow-icon">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </NuxtLink>
+          </article>
+        </div>
+
+        <div class="news-mobile-cta">
+          <NuxtLink to="/blog" class="btn btn-outline-red w-100 btn-view-more">
+            <span>View All News &amp; Events</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="btn-arrow-icon">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+          </NuxtLink>
+        </div>
+      </div>
+    </section>
+
     <!-- Why Choose Us -->
     <section class="why-us">
       <div class="container">
@@ -355,6 +438,87 @@ const bestSellingProducts = computed(() => {
 // Fetch active categories from backend
 const { data: backendCategories } = await useFetch(() => `${cleanApiBase.value}/api/categories?active_only=true`, { key: 'home-categories' })
 
+// Fetch latest blog articles for News & Events section
+const { data: allBlogs } = await useFetch(() => `${cleanApiBase.value}/api/blogs`, { key: 'home-latest-blogs' })
+
+const defaultArticles = [
+  {
+    id: 1,
+    title: 'Universal Paints Launches Advanced Hybrid Aquamax Waterproofing Technology',
+    slug: 'universal-paints-launches-advanced-hybrid-aquamax-waterproofing-technology',
+    content: 'Universal Paints is proud to unveil its latest breakthrough in architectural protection: Hybrid Aquamax Waterproofing Paint with 8-in-1 protective performance for exterior concrete, roofs, and masonry.',
+    image: '/images/about-us-page/lab-test.webp',
+    published_at: '2026-11-01',
+    created_at: '2026-11-01',
+    category: 'Innovation'
+  },
+  {
+    id: 2,
+    title: 'Color Trends & Architectural Finishes: Elevating Modern Sri Lankan Spaces',
+    slug: 'color-trends-and-architectural-finishes-elevating-modern-sri-lankan-spaces',
+    content: 'Explore curated modern interior and exterior color palettes designed by Universal Paints color consultants to withstand Sri Lanka’s climate while enhancing modern tropical living spaces.',
+    image: '/images/about-us-page/production-line.webp',
+    published_at: '2026-10-25',
+    created_at: '2026-10-25',
+    category: 'Design Trends'
+  },
+  {
+    id: 3,
+    title: 'Expanding Nationwide: Universal Paints Deepens Distribution Across 25 Districts',
+    slug: 'expanding-nationwide-universal-paints-deepens-distribution-across-25-districts',
+    content: 'With an expanded fleet and dedicated technical sales representatives, Universal Paints ensures same-day dealer replenishment and direct on-site support across Sri Lanka.',
+    image: '/images/about-us-page/truck.webp',
+    published_at: '2026-10-18',
+    created_at: '2026-10-18',
+    category: 'Network & Events'
+  }
+]
+
+const latestArticles = computed(() => {
+  const list = Array.isArray(allBlogs.value) ? allBlogs.value : (allBlogs.value?.data || [])
+  if (list && list.length > 0) {
+    return list.slice(0, 3)
+  }
+  return defaultArticles
+})
+
+const getArticleImageUrl = (path) => {
+  if (!path) return '/images/about-us-page/hero.webp'
+  if (path.startsWith('http://') || path.startsWith('https://')) return path
+  if (path.startsWith('/images/')) return path
+  if (path.startsWith('/storage/')) return `${cleanApiBase.value}${path}`
+  return `${cleanApiBase.value}${path}`
+}
+
+const getArticleExcerpt = (html, maxLen = 115) => {
+  if (!html) return ''
+  const clean = html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
+  return clean.length > maxLen ? clean.substring(0, maxLen) + '...' : clean
+}
+
+const formatArticleDate = (dateStr) => {
+  if (!dateStr) return 'Latest'
+  try {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    })
+  } catch (e) {
+    return dateStr
+  }
+}
+
+const getArticleCategory = (article) => {
+  if (article.category) return article.category
+  const title = (article.title || '').toLowerCase()
+  if (title.includes('waterproof') || title.includes('technology') || title.includes('innovat')) return 'Innovation'
+  if (title.includes('color') || title.includes('trend') || title.includes('interior')) return 'Trends & Ideas'
+  if (title.includes('network') || title.includes('distribut') || title.includes('expand')) return 'Network & Growth'
+  if (title.includes('event') || title.includes('exhibition') || title.includes('launch')) return 'Events'
+  return 'Company News'
+}
+
 const getCategoryImageUrl = (path) => {
   if (!path) return '/images/products/exterior.webp'
   if (path.startsWith('http://') || path.startsWith('https://')) return path
@@ -433,6 +597,17 @@ onMounted(async () => {
         if (res2) backendCategories.value = res2
       } catch (e) {}
     }
+  }
+
+  // Client-side hydration retry for blogs
+  const currentBlogList = Array.isArray(allBlogs.value) ? allBlogs.value : (allBlogs.value?.data || [])
+  if (!currentBlogList.length) {
+    try {
+      const bRes = await $fetch(`${cleanApiBase.value}/api/blogs`)
+      if (bRes && (Array.isArray(bRes) ? bRes.length : bRes.data?.length)) {
+        allBlogs.value = bRes
+      }
+    } catch (e) {}
   }
 });
 
@@ -1059,6 +1234,195 @@ onUnmounted(() => {
   font-size: 16px;
 }
 
+/* News & Events Section */
+.news-section {
+  padding: 90px 0;
+  background-color: #FFFFFF;
+  border-top: 1px solid #F1F5F9;
+  border-bottom: 1px solid #F1F5F9;
+}
+.news-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 48px;
+  gap: 24px;
+}
+.news-header-text {
+  max-width: 650px;
+}
+.news-subtitle-desc {
+  font-size: 16px;
+  color: #64748B;
+  line-height: 1.6;
+  margin: 10px 0 0;
+}
+.news-header-cta {
+  flex-shrink: 0;
+}
+.btn-view-all-news {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-size: 14.5px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-view-all-news .btn-arrow-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.25s ease;
+}
+.btn-view-all-news:hover .btn-arrow-icon {
+  transform: translateX(4px);
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 30px;
+}
+.news-card {
+  background: white;
+  border: 1px solid #E2E8F0;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.news-card:hover {
+  transform: translateY(-8px);
+  border-color: #CBD5E1;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+.news-card-link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+.news-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background-color: #F1F5F9;
+}
+.news-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block;
+}
+.news-card:hover .news-img-wrap img {
+  transform: scale(1.08);
+}
+.news-tag-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+.news-card-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.news-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #64748B;
+  margin-bottom: 12px;
+}
+.news-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.news-meta-item svg {
+  color: #E3000F;
+}
+.news-meta-dot {
+  color: #CBD5E1;
+}
+.news-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0F172A;
+  line-height: 1.4;
+  margin: 0 0 12px 0;
+  height: 50px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.25s ease;
+}
+.news-card:hover .news-card-title {
+  color: #E3000F;
+}
+.news-card-excerpt {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+  height: 68px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.news-card-footer {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid #F1F5F9;
+}
+.news-read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #E3000F;
+  font-size: 13.5px;
+  font-weight: 700;
+  transition: all 0.25s ease;
+}
+.news-read-more .btn-arrow-icon {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.25s ease;
+}
+.news-card:hover .news-read-more {
+  color: #B91C1C;
+  gap: 9px;
+}
+.news-card:hover .news-read-more .btn-arrow-icon {
+  transform: translateX(4px);
+}
+.news-mobile-cta {
+  display: none;
+  margin-top: 32px;
+}
+
 /* Why Us */
 .why-us {
   padding: 80px 0;
@@ -1261,6 +1625,27 @@ onUnmounted(() => {
   .network-features h4 {
     text-align: center;
     margin-bottom: 16px;
+  }
+  
+  /* News & Events */
+  .news-section {
+    padding: 60px 0;
+  }
+  .news-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .news-header {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 32px;
+    gap: 16px;
+  }
+  .news-header-cta {
+    display: none;
+  }
+  .news-mobile-cta {
+    display: block;
   }
   
   /* Why Us */
@@ -1583,6 +1968,47 @@ onUnmounted(() => {
     font-size: 13px;
     margin-bottom: 8px;
     padding-left: 24px;
+  }
+  
+  
+  /* News & Events Mobile */
+  .news-section {
+    padding: 44px 0;
+  }
+  .news-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .news-card {
+    border-radius: 16px;
+  }
+  .news-card-content {
+    padding: 18px 16px;
+  }
+  .news-card-title {
+    font-size: 16.5px;
+    height: auto;
+    -webkit-line-clamp: 2;
+    margin-bottom: 8px;
+  }
+  .news-card-excerpt {
+    font-size: 13.5px;
+    height: auto;
+    -webkit-line-clamp: 2;
+    margin-bottom: 14px;
+  }
+  .news-card-footer {
+    padding-top: 12px;
+  }
+  .news-mobile-cta {
+    display: block;
+    margin-top: 20px;
+  }
+  .news-mobile-cta .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 11px 18px;
+    font-size: 14px;
   }
   
   /* Why Us */

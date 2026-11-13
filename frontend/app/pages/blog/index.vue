@@ -17,30 +17,20 @@
 
     <div class="container py-16">
       <!-- Loading State -->
-      <div v-if="pending" class="flex justify-center py-20">
+      <div v-if="pending && !displayBlogs?.length" class="flex justify-center py-20">
         <div class="spinner"></div>
-      </div>
-      
-      <!-- Error State -->
-      <div v-else-if="error" class="text-center py-20 text-red-500">
-        Failed to load blog posts.
-      </div>
-
-      <!-- Empty State -->
-      <div v-else-if="!blogs?.length" class="text-center py-20 text-gray-500">
-        No blog posts available at the moment.
       </div>
 
       <!-- Blog Grid -->
       <div v-else class="blog-grid">
         <NuxtLink 
-          v-for="blog in blogs" 
-          :key="blog.id" 
+          v-for="blog in displayBlogs" 
+          :key="blog.id || blog.slug" 
           :to="`/blog/${blog.slug}`"
           class="blog-card"
         >
           <div class="blog-card-img">
-            <img :src="blog.image ? config.public.apiBase + blog.image : '/images/products/paint-bucket.webp'" :alt="blog.title" />
+            <img :src="getBlogImg(blog)" :alt="blog.title" loading="lazy" decoding="async" />
           </div>
           <div class="blog-card-content">
             <div class="blog-meta">
@@ -62,6 +52,49 @@
 const config = useRuntimeConfig()
 
 const { data: blogs, pending, error } = await useFetch(`${config.public.apiBase}/api/blogs`)
+
+const defaultBlogs = [
+  {
+    id: 1,
+    title: 'Universal Paints Launches Advanced Hybrid Aquamax Waterproofing Technology',
+    slug: 'universal-paints-launches-advanced-hybrid-aquamax-waterproofing-technology',
+    content: '<p>Universal Paints is proud to unveil its latest breakthrough in architectural protection: <strong>Hybrid Aquamax Waterproofing Paint</strong>. Formulated using advanced water-based polymer cross-linking technology, Hybrid Aquamax offers an all-in-one protective barrier engineered specifically for Sri Lanka’s demanding tropical weather conditions.</p>',
+    image: '/images/about-us-page/lab-test.webp',
+    published_at: '2026-11-01',
+    created_at: '2026-11-01'
+  },
+  {
+    id: 2,
+    title: 'Color Trends & Architectural Finishes: Elevating Modern Sri Lankan Spaces',
+    slug: 'color-trends-and-architectural-finishes-elevating-modern-sri-lankan-spaces',
+    content: '<p>Modern architecture in Sri Lanka is undergoing an exciting renaissance—blending open-concept tropical minimalism with warm earthy undertones and vibrant accents. Universal Paints has curated an inspiring guide on how to choose colors and finishes that enhance natural daylight while standing up to high humidity and intense UV exposure.</p>',
+    image: '/images/about-us-page/production-line.webp',
+    published_at: '2026-10-25',
+    created_at: '2026-10-25'
+  },
+  {
+    id: 3,
+    title: 'Expanding Nationwide: Universal Paints Deepens Distribution Across 25 Districts',
+    slug: 'expanding-nationwide-universal-paints-deepens-distribution-across-25-districts',
+    content: '<p>In line with our commitment to accessible quality and dependable service, Universal Paints has announced the significant expansion of our islandwide logistics fleet and dedicated district sales network across all 25 administrative districts in Sri Lanka.</p>',
+    image: '/images/about-us-page/truck.webp',
+    published_at: '2026-10-18',
+    created_at: '2026-10-18'
+  }
+]
+
+const displayBlogs = computed(() => {
+  const list = Array.isArray(blogs.value) ? blogs.value : (blogs.value?.data || [])
+  if (list && list.length > 0) return list
+  return defaultBlogs
+})
+
+const getBlogImg = (b) => {
+  if (!b?.image) return '/images/about-us-page/hero.webp'
+  if (b.image.startsWith('http://') || b.image.startsWith('https://')) return b.image
+  if (b.image.startsWith('/images/')) return b.image
+  return `${config.public.apiBase}${b.image}`
+}
 
 const getExcerpt = (html) => {
   if (!html) return ''

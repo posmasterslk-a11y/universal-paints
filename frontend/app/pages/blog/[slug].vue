@@ -1,12 +1,12 @@
 <template>
   <div class="blog-single-page">
     <!-- Loading State -->
-    <div v-if="pending" class="flex justify-center items-center min-h-screen py-32">
+    <div v-if="pending && !currentBlog" class="flex justify-center items-center min-h-screen py-32">
       <div class="spinner"></div>
     </div>
     
     <!-- Error State -->
-    <div v-else-if="error || !blog" class="flex flex-col items-center justify-center min-h-screen py-32 text-center px-4">
+    <div v-else-if="!currentBlog" class="flex flex-col items-center justify-center min-h-screen py-32 text-center px-4">
       <h1 class="text-4xl font-extrabold text-slate-900 mb-4">Blog Post Not Found</h1>
       <p class="text-lg text-slate-600 mb-8">The article you are looking for doesn't exist or has been removed.</p>
       <NuxtLink to="/blog" class="btn btn-primary">Back to Blog</NuxtLink>
@@ -17,22 +17,22 @@
       <!-- Hero Header -->
       <header class="blog-header">
         <div class="blog-header-bg">
-          <img :src="blog.image ? config.public.apiBase + blog.image : '/images/about-us-page/hero.webp'" :alt="blog.title" class="header-bg-img" />
+          <img :src="getBlogImg(currentBlog)" :alt="currentBlog.title" class="header-bg-img" />
           <div class="header-overlay"></div>
         </div>
         <div class="container relative z-10 text-center">
           <div class="blog-meta-top text-white/80 mb-4 uppercase tracking-wider font-semibold text-sm">
-            {{ new Date(blog.published_at || blog.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }}
+            {{ new Date(currentBlog.published_at || currentBlog.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }}
           </div>
           <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white max-w-4xl mx-auto leading-tight">
-            {{ blog.title }}
+            {{ currentBlog.title }}
           </h1>
         </div>
       </header>
 
       <!-- Main Content -->
       <div class="container py-16 lg:py-24 max-w-4xl">
-        <div class="blog-content quill-content" v-html="blog.content"></div>
+        <div class="blog-content quill-content" v-html="currentBlog.content"></div>
         
         <div class="mt-16 pt-8 border-t border-slate-200 flex justify-between items-center">
           <NuxtLink to="/blog" class="font-bold text-slate-600 hover:text-[#E3000F] transition flex items-center gap-2">
@@ -59,16 +59,60 @@ const config = useRuntimeConfig()
 
 const { data: blog, pending, error } = await useFetch(`${config.public.apiBase}/api/blogs/${route.params.slug}`)
 
-const blogTitle = computed(() => blog.value?.title ? `${blog.value.title} | Universal Paints Sri Lanka` : 'Universal Paints Blog')
-const blogDesc = computed(() => {
-  if (!blog.value?.content) return 'Read insights, surface preparation tips, and painting advice from Universal Paints Sri Lanka.'
-  return blog.value.content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().substring(0, 160)
+const defaultBlogs = [
+  {
+    id: 1,
+    title: 'Universal Paints Launches Advanced Hybrid Aquamax Waterproofing Technology',
+    slug: 'universal-paints-launches-advanced-hybrid-aquamax-waterproofing-technology',
+    content: '<p>Universal Paints is proud to unveil its latest breakthrough in architectural protection: <strong>Hybrid Aquamax Waterproofing Paint</strong>. Formulated using advanced water-based polymer cross-linking technology, Hybrid Aquamax offers an all-in-one protective barrier engineered specifically for Sri Lanka’s demanding tropical weather conditions.</p><h3>Unmatched 8-in-1 Surface Defense</h3><p>Unlike traditional solvent-based sealants, Hybrid Aquamax combines flexible crack-bridging elasticity with high hydrostatic pressure resistance. It seals hairline cracks up to 1.5mm, prevents efflorescence, resists fungal and algae growth, and acts as its own primer, significantly cutting labour and application costs for both residential builders and commercial developers.</p><h3>Engineered for Sri Lankan Climates</h3><p>With seasonal monsoons and high humidity across coastal and highland regions, concrete surfaces are constantly vulnerable to moisture ingress. Universal Paints technical research lab spent over 18 months formulating and field-testing Hybrid Aquamax on concrete slabs, exterior masonry, parapet walls, and asbestos sheets to guarantee long-lasting durability.</p><p>Hybrid Aquamax is now available in 1L, 4L, 10L, and 20L packs through Universal Paints authorized dealers and sales representatives nationwide.</p>',
+    image: '/images/about-us-page/lab-test.webp',
+    published_at: '2026-11-01',
+    created_at: '2026-11-01'
+  },
+  {
+    id: 2,
+    title: 'Color Trends & Architectural Finishes: Elevating Modern Sri Lankan Spaces',
+    slug: 'color-trends-and-architectural-finishes-elevating-modern-sri-lankan-spaces',
+    content: '<p>Modern architecture in Sri Lanka is undergoing an exciting renaissance—blending open-concept tropical minimalism with warm earthy undertones and vibrant accents. Universal Paints has curated an inspiring guide on how to choose colors and finishes that enhance natural daylight while standing up to high humidity and intense UV exposure.</p><h3>The Rise of Calming Earth Tones & Crisp Neutrals</h3><p>Interior spaces are embracing warm whites, subtle stone greys, and muted terracotta shades. Our flagship <em>Sudu Sudu Premium Emulsion</em> has become the top choice for contemporary living areas, offering a bright, light-reflective matte finish that creates an illusion of expansive space.</p><h3>Long-Lasting Exterior Aesthetics</h3><p>When painting exterior facades, color retention is just as vital as aesthetics. Universal Paints utilizes UV-resistant micronized pigments that prevent fading and chalking even after prolonged exposure to tropical sunlight. Combine light-reflective neutrals on main facades with bold feature walls in rainforest green or coastal blue to create memorable curb appeal.</p><p>Visit our showroom or connect with our dealer network to explore our extensive color palettes and sample cards.</p>',
+    image: '/images/about-us-page/production-line.webp',
+    published_at: '2026-10-25',
+    created_at: '2026-10-25'
+  },
+  {
+    id: 3,
+    title: 'Expanding Nationwide: Universal Paints Deepens Distribution Across 25 Districts',
+    slug: 'expanding-nationwide-universal-paints-deepens-distribution-across-25-districts',
+    content: '<p>In line with our commitment to accessible quality and dependable service, Universal Paints has announced the significant expansion of our islandwide logistics fleet and dedicated district sales network across all 25 administrative districts in Sri Lanka.</p><h3>Next-Day Dealer Replenishment</h3><p>Hardware retailers and paint distributors can now benefit from streamlined central ordering and guaranteed prompt replenishment. Our regional logistics hubs in Western, Central, Southern, North Western, and Eastern provinces ensure that stock-outs are eliminated, even during peak festive and construction seasons.</p><h3>Direct Technical Site Support</h3><p>Alongside expanded distribution, Universal Paints has deployed specialized technical advisors to assist contractors, architects, and homeowners on-site with substrate preparation diagnostics, moisture measurements, and custom tinting solutions.</p><p>Find your nearest distributor or district sales representative on our dedicated Network page today.</p>',
+    image: '/images/about-us-page/truck.webp',
+    published_at: '2026-10-18',
+    created_at: '2026-10-18'
+  }
+]
+
+const currentBlog = computed(() => {
+  if (blog.value && (blog.value.id || blog.value.title || blog.value.data?.id)) {
+    return blog.value.data || blog.value
+  }
+  return defaultBlogs.find(b => b.slug === route.params.slug) || null
 })
-const blogImg = computed(() => blog.value?.image ? (blog.value.image.startsWith('http') ? blog.value.image : config.public.apiBase + blog.value.image) : 'https://universalpaints.lk/images/about-us-page/hero.webp')
+
+const getBlogImg = (b) => {
+  if (!b?.image) return 'https://universalpaints.lk/images/about-us-page/hero.webp'
+  if (b.image.startsWith('http://') || b.image.startsWith('https://')) return b.image
+  if (b.image.startsWith('/images/')) return b.image
+  return `${config.public.apiBase}${b.image}`
+}
+
+const blogTitle = computed(() => currentBlog.value?.title ? `${currentBlog.value.title} | Universal Paints Sri Lanka` : 'Universal Paints Blog')
+const blogDesc = computed(() => {
+  if (!currentBlog.value?.content) return 'Read insights, surface preparation tips, and painting advice from Universal Paints Sri Lanka.'
+  return currentBlog.value.content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().substring(0, 160)
+})
+const blogImg = computed(() => getBlogImg(currentBlog.value))
 const blogUrl = computed(() => `https://universalpaints.lk/blog/${route.params.slug}`)
 
 useSeoMeta({
-  title: () => blog.value?.title || 'Blog Post',
+  title: () => currentBlog.value?.title || 'Blog Post',
   ogTitle: blogTitle,
   description: blogDesc,
   ogDescription: blogDesc,
@@ -91,10 +135,10 @@ useHead({
       children: computed(() => JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'BlogPosting',
-        headline: blog.value?.title || 'Universal Paints Blog Post',
+        headline: currentBlog.value?.title || 'Universal Paints Blog Post',
         image: [blogImg.value],
         description: blogDesc.value,
-        datePublished: blog.value?.published_at || blog.value?.created_at || new Date().toISOString(),
+        datePublished: currentBlog.value?.published_at || currentBlog.value?.created_at || new Date().toISOString(),
         author: {
           '@type': 'Organization',
           name: 'Universal Paints (Pvt) Ltd'
