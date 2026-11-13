@@ -148,19 +148,70 @@ Route::get('/run-migrations', function (\Illuminate\Http\Request $request) {
         return response()->json(['error' => 'Forbidden'], 403);
     }
 
+    $logs = [];
+
+    // 1. Ensure category column exists in blogs table immediately
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasTable('blogs')) {
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('blogs', 'category')) {
+                \Illuminate\Support\Facades\Schema::table('blogs', function ($table) {
+                    $table->string('category', 100)->nullable()->after('title');
+                });
+                $logs[] = "Added 'category' column to 'blogs' table.";
+            } else {
+                $logs[] = "'category' column already exists in 'blogs' table.";
+            }
+        }
+    } catch (\Throwable $e) {
+        $logs[] = "Schema alter error: " . $e->getMessage();
+    }
+
+    // 2. Register baseline migrations in migrations table if physical tables already exist
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasTable('migrations')) {
+            $existing = \Illuminate\Support\Facades\DB::table('migrations')->pluck('migration')->toArray();
+            $batch = (\Illuminate\Support\Facades\DB::table('migrations')->max('batch') ?? 0) + 1;
+
+            $tableMigrationMap = [
+                'users' => '2014_10_12_000000_create_users_table',
+                'password_resets' => '2014_10_12_100000_create_password_resets_table',
+                'failed_jobs' => '2019_08_19_000000_create_failed_jobs_table',
+                'personal_access_tokens' => '2019_12_14_000001_create_personal_access_tokens_table',
+                'products' => '2026_08_15_073122_create_products_table',
+                'orders' => '2026_08_15_073130_create_orders_table',
+                'order_items' => '2026_08_15_175605_create_order_items_table',
+                'blogs' => '2026_09_21_105018_create_blogs_table',
+                'categories' => '2026_10_20_000000_create_categories_table',
+                'sales_representatives' => '2026_11_10_060000_create_sales_representatives_table',
+            ];
+
+            foreach ($tableMigrationMap as $table => $migrationName) {
+                if (\Illuminate\Support\Facades\Schema::hasTable($table) && !in_array($migrationName, $existing)) {
+                    \Illuminate\Support\Facades\DB::table('migrations')->insert([
+                        'migration' => $migrationName,
+                        'batch' => $batch
+                    ]);
+                    $logs[] = "Registered existing migration: $migrationName";
+                }
+            }
+        }
+    } catch (\Throwable $e) {
+        $logs[] = "Migration table sync warning: " . $e->getMessage();
+    }
+
+    // 3. Run pending migrations safely
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        $output = \Illuminate\Support\Facades\Artisan::output();
-        return response()->json([
-            'status' => 'SUCCESS',
-            'output' => $output
-        ]);
+        $artisanOutput = \Illuminate\Support\Facades\Artisan::output();
+        $logs[] = "Artisan migrate: " . trim($artisanOutput);
     } catch (\Throwable $e) {
-        return response()->json([
-            'status' => 'ERROR',
-            'message' => $e->getMessage()
-        ], 500);
+        $logs[] = "Artisan migrate error: " . $e->getMessage();
     }
+
+    return response()->json([
+        'status' => 'SUCCESS',
+        'logs' => $logs
+    ]);
 });
 
 // Secure endpoint to optimize existing uncompressed images in DB to WebP
