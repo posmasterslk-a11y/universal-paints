@@ -321,13 +321,14 @@ const submitForm = async () => {
 
 <style scoped>
 .quill-wrapper :deep(.ql-toolbar.ql-snow) {
-  border: none;
-  border-bottom: 1px solid #e2e8f0;
+  border-width: 0 0 1px 0;
+  border-style: solid;
+  border-color: #e2e8f0;
   background-color: #f8fafc;
   padding: 10px 12px;
 }
 .quill-wrapper :deep(.ql-container.ql-snow) {
-  border: none;
+  border-width: 0;
   font-size: 15px;
   line-height: 1.6;
 }
