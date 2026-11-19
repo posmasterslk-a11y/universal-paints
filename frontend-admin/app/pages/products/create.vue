@@ -156,23 +156,35 @@ const handleImageUpload = async (e) => {
   const rawFile = e.target.files?.[0]
   if (!rawFile) return
 
+  const authToken = token.value || (process.client ? (localStorage.getItem('auth_token') || useCookie('auth_token').value) : '')
+
   isUploadingImage.value = true
   try {
-    const file = await compressImage(rawFile)
+    let fileToUpload = rawFile
+    try {
+      fileToUpload = await compressImage(rawFile)
+    } catch (cErr) {
+      fileToUpload = rawFile
+    }
+
     const formData = new FormData()
-    formData.append('image', file)
+    formData.append('image', fileToUpload)
     formData.append('folder', 'products')
 
     const res = await $fetch(`${config.public.apiBase}/api/upload`, {
       method: 'POST',
       body: formData,
       headers: {
-        Authorization: `Bearer ${token.value}`
+        Accept: 'application/json',
+        Authorization: `Bearer ${authToken}`
       }
     })
     form.value.main_image = res.url
   } catch (err) {
-    alert('Failed to upload image to Cloudflare R2: ' + (err.data?.message || err.message))
+    const errorDetails = err.data?.errors
+      ? Object.values(err.data.errors).flat().join('\n')
+      : (err.data?.message || err.message || 'Unknown network error')
+    alert(`Failed to upload image:\n${errorDetails}`)
   } finally {
     isUploadingImage.value = false
     e.target.value = ''

@@ -240,25 +240,42 @@ const handleImageUpload = async (e) => {
   const rawFile = e.target.files?.[0]
   if (!rawFile) return
 
+  const authToken = token.value || (process.client ? (localStorage.getItem('auth_token') || useCookie('auth_token').value) : '')
+  if (!authToken) {
+    alert('Your session has expired. Please log in again to upload.')
+    router.push('/login')
+    return
+  }
+
   isUploadingImage.value = true
   try {
-    const file = await compressImage(rawFile)
+    let fileToUpload = rawFile
+    try {
+      fileToUpload = await compressImage(rawFile)
+    } catch (cErr) {
+      fileToUpload = rawFile
+    }
+
     const formData = new FormData()
-    formData.append('image', file)
+    formData.append('image', fileToUpload)
     formData.append('folder', 'blogs')
 
     const res = await $fetch(`${config.public.apiBase}/api/upload`, {
       method: 'POST',
       body: formData,
       headers: {
-        Authorization: `Bearer ${token.value || (process.client ? localStorage.getItem('auth_token') : '')}`
+        Accept: 'application/json',
+        Authorization: `Bearer ${authToken}`
       }
     })
     if (res && res.url) {
       form.value.image = res.url
     }
   } catch (err) {
-    alert('Failed to upload image: ' + (err.data?.message || err.message))
+    const errorDetails = err.data?.errors
+      ? Object.values(err.data.errors).flat().join('\n')
+      : (err.data?.message || err.message || 'Unknown network error')
+    alert(`Failed to upload image:\n${errorDetails}`)
     console.error('Image upload error:', err)
   } finally {
     isUploadingImage.value = false

@@ -289,10 +289,12 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { compressImage } from '~/utils/imageCompressor'
 
 const config = useRuntimeConfig()
 const { token } = useAuth()
+const router = useRouter()
 
 const isLoading = ref(true)
 const isSaving = ref(false)
@@ -344,10 +346,12 @@ const handleImgError = (e) => {
 // Fetch layout settings on mount
 const loadLayout = async () => {
   isLoading.value = true
+  const authToken = token.value || (process.client ? (localStorage.getItem('auth_token') || useCookie('auth_token').value) : '')
   try {
     const res = await $fetch(`${config.public.apiBase}/api/web-layout/home`, {
       headers: {
-        Authorization: `Bearer ${token.value || (process.client ? localStorage.getItem('auth_token') : '')}`
+        Accept: 'application/json',
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {})
       }
     })
 
@@ -373,28 +377,48 @@ const handleFileUpload = async (event, index) => {
   const rawFile = event.target.files?.[0]
   if (!rawFile) return
 
+  const authToken = token.value || (process.client ? (localStorage.getItem('auth_token') || useCookie('auth_token').value) : '')
+  if (!authToken) {
+    alert('Your session has expired. Please log in again to upload images.')
+    router.push('/login')
+    return
+  }
+
   uploadingMap.value[index] = true
+  saveMessage.value = ''
+
   try {
-    const compressed = await compressImage(rawFile, { maxWidth: 1920, maxHeight: 1080, quality: 0.85 })
+    let fileToUpload = rawFile
+    try {
+      fileToUpload = await compressImage(rawFile, { maxWidth: 1920, maxHeight: 1080, quality: 0.85 })
+    } catch (compressErr) {
+      console.warn('Image compressor fallback to raw file:', compressErr)
+      fileToUpload = rawFile
+    }
+
     const formData = new FormData()
-    formData.append('image', compressed)
+    formData.append('image', fileToUpload)
     formData.append('folder', 'web-layout')
 
     const res = await $fetch(`${config.public.apiBase}/api/upload`, {
       method: 'POST',
       body: formData,
       headers: {
-        Authorization: `Bearer ${token.value || (process.client ? localStorage.getItem('auth_token') : '')}`
+        Accept: 'application/json',
+        Authorization: `Bearer ${authToken}`
       }
     })
 
     if (res && res.url) {
       heroSlides.value[index].image = res.url
-      saveMessage.value = `Image for Slide #${index + 1} uploaded successfully! Don't forget to click "Save All Changes".`
+      saveMessage.value = `Image for Slide #${index + 1} uploaded successfully! Don't forget to click "Save All Changes" to publish it live.`
       saveMessageType.value = 'success'
     }
   } catch (err) {
-    alert('Failed to upload image: ' + (err.data?.message || err.message))
+    const errorDetails = err.data?.errors
+      ? Object.values(err.data.errors).flat().join('\n')
+      : (err.data?.message || err.message || 'Unknown network error')
+    alert(`Failed to upload image:\n${errorDetails}`)
     console.error('Upload error:', err)
   } finally {
     uploadingMap.value[index] = false
@@ -453,9 +477,10 @@ const saveLayout = async () => {
     return
   }
 
-  const authToken = token.value || (process.client ? localStorage.getItem('auth_token') : '')
+  const authToken = token.value || (process.client ? (localStorage.getItem('auth_token') || useCookie('auth_token').value) : '')
   if (!authToken) {
     alert('Your session has expired. Please log in again.')
+    router.push('/login')
     return
   }
 
