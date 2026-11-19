@@ -59,7 +59,8 @@ class WebLayoutController extends Controller
                         'title' => 'Slide 3',
                         'show_splash' => true
                     ]
-                ]
+                ],
+                'about_image' => '/images/home-page/about-universal-paint.webp'
             ];
         }
 
@@ -169,6 +170,11 @@ class WebLayoutController extends Controller
                 }
                 $data['hero_slides'] = $cleanedSlides;
             }
+        }
+
+        // If 'about_image' is passed, sanitize string
+        if ($request->has('about_image')) {
+            $data['about_image'] = trim((string)$request->input('about_image'));
         }
 
         // If 'subpage_headers' is passed, validate and sanitize

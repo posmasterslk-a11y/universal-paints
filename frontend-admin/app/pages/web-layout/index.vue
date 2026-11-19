@@ -8,7 +8,7 @@
           Web Layout & Media
         </h1>
         <p class="text-sm text-slate-500 mt-1">
-          Customize fixed background media, homepage hero slider images, and sub-pages header banners.
+          Customize fixed background media, homepage hero slider, about section image, and sub-pages header banners.
         </p>
       </div>
 
@@ -60,12 +60,12 @@
           :class="activeTab === 'home' ? 'border-red-600 text-red-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
         >
           <i class="fa-solid fa-house"></i>
-          Homepage Hero Slider
+          Homepage Layout
           <span 
             class="ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold transition"
             :class="activeTab === 'home' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'"
           >
-            {{ heroSlides.length }} Slides
+            {{ heroSlides.length }} Slides + About Image
           </span>
         </button>
 
@@ -94,9 +94,11 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- TAB 1: HOMEPAGE HERO SLIDER               -->
+    <!-- TAB 1: HOMEPAGE LAYOUT                     -->
     <!-- ========================================== -->
     <div v-else-if="activeTab === 'home'" class="space-y-6">
+      
+      <!-- Card 1: Homepage Hero Background Slider -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
         
         <!-- Section Info Banner -->
@@ -353,27 +355,157 @@
           </div>
         </div>
 
-        <!-- Sticky / Bottom Action Bar -->
-        <div class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p class="text-xs text-slate-500">
-            <i class="fa-solid fa-circle-info text-slate-400 mr-1"></i>
-            Changes take effect immediately on the live website after clicking <strong>Save All Changes</strong>.
-          </p>
-          <div class="flex items-center gap-3 w-full sm:w-auto">
-            <button 
-              type="button" 
-              @click="saveCurrentLayout" 
-              :disabled="isSaving || isAnyUploading"
-              class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-7 py-2.5 rounded-lg font-semibold text-xs transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
-            >
-              <i class="fa-solid fa-spinner fa-spin" v-if="isSaving"></i>
-              <i class="fa-solid fa-floppy-disk" v-else></i>
-              {{ isSaving ? 'Saving Changes...' : 'Save All Changes' }}
-            </button>
+      </div>
+
+      <!-- Card 2: Homepage About Section Feature Image ("A Legacy of Quality and Commitment") -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
+        
+        <!-- Section Info Banner -->
+        <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-xl p-5 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+          <div class="space-y-1">
+            <h2 class="text-lg font-bold flex items-center gap-2">
+              <i class="fa-solid fa-award text-amber-400"></i>
+              About Section Feature Image ("A Legacy of Quality and Commitment")
+            </h2>
+            <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+              This image is displayed in the "ABOUT UNIVERSAL PAINTS" section on the homepage next to the title <strong>"A Legacy of Quality and Commitment"</strong> and company stats (20+ Years, 1000+ Retailers, 500+ Products).
+            </p>
           </div>
+
+          <button 
+            type="button" 
+            v-if="aboutImage && aboutImage !== '/images/home-page/about-universal-paint.webp'"
+            @click="resetAboutImageToDefault"
+            class="px-3 py-2 bg-white/10 hover:bg-white/20 text-slate-200 rounded-lg text-xs font-medium transition shrink-0"
+            title="Reset about section image to default asset"
+          >
+            <i class="fa-solid fa-rotate-left mr-1"></i>
+            Reset Default Image
+          </button>
+        </div>
+
+        <!-- About Section Card Body -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50 hover:border-slate-300 transition shadow-xs p-5 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          
+          <!-- Live Preview Thumbnail -->
+          <div class="lg:col-span-5 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-700">Section Appearance Preview</label>
+              <span v-if="aboutImage && aboutImage !== '/images/home-page/about-universal-paint.webp'" class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">
+                Custom Image Active
+              </span>
+              <span v-else class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-600">
+                Default Theme Asset
+              </span>
+            </div>
+
+            <div class="relative w-full h-52 rounded-xl overflow-hidden border border-slate-300 bg-slate-100 group shadow-md flex items-center justify-center">
+              <img 
+                v-if="aboutImage"
+                :src="resolvePreviewUrl(aboutImage)" 
+                alt="A Legacy of Quality and Commitment" 
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                @error="handleImgError($event)"
+              />
+              <div v-else class="text-slate-400 text-center p-4">
+                <i class="fa-solid fa-image text-3xl mb-1 opacity-50"></i>
+                <p class="text-xs">No image selected</p>
+              </div>
+
+              <!-- Overlay banner mockup -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none p-4 flex flex-col justify-end text-white">
+                <span class="text-[9px] font-extrabold tracking-wider text-red-400 uppercase">ABOUT UNIVERSAL PAINTS</span>
+                <h4 class="text-xs font-extrabold text-white leading-tight mt-0.5">A Legacy of Quality and Commitment</h4>
+                <div class="flex items-center gap-2 mt-2 text-[9px] text-slate-200">
+                  <span class="bg-red-600/90 px-1.5 py-0.5 rounded font-bold">20+ Years</span>
+                  <span class="bg-amber-600/90 px-1.5 py-0.5 rounded font-bold">1000+ Retailers</span>
+                  <span class="bg-emerald-600/90 px-1.5 py-0.5 rounded font-bold">500+ Products</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upload Controls -->
+          <div class="lg:col-span-7 space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                Feature Image Source <span class="text-red-500">*</span>
+              </label>
+              <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                  <label 
+                    class="cursor-pointer bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shrink-0"
+                    :class="{ 'opacity-50 pointer-events-none': isAboutUploading }"
+                  >
+                    <i class="fa-solid fa-spinner fa-spin" v-if="isAboutUploading"></i>
+                    <i class="fa-solid fa-cloud-arrow-up" v-else></i>
+                    <span>{{ isAboutUploading ? 'Uploading...' : 'Upload Image' }}</span>
+                    <input 
+                      type="file" 
+                      accept="image/png,image/jpeg,image/webp,image/jpg" 
+                      class="hidden" 
+                      @change="handleAboutUpload($event)"
+                      :disabled="isAboutUploading"
+                    />
+                  </label>
+
+                  <input 
+                    type="text" 
+                    v-model="aboutImage" 
+                    class="flex-1 text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono focus:outline-hidden focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
+                    placeholder="Paste image URL (e.g. Cloudflare R2 link) or relative path"
+                  />
+
+                  <button
+                    type="button"
+                    v-if="aboutImage !== '/images/home-page/about-universal-paint.webp'"
+                    @click="resetAboutImageToDefault"
+                    class="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium transition shrink-0"
+                    title="Revert to original default image"
+                  >
+                    <i class="fa-solid fa-rotate-left mr-1"></i> Default
+                  </button>
+                </div>
+                
+                <p class="text-[11px] text-slate-500">
+                  Recommended resolution: <strong>1000 × 750 px</strong> or <strong>1200 × 900 px</strong> (Landscape/4:3 ratio). Automatically compressed to WebP and hosted on Cloudflare R2 CDN.
+                </p>
+              </div>
+            </div>
+
+            <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-lg text-[11px] text-amber-900 flex items-start gap-2">
+              <i class="fa-solid fa-lightbulb text-amber-500 mt-0.5"></i>
+              <div>
+                <strong>Brand Story:</strong> This photo represents the company's factory, professional painters, or product excellence on the homepage. Click <strong>"Save All Changes"</strong> below after changing the image to publish it live.
+              </div>
+            </div>
+
+          </div>
+
         </div>
 
       </div>
+
+      <!-- Sticky / Bottom Action Bar -->
+      <div class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-slate-500">
+          <i class="fa-solid fa-circle-info text-slate-400 mr-1"></i>
+          Changes take effect immediately on the live homepage after clicking <strong>Save All Changes</strong>.
+        </p>
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <button 
+            type="button" 
+            @click="saveCurrentLayout" 
+            :disabled="isSaving || isAnyUploading"
+            class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-7 py-2.5 rounded-lg font-semibold text-xs transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
+          >
+            <i class="fa-solid fa-spinner fa-spin" v-if="isSaving"></i>
+            <i class="fa-solid fa-floppy-disk" v-else></i>
+            {{ isSaving ? 'Saving Changes...' : 'Save All Changes' }}
+          </button>
+        </div>
+      </div>
+
     </div>
 
     <!-- ========================================== -->
@@ -602,16 +734,19 @@ const isSaving = ref(false)
 const saveMessage = ref('')
 const saveMessageType = ref('success')
 
-// Per-slide uploading status tracker
+// Per-item uploading status tracker
 const uploadingMap = ref({})
 const uploadingSubpageMap = ref({})
+const isAboutUploading = ref(false)
 
 const isAnyUploading = computed(() => {
-  return Object.values(uploadingMap.value).some(Boolean) || Object.values(uploadingSubpageMap.value).some(Boolean)
+  return Object.values(uploadingMap.value).some(Boolean) || 
+         Object.values(uploadingSubpageMap.value).some(Boolean) ||
+         isAboutUploading.value
 })
 
 // ==========================================
-// 1. HOMEPAGE SLIDER DEFAULTS & STATE
+// 1. HOMEPAGE SLIDER & ABOUT DEFAULTS & STATE
 // ==========================================
 const defaultSlides = [
   {
@@ -635,6 +770,7 @@ const defaultSlides = [
 ]
 
 const heroSlides = ref([ ...defaultSlides ])
+const aboutImage = ref('/images/home-page/about-universal-paint.webp')
 
 const isCustomSlide = (url) => {
   if (!url) return false
@@ -741,16 +877,27 @@ const loadLayout = async () => {
       })
     ])
 
-    // Load Home Slider
-    if (homeRes && Array.isArray(homeRes.hero_slides) && homeRes.hero_slides.length > 0) {
-      heroSlides.value = homeRes.hero_slides.map((s, idx) => ({
-        id: s.id || (idx + 1),
-        image: typeof s === 'string' ? s : (s.image || ''),
-        title: typeof s === 'string' ? `Slide ${idx + 1}` : (s.title || `Slide ${idx + 1}`),
-        show_splash: typeof s === 'object' && s !== null ? s.show_splash !== false : true
-      }))
+    // Load Home Slider & About Image
+    if (homeRes) {
+      if (Array.isArray(homeRes.hero_slides) && homeRes.hero_slides.length > 0) {
+        heroSlides.value = homeRes.hero_slides.map((s, idx) => ({
+          id: s.id || (idx + 1),
+          image: typeof s === 'string' ? s : (s.image || ''),
+          title: typeof s === 'string' ? `Slide ${idx + 1}` : (s.title || `Slide ${idx + 1}`),
+          show_splash: typeof s === 'object' && s !== null ? s.show_splash !== false : true
+        }))
+      } else {
+        heroSlides.value = [ ...defaultSlides ]
+      }
+
+      if (homeRes.about_image) {
+        aboutImage.value = homeRes.about_image
+      } else {
+        aboutImage.value = '/images/home-page/about-universal-paint.webp'
+      }
     } else {
       heroSlides.value = [ ...defaultSlides ]
+      aboutImage.value = '/images/home-page/about-universal-paint.webp'
     }
 
     // Load Sub-Pages Headers
@@ -772,6 +919,7 @@ const loadLayout = async () => {
   } catch (err) {
     console.warn('Failed to fetch web layout, using defaults:', err)
     heroSlides.value = [ ...defaultSlides ]
+    aboutImage.value = '/images/home-page/about-universal-paint.webp'
     subpageHeaders.value = { ...defaultSubpages }
   } finally {
     isLoading.value = false
@@ -831,6 +979,68 @@ const handleFileUpload = async (event, index) => {
   } finally {
     uploadingMap.value[index] = false
     event.target.value = ''
+  }
+}
+
+// Upload file for About Section image
+const handleAboutUpload = async (event) => {
+  const rawFile = event.target.files?.[0]
+  if (!rawFile) return
+
+  const authToken = token.value || (process.client ? (localStorage.getItem('auth_token') || useCookie('auth_token').value) : '')
+  if (!authToken) {
+    alert('Your session has expired. Please log in again to upload images.')
+    router.push('/login')
+    return
+  }
+
+  isAboutUploading.value = true
+  saveMessage.value = ''
+
+  try {
+    let fileToUpload = rawFile
+    try {
+      fileToUpload = await compressImage(rawFile, { maxWidth: 1600, maxHeight: 1200, quality: 0.85 })
+    } catch (compressErr) {
+      console.warn('Image compressor fallback to raw file:', compressErr)
+      fileToUpload = rawFile
+    }
+
+    const formData = new FormData()
+    formData.append('image', fileToUpload)
+    formData.append('folder', 'web-layout')
+
+    const res = await $fetch(`${config.public.apiBase}/api/upload`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${authToken}`
+      }
+    })
+
+    if (res && res.url) {
+      aboutImage.value = res.url
+      saveMessage.value = 'About section image ("A Legacy of Quality and Commitment") uploaded successfully! Click "Save All Changes" to publish it live.'
+      saveMessageType.value = 'success'
+    }
+  } catch (err) {
+    const errorDetails = err.data?.errors
+      ? Object.values(err.data.errors).flat().join('\n')
+      : (err.data?.message || err.message || 'Unknown network error')
+    alert(`Failed to upload image:\n${errorDetails}`)
+    console.error('Upload error:', err)
+  } finally {
+    isAboutUploading.value = false
+    event.target.value = ''
+  }
+}
+
+const resetAboutImageToDefault = () => {
+  if (confirm('Reset About Section feature image to the default website asset?')) {
+    aboutImage.value = '/images/home-page/about-universal-paint.webp'
+    saveMessage.value = 'Reset About Section image to default asset. Click "Save All Changes" to publish.'
+    saveMessageType.value = 'success'
   }
 }
 
@@ -946,6 +1156,7 @@ const moveSlideDown = (index) => {
 const resetToDefaults = () => {
   if (confirm('Are you sure you want to reset hero slider images to the default website assets?')) {
     heroSlides.value = JSON.parse(JSON.stringify(defaultSlides))
+    aboutImage.value = '/images/home-page/about-universal-paint.webp'
     saveMessage.value = 'Reset to default assets. Click "Save All Changes" to publish.'
     saveMessageType.value = 'success'
   }
@@ -980,14 +1191,18 @@ const saveCurrentLayout = async () => {
           Authorization: `Bearer ${authToken}`,
           Accept: 'application/json'
         },
-        body: { hero_slides: validSlides }
+        body: { 
+          hero_slides: validSlides,
+          about_image: aboutImage.value
+        }
       })
 
-      if (res && res.hero_slides) {
-        heroSlides.value = res.hero_slides
+      if (res) {
+        if (res.hero_slides) heroSlides.value = res.hero_slides
+        if (res.about_image) aboutImage.value = res.about_image
       }
 
-      saveMessage.value = 'Homepage hero slider images updated and published successfully!'
+      saveMessage.value = 'Homepage settings (hero slider & about section image) updated and published successfully!'
       saveMessageType.value = 'success'
 
     } else if (activeTab.value === 'subpages') {

@@ -208,7 +208,7 @@
     <!-- About Section -->
     <section class="about-section">
       <div class="about-image">
-        <img src="/images/home-page/about-universal-paint.webp" alt="About Universal Paints" loading="lazy" decoding="async" />
+        <img :src="aboutSectionImage" alt="About Universal Paints" loading="lazy" decoding="async" />
       </div>
       <div class="about-content">
         <div class="section-subtitle">ABOUT UNIVERSAL PAINTS</div>
@@ -591,6 +591,14 @@ const getHeroBgUrl = (bg) => {
   if (bg.startsWith('/storage/')) return `${cleanApiBase.value}${bg}`
   return `${cleanApiBase.value}${bg}`
 }
+
+const aboutSectionImage = computed(() => {
+  const img = homeLayout.value?.about_image
+  if (img && typeof img === 'string' && img.trim() !== '') {
+    return getHeroBgUrl(img.trim())
+  }
+  return '/images/home-page/about-universal-paint.webp'
+})
 
 const isCustomSlide = (bg) => {
   const url = typeof bg === 'string' ? bg : (bg?.image || '')
