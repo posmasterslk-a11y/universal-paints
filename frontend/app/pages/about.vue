@@ -118,7 +118,7 @@
         </div>
         
         <div class="story-middle">
-          <img src="/images/about-us-page/paint-bucket.webp" alt="Paint Buckets" class="story-img" />
+          <img :src="storyImage" alt="Paint Buckets" class="story-img" />
         </div>
 
         <div class="story-right">
@@ -223,10 +223,10 @@
         </div>
         <div class="mfg-right">
           <div class="mfg-images">
-            <img src="/images/about-us-page/factory-tanks.webp" alt="Factory Tanks" class="mfg-img large-img" />
+            <img :src="mfgTanksImage" alt="Factory Tanks" class="mfg-img large-img" />
             <div class="mfg-images-col">
-              <img src="/images/about-us-page/production-line.webp" alt="Production Line" class="mfg-img" />
-              <img src="/images/about-us-page/lab-test.webp" alt="Lab Testing" class="mfg-img" />
+              <img :src="mfgProductionImage" alt="Production Line" class="mfg-img" />
+              <img :src="mfgLabImage" alt="Lab Testing" class="mfg-img" />
             </div>
           </div>
         </div>
@@ -236,7 +236,7 @@
     <!-- Network Section -->
     <section class="network-section">
       <div class="network-bg">
-        <img src="/images/about-us-page/truck.webp" alt="Universal Paints Delivery Truck" />
+        <img :src="truckImage" alt="Universal Paints Delivery Truck" />
         <div class="network-overlay"></div>
       </div>
       <div class="container network-grid">
@@ -313,8 +313,27 @@
 </template>
 
 <script setup>
-const { getSubpageHeader } = useWebLayout()
-const heroBannerImage = computed(() => getSubpageHeader('about', '/images/about-us-page/hero.webp'))
+const config = useRuntimeConfig()
+const cleanApiBase = computed(() => (config.public.apiBase || 'https://api.universalpaints.lk').replace(/\/api\/?$/, ''))
+
+const { data: aboutLayout } = await useFetch(
+  () => `${cleanApiBase.value}/api/web-layout/about`,
+  { key: 'about-web-layout' }
+)
+
+const resolveImg = (img, fallback) => {
+  if (!img) return fallback
+  if (img.startsWith('http://') || img.startsWith('https://')) return img
+  if (img.startsWith('/images/')) return img
+  return `${cleanApiBase.value}${img}`
+}
+
+const heroBannerImage = computed(() => resolveImg(aboutLayout.value?.header_image, '/images/about-us-page/hero.webp'))
+const storyImage = computed(() => resolveImg(aboutLayout.value?.story_image, '/images/about-us-page/paint-bucket.webp'))
+const mfgTanksImage = computed(() => resolveImg(aboutLayout.value?.mfg_tanks_image, '/images/about-us-page/factory-tanks.webp'))
+const mfgProductionImage = computed(() => resolveImg(aboutLayout.value?.mfg_production_image, '/images/about-us-page/production-line.webp'))
+const mfgLabImage = computed(() => resolveImg(aboutLayout.value?.mfg_lab_image, '/images/about-us-page/lab-test.webp'))
+const truckImage = computed(() => resolveImg(aboutLayout.value?.truck_image, '/images/about-us-page/truck.webp'))
 
 useSeoMeta({
   title: 'About Us | Pioneering Quality Coatings in Sri Lanka',

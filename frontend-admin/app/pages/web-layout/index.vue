@@ -8,7 +8,7 @@
           Web Layout & Media
         </h1>
         <p class="text-sm text-slate-500 mt-1">
-          Customize fixed background media, homepage hero slider, about section image, and sub-pages header banners.
+          Customize homepage sliders, About Us page photos & manufacturing gallery, and sub-pages header banners.
         </p>
       </div>
 
@@ -52,36 +52,52 @@
 
     <!-- Section Tabs -->
     <div class="border-b border-slate-200">
-      <nav class="flex space-x-4 sm:space-x-8">
+      <nav class="flex space-x-2 sm:space-x-8 overflow-x-auto pb-1">
         <button 
           type="button"
           @click="activeTab = 'home'"
-          class="py-3 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition"
+          class="py-3 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition shrink-0"
           :class="activeTab === 'home' ? 'border-red-600 text-red-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
         >
           <i class="fa-solid fa-house"></i>
           Homepage Layout
           <span 
-            class="ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold transition"
+            class="ml-1 px-2 py-0.5 rounded-full text-[11px] font-semibold transition"
             :class="activeTab === 'home' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'"
           >
-            {{ heroSlides.length }} Slides + About Image
+            {{ heroSlides.length }} Slides + Feature
+          </span>
+        </button>
+
+        <button 
+          type="button"
+          @click="activeTab = 'about'"
+          class="py-3 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition shrink-0"
+          :class="activeTab === 'about' ? 'border-red-600 text-red-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+        >
+          <i class="fa-solid fa-building"></i>
+          About Us Page Images
+          <span 
+            class="ml-1 px-2 py-0.5 rounded-full text-[11px] font-semibold transition"
+            :class="activeTab === 'about' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'"
+          >
+            Gallery & Story (6)
           </span>
         </button>
 
         <button 
           type="button"
           @click="activeTab = 'subpages'"
-          class="py-3 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition"
+          class="py-3 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition shrink-0"
           :class="activeTab === 'subpages' ? 'border-red-600 text-red-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
         >
           <i class="fa-solid fa-images"></i>
-          Sub-Pages Header Banners
+          Other Sub-Pages Headers
           <span 
-            class="ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold transition"
+            class="ml-1 px-2 py-0.5 rounded-full text-[11px] font-semibold transition"
             :class="activeTab === 'subpages' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'"
           >
-            {{ Object.keys(subpageHeaders).length }} Pages
+            Headers (4)
           </span>
         </button>
       </nav>
@@ -509,7 +525,302 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- TAB 2: SUB-PAGES HEADER BANNERS           -->
+    <!-- TAB 2: ABOUT US PAGE MEDIA (6 IMAGES)      -->
+    <!-- ========================================== -->
+    <div v-else-if="activeTab === 'about'" class="space-y-6">
+      
+      <!-- Section Info Banner -->
+      <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-xl p-5 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+        <div class="space-y-1">
+          <h2 class="text-lg font-bold flex items-center gap-2">
+            <i class="fa-solid fa-building text-red-400"></i>
+            About Us Page Media Assets & Manufacturing Gallery
+          </h2>
+          <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+            Customize all visual assets for the About Us page (`/about`), including the top hero banner, our purpose image, the 3 manufacturing facility images, and the delivery fleet truck background.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 self-end md:self-auto shrink-0">
+          <a 
+            href="https://universalpaints.lk/about" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="px-3 py-2 bg-white/10 hover:bg-white/20 text-slate-200 rounded-lg text-xs font-medium transition flex items-center gap-1.5"
+          >
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            View About Page
+          </a>
+          <button 
+            type="button" 
+            @click="resetAllAboutImagesToDefault"
+            class="px-3 py-2 bg-white/10 hover:bg-white/20 text-slate-200 rounded-lg text-xs font-medium transition"
+            title="Reset all about images to default assets"
+          >
+            <i class="fa-solid fa-rotate-left mr-1"></i>
+            Reset All
+          </button>
+        </div>
+      </div>
+
+      <!-- 1. Hero Header Banner -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-red-600 text-white font-extrabold text-xs flex items-center justify-center">1</span>
+            <h3 class="font-bold text-slate-800 text-sm">Hero Header Banner</h3>
+            <span class="text-[10px] text-slate-500 font-mono">(Top Page Banner)</span>
+          </div>
+          <span v-if="aboutPageData.header_image && aboutPageData.header_image !== '/images/about-us-page/hero.webp'" class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">
+            Custom Image Active
+          </span>
+          <span v-else class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-600">
+            Default Theme Asset
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-5">
+            <div class="relative w-full h-44 rounded-xl overflow-hidden border border-slate-300 bg-slate-900 shadow-sm flex items-center justify-center">
+              <img 
+                v-if="aboutPageData.header_image" 
+                :src="resolvePreviewUrl(aboutPageData.header_image)" 
+                alt="About Header Banner" 
+                class="w-full h-full object-cover"
+                @error="handleImgError($event)"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent p-4 flex flex-col justify-end text-white pointer-events-none">
+                <span class="text-[9px] text-red-400 font-bold uppercase tracking-wider">Universal Paints</span>
+                <h4 class="text-sm font-extrabold">About Universal Paints</h4>
+              </div>
+            </div>
+          </div>
+          <div class="lg:col-span-7 space-y-3">
+            <div class="flex items-center gap-2">
+              <label class="cursor-pointer bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shrink-0" :class="{ 'opacity-50 pointer-events-none': uploadingAboutItem['header_image'] }">
+                <i class="fa-solid fa-spinner fa-spin" v-if="uploadingAboutItem['header_image']"></i>
+                <i class="fa-solid fa-cloud-arrow-up" v-else></i>
+                <span>{{ uploadingAboutItem['header_image'] ? 'Uploading...' : 'Upload Header' }}</span>
+                <input type="file" accept="image/*" class="hidden" @change="handleAboutAssetUpload($event, 'header_image')" :disabled="uploadingAboutItem['header_image']" />
+              </label>
+              <input type="text" v-model="aboutPageData.header_image" class="flex-1 text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono" placeholder="Image URL" />
+              <button type="button" v-if="aboutPageData.header_image !== '/images/about-us-page/hero.webp'" @click="aboutPageData.header_image = '/images/about-us-page/hero.webp'" class="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium">Default</button>
+            </div>
+            <p class="text-[11px] text-slate-500">Recommended: 1920 × 600 px or 1920 × 1080 px Landscape WebP/JPG.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Our Story / Purpose Image -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-red-600 text-white font-extrabold text-xs flex items-center justify-center">2</span>
+            <h3 class="font-bold text-slate-800 text-sm">Our Story & Purpose Feature Image</h3>
+            <span class="text-[10px] text-slate-500 font-mono">(paint-bucket.webp)</span>
+          </div>
+          <span v-if="aboutPageData.story_image && aboutPageData.story_image !== '/images/about-us-page/paint-bucket.webp'" class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">
+            Custom Image Active
+          </span>
+          <span v-else class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-600">
+            Default Theme Asset
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-5">
+            <div class="relative w-full h-44 rounded-xl overflow-hidden border border-slate-300 bg-slate-100 shadow-sm flex items-center justify-center">
+              <img 
+                v-if="aboutPageData.story_image" 
+                :src="resolvePreviewUrl(aboutPageData.story_image)" 
+                alt="Our Story Feature" 
+                class="w-full h-full object-contain p-2"
+                @error="handleImgError($event)"
+              />
+            </div>
+          </div>
+          <div class="lg:col-span-7 space-y-3">
+            <p class="text-xs text-slate-600">This image appears in the center column of the <strong>"Built on Trust. Driven by Quality."</strong> section on the About Us page.</p>
+            <div class="flex items-center gap-2">
+              <label class="cursor-pointer bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shrink-0" :class="{ 'opacity-50 pointer-events-none': uploadingAboutItem['story_image'] }">
+                <i class="fa-solid fa-spinner fa-spin" v-if="uploadingAboutItem['story_image']"></i>
+                <i class="fa-solid fa-cloud-arrow-up" v-else></i>
+                <span>{{ uploadingAboutItem['story_image'] ? 'Uploading...' : 'Upload Image' }}</span>
+                <input type="file" accept="image/*" class="hidden" @change="handleAboutAssetUpload($event, 'story_image')" :disabled="uploadingAboutItem['story_image']" />
+              </label>
+              <input type="text" v-model="aboutPageData.story_image" class="flex-1 text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono" placeholder="Image URL" />
+              <button type="button" v-if="aboutPageData.story_image !== '/images/about-us-page/paint-bucket.webp'" @click="aboutPageData.story_image = '/images/about-us-page/paint-bucket.webp'" class="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium">Default</button>
+            </div>
+            <p class="text-[11px] text-slate-500">Recommended: Square or portrait 600 × 600 px / 800 × 800 px (transparent PNG or WebP).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Advanced Manufacturing Facility Gallery (3 Images) -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+        <div class="border-b border-slate-200 pb-3 flex items-center justify-between">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-red-600 text-white font-extrabold text-xs flex items-center justify-center">3</span>
+              <h3 class="font-bold text-slate-800 text-sm">Advanced Manufacturing Facility Images (Set of 3)</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Section: "OUR MANUFACTURING - Advanced Technology. Superior Quality."</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Image 3A: Factory Tanks (Main Large Image) -->
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-700">3A. Factory Tanks (Main)</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 font-mono">factory-tanks.webp</span>
+            </div>
+            <div class="w-full h-36 rounded-lg overflow-hidden border border-slate-300 bg-slate-200">
+              <img :src="resolvePreviewUrl(aboutPageData.mfg_tanks_image)" alt="Factory Tanks" class="w-full h-full object-cover" @error="handleImgError($event)" />
+            </div>
+            <div class="space-y-2">
+              <div class="flex items-center gap-1.5">
+                <label class="cursor-pointer bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition shrink-0" :class="{ 'opacity-50 pointer-events-none': uploadingAboutItem['mfg_tanks_image'] }">
+                  <i class="fa-solid fa-spinner fa-spin" v-if="uploadingAboutItem['mfg_tanks_image']"></i>
+                  <i class="fa-solid fa-cloud-arrow-up" v-else></i>
+                  <span>Upload</span>
+                  <input type="file" accept="image/*" class="hidden" @change="handleAboutAssetUpload($event, 'mfg_tanks_image')" :disabled="uploadingAboutItem['mfg_tanks_image']" />
+                </label>
+                <input type="text" v-model="aboutPageData.mfg_tanks_image" class="flex-1 text-[11px] px-2 py-1.5 border border-slate-300 rounded font-mono" placeholder="URL" />
+              </div>
+              <button type="button" v-if="aboutPageData.mfg_tanks_image !== '/images/about-us-page/factory-tanks.webp'" @click="aboutPageData.mfg_tanks_image = '/images/about-us-page/factory-tanks.webp'" class="text-[10px] text-slate-500 hover:text-slate-800">
+                <i class="fa-solid fa-rotate-left mr-0.5"></i> Reset to Default
+              </button>
+            </div>
+          </div>
+
+          <!-- Image 3B: Production Line -->
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-700">3B. Production Line</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 font-mono">production-line.webp</span>
+            </div>
+            <div class="w-full h-36 rounded-lg overflow-hidden border border-slate-300 bg-slate-200">
+              <img :src="resolvePreviewUrl(aboutPageData.mfg_production_image)" alt="Production Line" class="w-full h-full object-cover" @error="handleImgError($event)" />
+            </div>
+            <div class="space-y-2">
+              <div class="flex items-center gap-1.5">
+                <label class="cursor-pointer bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition shrink-0" :class="{ 'opacity-50 pointer-events-none': uploadingAboutItem['mfg_production_image'] }">
+                  <i class="fa-solid fa-spinner fa-spin" v-if="uploadingAboutItem['mfg_production_image']"></i>
+                  <i class="fa-solid fa-cloud-arrow-up" v-else></i>
+                  <span>Upload</span>
+                  <input type="file" accept="image/*" class="hidden" @change="handleAboutAssetUpload($event, 'mfg_production_image')" :disabled="uploadingAboutItem['mfg_production_image']" />
+                </label>
+                <input type="text" v-model="aboutPageData.mfg_production_image" class="flex-1 text-[11px] px-2 py-1.5 border border-slate-300 rounded font-mono" placeholder="URL" />
+              </div>
+              <button type="button" v-if="aboutPageData.mfg_production_image !== '/images/about-us-page/production-line.webp'" @click="aboutPageData.mfg_production_image = '/images/about-us-page/production-line.webp'" class="text-[10px] text-slate-500 hover:text-slate-800">
+                <i class="fa-solid fa-rotate-left mr-0.5"></i> Reset to Default
+              </button>
+            </div>
+          </div>
+
+          <!-- Image 3C: Lab Testing -->
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-700">3C. Quality Lab Testing</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 font-mono">lab-test.webp</span>
+            </div>
+            <div class="w-full h-36 rounded-lg overflow-hidden border border-slate-300 bg-slate-200">
+              <img :src="resolvePreviewUrl(aboutPageData.mfg_lab_image)" alt="Lab Testing" class="w-full h-full object-cover" @error="handleImgError($event)" />
+            </div>
+            <div class="space-y-2">
+              <div class="flex items-center gap-1.5">
+                <label class="cursor-pointer bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition shrink-0" :class="{ 'opacity-50 pointer-events-none': uploadingAboutItem['mfg_lab_image'] }">
+                  <i class="fa-solid fa-spinner fa-spin" v-if="uploadingAboutItem['mfg_lab_image']"></i>
+                  <i class="fa-solid fa-cloud-arrow-up" v-else></i>
+                  <span>Upload</span>
+                  <input type="file" accept="image/*" class="hidden" @change="handleAboutAssetUpload($event, 'mfg_lab_image')" :disabled="uploadingAboutItem['mfg_lab_image']" />
+                </label>
+                <input type="text" v-model="aboutPageData.mfg_lab_image" class="flex-1 text-[11px] px-2 py-1.5 border border-slate-300 rounded font-mono" placeholder="URL" />
+              </div>
+              <button type="button" v-if="aboutPageData.mfg_lab_image !== '/images/about-us-page/lab-test.webp'" @click="aboutPageData.mfg_lab_image = '/images/about-us-page/lab-test.webp'" class="text-[10px] text-slate-500 hover:text-slate-800">
+                <i class="fa-solid fa-rotate-left mr-0.5"></i> Reset to Default
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 4. Delivery Fleet / Truck Background Image -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-red-600 text-white font-extrabold text-xs flex items-center justify-center">4</span>
+            <h3 class="font-bold text-slate-800 text-sm">Delivery Fleet & Logistics Background Image</h3>
+            <span class="text-[10px] text-slate-500 font-mono">(truck.webp)</span>
+          </div>
+          <span v-if="aboutPageData.truck_image && aboutPageData.truck_image !== '/images/about-us-page/truck.webp'" class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">
+            Custom Image Active
+          </span>
+          <span v-else class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-600">
+            Default Theme Asset
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-5">
+            <div class="relative w-full h-44 rounded-xl overflow-hidden border border-slate-300 bg-slate-900 shadow-sm flex items-center justify-center">
+              <img 
+                v-if="aboutPageData.truck_image" 
+                :src="resolvePreviewUrl(aboutPageData.truck_image)" 
+                alt="Delivery Truck" 
+                class="w-full h-full object-cover"
+                @error="handleImgError($event)"
+              />
+              <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent p-4 flex flex-col justify-end text-white pointer-events-none">
+                <span class="text-[9px] text-red-400 font-bold uppercase tracking-wider">Nationwide Logistics</span>
+                <h4 class="text-sm font-extrabold">Delivery Fleet</h4>
+              </div>
+            </div>
+          </div>
+          <div class="lg:col-span-7 space-y-3">
+            <p class="text-xs text-slate-600">This image serves as the background for the <strong>"Seamless Nationwide Logistics"</strong> and Island-Wide Network map section.</p>
+            <div class="flex items-center gap-2">
+              <label class="cursor-pointer bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shrink-0" :class="{ 'opacity-50 pointer-events-none': uploadingAboutItem['truck_image'] }">
+                <i class="fa-solid fa-spinner fa-spin" v-if="uploadingAboutItem['truck_image']"></i>
+                <i class="fa-solid fa-cloud-arrow-up" v-else></i>
+                <span>{{ uploadingAboutItem['truck_image'] ? 'Uploading...' : 'Upload Truck Image' }}</span>
+                <input type="file" accept="image/*" class="hidden" @change="handleAboutAssetUpload($event, 'truck_image')" :disabled="uploadingAboutItem['truck_image']" />
+              </label>
+              <input type="text" v-model="aboutPageData.truck_image" class="flex-1 text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono" placeholder="Image URL" />
+              <button type="button" v-if="aboutPageData.truck_image !== '/images/about-us-page/truck.webp'" @click="aboutPageData.truck_image = '/images/about-us-page/truck.webp'" class="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium">Default</button>
+            </div>
+            <p class="text-[11px] text-slate-500">Recommended: 1600 × 900 px Landscape image.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sticky / Bottom Action Bar -->
+      <div class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-slate-500">
+          <i class="fa-solid fa-circle-info text-slate-400 mr-1"></i>
+          Changes take effect immediately on the live About Us page after clicking <strong>Save All Changes</strong>.
+        </p>
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <button 
+            type="button" 
+            @click="saveCurrentLayout" 
+            :disabled="isSaving || isAnyUploading"
+            class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-7 py-2.5 rounded-lg font-semibold text-xs transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
+          >
+            <i class="fa-solid fa-spinner fa-spin" v-if="isSaving"></i>
+            <i class="fa-solid fa-floppy-disk" v-else></i>
+            {{ isSaving ? 'Saving Changes...' : 'Save All Changes' }}
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: SUB-PAGES HEADER BANNERS           -->
     <!-- ========================================== -->
     <div v-else-if="activeTab === 'subpages'" class="space-y-6">
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
@@ -519,10 +830,10 @@
           <div class="space-y-1">
             <h2 class="text-lg font-bold flex items-center gap-2">
               <i class="fa-solid fa-images text-red-400"></i>
-              Sub-Pages Header Banners (Hero Images)
+              Other Sub-Pages Header Banners (Hero Images)
             </h2>
             <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
-              Upload custom hero header images for the website's key sub-pages. When a custom image is uploaded, it seamlessly replaces the default banner with all titles and overlays perfectly preserved.
+              Upload custom hero header images for the other key sub-pages. When a custom image is uploaded, it seamlessly replaces the default banner with all titles and overlays perfectly preserved.
             </p>
           </div>
 
@@ -539,158 +850,151 @@
           </div>
         </div>
 
-        <!-- Subpages List -->
+        <!-- Subpages List (Excluding about since it has its own dedicated rich tab) -->
         <div class="space-y-6">
-          <div 
-            v-for="(pageData, pageKey) in subpageHeaders" 
-            :key="pageKey"
-            class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50 hover:border-slate-300 transition shadow-xs"
-          >
-            <!-- Card Header -->
-            <div class="bg-slate-100 px-5 py-3 border-b border-slate-200 flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <span class="w-6 h-6 rounded-full bg-slate-800 text-white font-extrabold text-xs flex items-center justify-center">
-                  <i :class="getPageIcon(pageKey)" class="text-[10px]"></i>
-                </span>
-                <span class="font-bold text-slate-800 text-sm">
-                  {{ pageData.title }}
-                </span>
-                <span class="font-mono text-[11px] px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-semibold">
-                  {{ pageData.route }}
-                </span>
-                <span v-if="pageData.image && pageData.image !== pageData.default_image" class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">
-                  Custom Header Active
-                </span>
-                <span v-else class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-600">
-                  Default Theme Asset
-                </span>
-              </div>
-
-              <!-- Quick action -->
-              <div class="flex items-center gap-2">
-                <a 
-                  :href="'https://universalpaints.lk' + pageData.route" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  class="text-xs text-slate-500 hover:text-slate-800 font-medium flex items-center gap-1 transition"
-                  title="View this page live"
-                >
-                  <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                  <span class="hidden sm:inline">View Page</span>
-                </a>
-              </div>
-            </div>
-
-            <!-- Card Content Body -->
-            <div class="p-5 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-              
-              <!-- Live Preview Thumbnail with Realistic Page Mockup -->
-              <div class="lg:col-span-5 space-y-1.5">
-                <label class="block text-xs font-bold text-slate-700">Header Appearance Preview</label>
-                <div class="relative w-full h-44 rounded-xl overflow-hidden border border-slate-700 bg-slate-900 group shadow-lg flex items-center justify-center">
-                  
-                  <!-- Background Image -->
-                  <img 
-                    v-if="pageData.image || pageData.default_image"
-                    :src="resolvePreviewUrl(pageData.image || pageData.default_image)" 
-                    :alt="pageData.title"
-                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    @error="handleImgError($event)"
-                  />
-                  <!-- Fallback gradient if no image exists (e.g. sales reps default) -->
-                  <div 
-                    v-else 
-                    class="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-red-950 flex items-center justify-center"
-                  ></div>
-
-                  <!-- Dark Header Overlay (similar to website CSS) -->
-                  <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/50 to-slate-950/30 pointer-events-none"></div>
-
-                  <!-- Breadcrumb and Page Title Mockup -->
-                  <div class="absolute inset-0 p-4 flex flex-col justify-end text-white pointer-events-none z-10">
-                    <div class="flex items-center gap-1.5 text-[9px] text-slate-300 font-medium mb-1">
-                      <span>Home</span>
-                      <span class="text-slate-500">&gt;</span>
-                      <span class="text-red-400 font-bold">{{ pageData.title }}</span>
-                    </div>
-                    <span class="text-[9px] font-extrabold tracking-wider text-red-400 uppercase block">
-                      {{ pageData.subtitle || 'Universal Paints' }}
-                    </span>
-                    <h3 class="text-sm font-black text-white leading-tight">
-                      {{ pageData.title }}
-                    </h3>
-                  </div>
-
-                  <!-- Route Badge (top right) -->
-                  <div class="absolute top-2 right-2 bg-black/70 backdrop-blur-xs text-white text-[9px] font-mono px-2 py-0.5 rounded z-10">
+          <template v-for="(pageData, pageKey) in otherSubpageHeaders" :key="pageKey">
+            <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50 hover:border-slate-300 transition shadow-xs">
+              <!-- Card Header -->
+              <div class="bg-slate-100 px-5 py-3 border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <span class="w-6 h-6 rounded-full bg-slate-800 text-white font-extrabold text-xs flex items-center justify-center">
+                    <i :class="getPageIcon(pageKey)" class="text-[10px]"></i>
+                  </span>
+                  <span class="font-bold text-slate-800 text-sm">
+                    {{ pageData.title }}
+                  </span>
+                  <span class="font-mono text-[11px] px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-semibold">
                     {{ pageData.route }}
-                  </div>
+                  </span>
+                  <span v-if="pageData.image && pageData.image !== pageData.default_image" class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">
+                    Custom Header Active
+                  </span>
+                  <span v-else class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-600">
+                    Default Theme Asset
+                  </span>
+                </div>
+
+                <!-- Quick action -->
+                <div class="flex items-center gap-2">
+                  <a 
+                    :href="'https://universalpaints.lk' + pageData.route" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="text-xs text-slate-500 hover:text-slate-800 font-medium flex items-center gap-1 transition"
+                    title="View this page live"
+                  >
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    <span class="hidden sm:inline">View Page</span>
+                  </a>
                 </div>
               </div>
 
-              <!-- Upload & URL Configuration Controls -->
-              <div class="lg:col-span-7 space-y-4">
+              <!-- Card Content Body -->
+              <div class="p-5 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
                 
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1">
-                    Header Banner Image <span class="text-red-500">*</span>
-                  </label>
-                  <div class="space-y-2">
-                    <div class="flex items-center gap-2">
-                      <label 
-                        class="cursor-pointer bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shrink-0"
-                        :class="{ 'opacity-50 pointer-events-none': uploadingSubpageMap[pageKey] }"
-                      >
-                        <i class="fa-solid fa-spinner fa-spin" v-if="uploadingSubpageMap[pageKey]"></i>
-                        <i class="fa-solid fa-cloud-arrow-up" v-else></i>
-                        <span>{{ uploadingSubpageMap[pageKey] ? 'Uploading...' : 'Upload Header Image' }}</span>
-                        <input 
-                          type="file" 
-                          accept="image/png,image/jpeg,image/webp,image/jpg" 
-                          class="hidden" 
-                          @change="handleSubpageUpload($event, pageKey)"
-                          :disabled="uploadingSubpageMap[pageKey]"
-                        />
-                      </label>
-
-                      <input 
-                        type="text" 
-                        v-model="pageData.image" 
-                        class="flex-1 text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono focus:outline-hidden focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
-                        placeholder="Paste image URL (e.g. Cloudflare R2 link) or relative path"
-                      />
-
-                      <button
-                        type="button"
-                        v-if="pageData.default_image && pageData.image !== pageData.default_image"
-                        @click="resetSingleSubpage(pageKey)"
-                        class="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium transition shrink-0"
-                        title="Revert to original default image"
-                      >
-                        <i class="fa-solid fa-rotate-left mr-1"></i> Default
-                      </button>
-                    </div>
+                <!-- Live Preview Thumbnail -->
+                <div class="lg:col-span-5 space-y-1.5">
+                  <label class="block text-xs font-bold text-slate-700">Header Appearance Preview</label>
+                  <div class="relative w-full h-44 rounded-xl overflow-hidden border border-slate-700 bg-slate-900 group shadow-lg flex items-center justify-center">
                     
-                    <p class="text-[11px] text-slate-500">
-                      Recommended: <strong>1920 × 600 px</strong> or <strong>1920 × 1080 px</strong> landscape image. Uploads are automatically optimized to WebP and hosted on Cloudflare R2 CDN.
-                    </p>
+                    <img 
+                      v-if="pageData.image || pageData.default_image"
+                      :src="resolvePreviewUrl(pageData.image || pageData.default_image)" 
+                      :alt="pageData.title"
+                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      @error="handleImgError($event)"
+                    />
+                    <div 
+                      v-else 
+                      class="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-red-950 flex items-center justify-center"
+                    ></div>
+
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/50 to-slate-950/30 pointer-events-none"></div>
+
+                    <div class="absolute inset-0 p-4 flex flex-col justify-end text-white pointer-events-none z-10">
+                      <div class="flex items-center gap-1.5 text-[9px] text-slate-300 font-medium mb-1">
+                        <span>Home</span>
+                        <span class="text-slate-500">&gt;</span>
+                        <span class="text-red-400 font-bold">{{ pageData.title }}</span>
+                      </div>
+                      <span class="text-[9px] font-extrabold tracking-wider text-red-400 uppercase block">
+                        {{ pageData.subtitle || 'Universal Paints' }}
+                      </span>
+                      <h3 class="text-sm font-black text-white leading-tight">
+                        {{ pageData.title }}
+                      </h3>
+                    </div>
+
+                    <div class="absolute top-2 right-2 bg-black/70 backdrop-blur-xs text-white text-[9px] font-mono px-2 py-0.5 rounded z-10">
+                      {{ pageData.route }}
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <label class="block text-xs font-semibold text-slate-700 mb-1">Header Subtitle / Tagline</label>
-                  <input 
-                    type="text" 
-                    v-model="pageData.subtitle" 
-                    class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
-                    placeholder="e.g. Our Journey & Story or Get in Touch"
-                  />
+                <!-- Upload & URL Configuration Controls -->
+                <div class="lg:col-span-7 space-y-4">
+                  
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                      Header Banner Image <span class="text-red-500">*</span>
+                    </label>
+                    <div class="space-y-2">
+                      <div class="flex items-center gap-2">
+                        <label 
+                          class="cursor-pointer bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shrink-0"
+                          :class="{ 'opacity-50 pointer-events-none': uploadingSubpageMap[pageKey] }"
+                        >
+                          <i class="fa-solid fa-spinner fa-spin" v-if="uploadingSubpageMap[pageKey]"></i>
+                          <i class="fa-solid fa-cloud-arrow-up" v-else></i>
+                          <span>{{ uploadingSubpageMap[pageKey] ? 'Uploading...' : 'Upload Header Image' }}</span>
+                          <input 
+                            type="file" 
+                            accept="image/png,image/jpeg,image/webp,image/jpg" 
+                            class="hidden" 
+                            @change="handleSubpageUpload($event, pageKey)"
+                            :disabled="uploadingSubpageMap[pageKey]"
+                          />
+                        </label>
+
+                        <input 
+                          type="text" 
+                          v-model="pageData.image" 
+                          class="flex-1 text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono focus:outline-hidden focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
+                          placeholder="Paste image URL (e.g. Cloudflare R2 link) or relative path"
+                        />
+
+                        <button
+                          type="button"
+                          v-if="pageData.default_image && pageData.image !== pageData.default_image"
+                          @click="resetSingleSubpage(pageKey)"
+                          class="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium transition shrink-0"
+                          title="Revert to original default image"
+                        >
+                          <i class="fa-solid fa-rotate-left mr-1"></i> Default
+                        </button>
+                      </div>
+                      
+                      <p class="text-[11px] text-slate-500">
+                        Recommended: <strong>1920 × 600 px</strong> or <strong>1920 × 1080 px</strong> landscape image. Uploads are automatically optimized to WebP and hosted on Cloudflare R2 CDN.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Header Subtitle / Tagline</label>
+                    <input 
+                      type="text" 
+                      v-model="pageData.subtitle" 
+                      class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
+                      placeholder="e.g. Our Journey & Story or Get in Touch"
+                    />
+                  </div>
+
                 </div>
 
               </div>
-
             </div>
-          </div>
+          </template>
         </div>
 
         <!-- Sticky / Bottom Action Bar -->
@@ -738,10 +1042,12 @@ const saveMessageType = ref('success')
 const uploadingMap = ref({})
 const uploadingSubpageMap = ref({})
 const isAboutUploading = ref(false)
+const uploadingAboutItem = ref({})
 
 const isAnyUploading = computed(() => {
   return Object.values(uploadingMap.value).some(Boolean) || 
          Object.values(uploadingSubpageMap.value).some(Boolean) ||
+         Object.values(uploadingAboutItem.value).some(Boolean) ||
          isAboutUploading.value
 })
 
@@ -781,7 +1087,21 @@ const isCustomSlide = (url) => {
 }
 
 // ==========================================
-// 2. SUB-PAGES HEADERS DEFAULTS & STATE
+// 2. ABOUT US PAGE RICH ASSETS (6 IMAGES)
+// ==========================================
+const defaultAboutPage = {
+  header_image: '/images/about-us-page/hero.webp',
+  story_image: '/images/about-us-page/paint-bucket.webp',
+  mfg_tanks_image: '/images/about-us-page/factory-tanks.webp',
+  mfg_production_image: '/images/about-us-page/production-line.webp',
+  mfg_lab_image: '/images/about-us-page/lab-test.webp',
+  truck_image: '/images/about-us-page/truck.webp',
+}
+
+const aboutPageData = ref({ ...defaultAboutPage })
+
+// ==========================================
+// 3. SUB-PAGES HEADERS DEFAULTS & STATE
 // ==========================================
 const defaultSubpages = {
   about: {
@@ -823,6 +1143,17 @@ const defaultSubpages = {
 
 const subpageHeaders = ref({ ...defaultSubpages })
 
+// Filter out about page for Tab 3 (since about page has its own full tab)
+const otherSubpageHeaders = computed(() => {
+  const result = {}
+  for (const [k, v] of Object.entries(subpageHeaders.value)) {
+    if (k !== 'about') {
+      result[k] = v
+    }
+  }
+  return result
+})
+
 const getPageIcon = (key) => {
   const iconMap = {
     about: 'fa-solid fa-building',
@@ -849,14 +1180,14 @@ const handleImgError = (e) => {
 }
 
 // ==========================================
-// 3. FETCH LAYOUT CONFIGURATIONS
+// 4. FETCH ALL LAYOUT CONFIGURATIONS
 // ==========================================
 const loadLayout = async () => {
   isLoading.value = true
   const authToken = token.value || (process.client ? (localStorage.getItem('auth_token') || useCookie('auth_token').value) : '')
   
   try {
-    const [homeRes, subRes] = await Promise.all([
+    const [homeRes, aboutRes, subRes] = await Promise.all([
       $fetch(`${config.public.apiBase}/api/web-layout/home`, {
         headers: {
           Accept: 'application/json',
@@ -864,6 +1195,15 @@ const loadLayout = async () => {
         }
       }).catch(err => {
         console.warn('Failed to load home web-layout:', err)
+        return null
+      }),
+      $fetch(`${config.public.apiBase}/api/web-layout/about`, {
+        headers: {
+          Accept: 'application/json',
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {})
+        }
+      }).catch(err => {
+        console.warn('Failed to load about web-layout:', err)
         return null
       }),
       $fetch(`${config.public.apiBase}/api/web-layout/subpages`, {
@@ -877,7 +1217,7 @@ const loadLayout = async () => {
       })
     ])
 
-    // Load Home Slider & About Image
+    // Load Home Slider & About Feature Image
     if (homeRes) {
       if (Array.isArray(homeRes.hero_slides) && homeRes.hero_slides.length > 0) {
         heroSlides.value = homeRes.hero_slides.map((s, idx) => ({
@@ -900,6 +1240,20 @@ const loadLayout = async () => {
       aboutImage.value = '/images/home-page/about-universal-paint.webp'
     }
 
+    // Load About Us Page Assets
+    if (aboutRes) {
+      aboutPageData.value = {
+        header_image: aboutRes.header_image || defaultAboutPage.header_image,
+        story_image: aboutRes.story_image || defaultAboutPage.story_image,
+        mfg_tanks_image: aboutRes.mfg_tanks_image || defaultAboutPage.mfg_tanks_image,
+        mfg_production_image: aboutRes.mfg_production_image || defaultAboutPage.mfg_production_image,
+        mfg_lab_image: aboutRes.mfg_lab_image || defaultAboutPage.mfg_lab_image,
+        truck_image: aboutRes.truck_image || defaultAboutPage.truck_image,
+      }
+    } else {
+      aboutPageData.value = { ...defaultAboutPage }
+    }
+
     // Load Sub-Pages Headers
     if (subRes && subRes.subpage_headers) {
       const merged = { ...defaultSubpages }
@@ -920,6 +1274,7 @@ const loadLayout = async () => {
     console.warn('Failed to fetch web layout, using defaults:', err)
     heroSlides.value = [ ...defaultSlides ]
     aboutImage.value = '/images/home-page/about-universal-paint.webp'
+    aboutPageData.value = { ...defaultAboutPage }
     subpageHeaders.value = { ...defaultSubpages }
   } finally {
     isLoading.value = false
@@ -927,109 +1282,80 @@ const loadLayout = async () => {
 }
 
 // ==========================================
-// 4. UPLOAD FILES TO CLOUDFLARE R2
+// 5. UPLOAD LOGIC TO CLOUDFLARE R2
 // ==========================================
+const uploadToR2 = async (rawFile, folder = 'web-layout') => {
+  const authToken = token.value || (process.client ? (localStorage.getItem('auth_token') || useCookie('auth_token').value) : '')
+  if (!authToken) {
+    alert('Your session has expired. Please log in again.')
+    router.push('/login')
+    throw new Error('Unauthenticated')
+  }
+
+  let fileToUpload = rawFile
+  try {
+    fileToUpload = await compressImage(rawFile, { maxWidth: 1920, maxHeight: 1200, quality: 0.85 })
+  } catch (compressErr) {
+    console.warn('Image compressor fallback:', compressErr)
+    fileToUpload = rawFile
+  }
+
+  const formData = new FormData()
+  formData.append('image', fileToUpload)
+  formData.append('folder', folder)
+
+  const res = await $fetch(`${config.public.apiBase}/api/upload`, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Bearer ${authToken}`
+    }
+  })
+
+  return res?.url
+}
+
+// Handle Home Hero Slide Upload
 const handleFileUpload = async (event, index) => {
   const rawFile = event.target.files?.[0]
   if (!rawFile) return
-
-  const authToken = token.value || (process.client ? (localStorage.getItem('auth_token') || useCookie('auth_token').value) : '')
-  if (!authToken) {
-    alert('Your session has expired. Please log in again to upload images.')
-    router.push('/login')
-    return
-  }
 
   uploadingMap.value[index] = true
   saveMessage.value = ''
 
   try {
-    let fileToUpload = rawFile
-    try {
-      fileToUpload = await compressImage(rawFile, { maxWidth: 1920, maxHeight: 1080, quality: 0.85 })
-    } catch (compressErr) {
-      console.warn('Image compressor fallback to raw file:', compressErr)
-      fileToUpload = rawFile
-    }
-
-    const formData = new FormData()
-    formData.append('image', fileToUpload)
-    formData.append('folder', 'web-layout')
-
-    const res = await $fetch(`${config.public.apiBase}/api/upload`, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${authToken}`
-      }
-    })
-
-    if (res && res.url) {
-      heroSlides.value[index].image = res.url
+    const url = await uploadToR2(rawFile)
+    if (url) {
+      heroSlides.value[index].image = url
       saveMessage.value = `Image for Slide #${index + 1} uploaded successfully! Don't forget to click "Save All Changes" to publish it live.`
       saveMessageType.value = 'success'
     }
   } catch (err) {
-    const errorDetails = err.data?.errors
-      ? Object.values(err.data.errors).flat().join('\n')
-      : (err.data?.message || err.message || 'Unknown network error')
-    alert(`Failed to upload image:\n${errorDetails}`)
-    console.error('Upload error:', err)
+    alert(`Failed to upload image: ${err.message || err}`)
   } finally {
     uploadingMap.value[index] = false
     event.target.value = ''
   }
 }
 
-// Upload file for About Section image
+// Handle Home About Section Upload
 const handleAboutUpload = async (event) => {
   const rawFile = event.target.files?.[0]
   if (!rawFile) return
-
-  const authToken = token.value || (process.client ? (localStorage.getItem('auth_token') || useCookie('auth_token').value) : '')
-  if (!authToken) {
-    alert('Your session has expired. Please log in again to upload images.')
-    router.push('/login')
-    return
-  }
 
   isAboutUploading.value = true
   saveMessage.value = ''
 
   try {
-    let fileToUpload = rawFile
-    try {
-      fileToUpload = await compressImage(rawFile, { maxWidth: 1600, maxHeight: 1200, quality: 0.85 })
-    } catch (compressErr) {
-      console.warn('Image compressor fallback to raw file:', compressErr)
-      fileToUpload = rawFile
-    }
-
-    const formData = new FormData()
-    formData.append('image', fileToUpload)
-    formData.append('folder', 'web-layout')
-
-    const res = await $fetch(`${config.public.apiBase}/api/upload`, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${authToken}`
-      }
-    })
-
-    if (res && res.url) {
-      aboutImage.value = res.url
-      saveMessage.value = 'About section image ("A Legacy of Quality and Commitment") uploaded successfully! Click "Save All Changes" to publish it live.'
+    const url = await uploadToR2(rawFile)
+    if (url) {
+      aboutImage.value = url
+      saveMessage.value = 'About section image uploaded successfully! Click "Save All Changes" to publish it live.'
       saveMessageType.value = 'success'
     }
   } catch (err) {
-    const errorDetails = err.data?.errors
-      ? Object.values(err.data.errors).flat().join('\n')
-      : (err.data?.message || err.message || 'Unknown network error')
-    alert(`Failed to upload image:\n${errorDetails}`)
-    console.error('Upload error:', err)
+    alert(`Failed to upload image: ${err.message || err}`)
   } finally {
     isAboutUploading.value = false
     event.target.value = ''
@@ -1044,81 +1370,86 @@ const resetAboutImageToDefault = () => {
   }
 }
 
-// Upload file for sub-page header
-const handleSubpageUpload = async (event, pageKey) => {
+// Handle About Us Page Asset Upload (Any of the 6 images)
+const handleAboutAssetUpload = async (event, key) => {
   const rawFile = event.target.files?.[0]
   if (!rawFile) return
 
-  const authToken = token.value || (process.client ? (localStorage.getItem('auth_token') || useCookie('auth_token').value) : '')
-  if (!authToken) {
-    alert('Your session has expired. Please log in again to upload images.')
-    router.push('/login')
-    return
+  uploadingAboutItem.value[key] = true
+  saveMessage.value = ''
+
+  try {
+    const url = await uploadToR2(rawFile)
+    if (url) {
+      aboutPageData.value[key] = url
+      // If header image was changed, sync with subpageHeaders too
+      if (key === 'header_image' && subpageHeaders.value.about) {
+        subpageHeaders.value.about.image = url
+      }
+      saveMessage.value = `Image updated successfully! Click "Save All Changes" to publish it live.`
+      saveMessageType.value = 'success'
+    }
+  } catch (err) {
+    alert(`Failed to upload image: ${err.message || err}`)
+  } finally {
+    uploadingAboutItem.value[key] = false
+    event.target.value = ''
   }
+}
+
+const resetAllAboutImagesToDefault = () => {
+  if (confirm('Reset all About Us page images to original theme defaults?')) {
+    aboutPageData.value = { ...defaultAboutPage }
+    if (subpageHeaders.value.about) {
+      subpageHeaders.value.about.image = defaultAboutPage.header_image
+    }
+    saveMessage.value = 'Reset About Us page to defaults. Click "Save All Changes" to publish.'
+    saveMessageType.value = 'success'
+  }
+}
+
+// Handle other subpage header upload
+const handleSubpageUpload = async (event, pageKey) => {
+  const rawFile = event.target.files?.[0]
+  if (!rawFile) return
 
   uploadingSubpageMap.value[pageKey] = true
   saveMessage.value = ''
 
   try {
-    let fileToUpload = rawFile
-    try {
-      fileToUpload = await compressImage(rawFile, { maxWidth: 1920, maxHeight: 1080, quality: 0.85 })
-    } catch (compressErr) {
-      console.warn('Image compressor fallback to raw file:', compressErr)
-      fileToUpload = rawFile
-    }
-
-    const formData = new FormData()
-    formData.append('image', fileToUpload)
-    formData.append('folder', 'web-layout')
-
-    const res = await $fetch(`${config.public.apiBase}/api/upload`, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${authToken}`
-      }
-    })
-
-    if (res && res.url) {
-      subpageHeaders.value[pageKey].image = res.url
+    const url = await uploadToR2(rawFile)
+    if (url) {
+      subpageHeaders.value[pageKey].image = url
       saveMessage.value = `Header image for "${subpageHeaders.value[pageKey].title}" uploaded successfully! Click "Save All Changes" to publish it live.`
       saveMessageType.value = 'success'
     }
   } catch (err) {
-    const errorDetails = err.data?.errors
-      ? Object.values(err.data.errors).flat().join('\n')
-      : (err.data?.message || err.message || 'Unknown network error')
-    alert(`Failed to upload image:\n${errorDetails}`)
-    console.error('Upload error:', err)
+    alert(`Failed to upload image: ${err.message || err}`)
   } finally {
     uploadingSubpageMap.value[pageKey] = false
     event.target.value = ''
   }
 }
 
-// Reset single subpage
 const resetSingleSubpage = (pageKey) => {
   if (confirm(`Reset header image for "${subpageHeaders.value[pageKey].title}" to default?`)) {
     subpageHeaders.value[pageKey].image = subpageHeaders.value[pageKey].default_image
   }
 }
 
-// Reset all subpages
 const resetAllSubpagesToDefault = () => {
-  if (confirm('Are you sure you want to reset all sub-page header images to default assets?')) {
+  if (confirm('Are you sure you want to reset all other sub-page header images to defaults?')) {
     for (const key of Object.keys(subpageHeaders.value)) {
-      subpageHeaders.value[key].image = subpageHeaders.value[key].default_image
+      if (key !== 'about') {
+        subpageHeaders.value[key].image = subpageHeaders.value[key].default_image
+      }
     }
-    saveMessage.value = 'Reset all sub-pages to default headers. Click "Save All Changes" to publish.'
+    saveMessage.value = 'Reset other sub-pages to default headers. Click "Save All Changes" to publish.'
     saveMessageType.value = 'success'
   }
 }
 
-// ==========================================
-// 5. SLIDE MANAGEMENT HELPERS
-// ==========================================
+// Slide Management Helpers
 const addSlide = () => {
   const newId = heroSlides.value.length ? Math.max(...heroSlides.value.map(s => s.id || 0)) + 1 : 1
   heroSlides.value.push({
@@ -1203,6 +1534,28 @@ const saveCurrentLayout = async () => {
       }
 
       saveMessage.value = 'Homepage settings (hero slider & about section image) updated and published successfully!'
+      saveMessageType.value = 'success'
+
+    } else if (activeTab.value === 'about') {
+      const res = await $fetch(`${config.public.apiBase}/api/web-layout/about`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          Accept: 'application/json'
+        },
+        body: { ...aboutPageData.value }
+      })
+
+      if (res) {
+        aboutPageData.value = { ...defaultAboutPage, ...res }
+      }
+
+      // Also ensure subpages layout has updated about header
+      if (aboutPageData.value.header_image && subpageHeaders.value.about) {
+        subpageHeaders.value.about.image = aboutPageData.value.header_image
+      }
+
+      saveMessage.value = 'About Us page media assets and manufacturing gallery updated and published successfully!'
       saveMessageType.value = 'success'
 
     } else if (activeTab.value === 'subpages') {

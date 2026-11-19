@@ -64,6 +64,17 @@ class WebLayoutController extends Controller
             ];
         }
 
+        if ($page === 'about') {
+            return [
+                'header_image' => '/images/about-us-page/hero.webp',
+                'story_image' => '/images/about-us-page/paint-bucket.webp',
+                'mfg_tanks_image' => '/images/about-us-page/factory-tanks.webp',
+                'mfg_production_image' => '/images/about-us-page/production-line.webp',
+                'mfg_lab_image' => '/images/about-us-page/lab-test.webp',
+                'truck_image' => '/images/about-us-page/truck.webp',
+            ];
+        }
+
         if ($page === 'subpages' || $page === 'pages') {
             return [
                 'subpage_headers' => [
