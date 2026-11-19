@@ -64,7 +64,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/sales-reps/{id}', [\App\Http\Controllers\API\SalesRepresentativeController::class, 'update']);
     Route::put('/sales-reps/{id}', [\App\Http\Controllers\API\SalesRepresentativeController::class, 'update']);
     Route::delete('/sales-reps/{id}', [\App\Http\Controllers\API\SalesRepresentativeController::class, 'destroy']);
+
+    // Protected Web Layout configuration routes (Admin)
+    Route::post('/web-layout/{page}', [\App\Http\Controllers\API\WebLayoutController::class, 'updateLayout']);
 });
+
+// Public Web Layout routes (Read)
+Route::get('/web-layout/{page}', [\App\Http\Controllers\API\WebLayoutController::class, 'getLayout']);
 
 // Public Sales Representatives routes (Read)
 Route::get('/sales-reps', [\App\Http\Controllers\API\SalesRepresentativeController::class, 'index']);
@@ -183,6 +189,7 @@ Route::get('/run-migrations', function (\Illuminate\Http\Request $request) {
                 'blogs' => '2026_09_21_105018_create_blogs_table',
                 'categories' => '2026_10_20_000000_create_categories_table',
                 'sales_representatives' => '2026_11_10_060000_create_sales_representatives_table',
+                'web_layouts' => '2026_11_19_000000_create_web_layouts_table',
             ];
 
             foreach ($tableMigrationMap as $table => $migrationName) {

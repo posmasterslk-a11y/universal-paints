@@ -7,7 +7,7 @@
         :key="index"
         class="hero-bg-layer"
         :class="{ active: currentBgIndex === index }"
-        :style="{ backgroundImage: `url(${bg})` }"
+        :style="{ backgroundImage: `url(${getHeroBgUrl(bg)})` }"
       ></div>
       <div class="container hero-content">
         <div class="hero-text">
@@ -35,14 +35,14 @@
       </div>
       
       <!-- Slider Navigation Dots -->
-      <div class="hero-slider-nav">
+      <div class="hero-slider-nav" v-if="heroBackgrounds && heroBackgrounds.length > 1">
         <button 
           v-for="(_, index) in heroBackgrounds" 
           :key="'dot-'+index"
           class="slider-dot"
           :class="{ active: currentBgIndex === index }"
           @click="setHeroSlide(index)"
-          aria-label="Change slide"
+          :aria-label="'Change slide ' + (index + 1)"
         ></button>
       </div>
     </section>
@@ -441,6 +441,9 @@ const { data: backendCategories } = await useFetch(() => `${cleanApiBase.value}/
 // Fetch latest blog articles for News & Events section directly from backend API
 const { data: allBlogs } = await useFetch(() => `${cleanApiBase.value}/api/blogs`, { key: 'home-latest-blogs' })
 
+// Fetch home page web layout configuration (hero slider images, media assets)
+const { data: homeLayout } = await useFetch(() => `${cleanApiBase.value}/api/web-layout/home`, { key: 'home-web-layout' })
+
 const latestArticles = computed(() => {
   const list = Array.isArray(allBlogs.value) ? allBlogs.value : (allBlogs.value?.data || [])
   return list.slice(0, 3)
@@ -524,11 +527,31 @@ const displayCategories = computed(() => {
   return []
 })
 
-const heroBackgrounds = [
+const defaultHeroSlides = [
   '/images/home-page/dark-hero-bg1.webp',
   '/images/home-page/dark-hero-bg2.webp',
   '/images/home-page/dark-hero-bg3.webp'
-];
+]
+
+const heroBackgrounds = computed(() => {
+  const slides = homeLayout.value?.hero_slides
+  if (Array.isArray(slides) && slides.length > 0) {
+    const urls = slides
+      .map(s => typeof s === 'string' ? s : s?.image)
+      .filter(img => Boolean(img && String(img).trim()))
+    if (urls.length > 0) return urls
+  }
+  return defaultHeroSlides
+})
+
+const getHeroBgUrl = (bg) => {
+  if (!bg) return '/images/home-page/dark-hero-bg1.webp'
+  if (bg.startsWith('http://') || bg.startsWith('https://')) return bg
+  if (bg.startsWith('/images/')) return bg
+  if (bg.startsWith('/storage/')) return `${cleanApiBase.value}${bg}`
+  return `${cleanApiBase.value}${bg}`
+}
+
 const currentBgIndex = ref(0);
 let bgInterval;
 
@@ -537,15 +560,27 @@ const setHeroSlide = (index) => {
   if (bgInterval) {
     clearInterval(bgInterval);
     bgInterval = setInterval(() => {
-      currentBgIndex.value = (currentBgIndex.value + 1) % heroBackgrounds.length;
+      const len = heroBackgrounds.value?.length || 1;
+      currentBgIndex.value = (currentBgIndex.value + 1) % len;
     }, 5000);
   }
 };
 
 onMounted(async () => {
   bgInterval = setInterval(() => {
-    currentBgIndex.value = (currentBgIndex.value + 1) % heroBackgrounds.length;
+    const len = heroBackgrounds.value?.length || 1;
+    currentBgIndex.value = (currentBgIndex.value + 1) % len;
   }, 5000);
+
+  // Client-side hydration retry for web layout
+  if (!homeLayout.value?.hero_slides?.length) {
+    try {
+      const lRes = await $fetch(`${cleanApiBase.value}/api/web-layout/home`)
+      if (lRes && lRes.hero_slides) {
+        homeLayout.value = lRes
+      }
+    } catch (e) {}
+  }
 
   // Client-side hydration retry if SSR payload was empty or failed
   const currentList = Array.isArray(backendCategories.value) ? backendCategories.value : (backendCategories.value?.data || [])

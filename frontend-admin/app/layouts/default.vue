@@ -26,6 +26,10 @@
           <i class="fa-solid fa-pen-nib w-5"></i>
           Blogs
         </NuxtLink>
+        <NuxtLink to="/web-layout" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition" active-class="bg-red-600 !text-white hover:bg-red-600">
+          <i class="fa-solid fa-layer-group w-5"></i>
+          Web Layout
+        </NuxtLink>
         <NuxtLink to="/users" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition" active-class="bg-red-600 !text-white hover:bg-red-600">
           <i class="fa-solid fa-users w-5"></i>
           User Accounts
