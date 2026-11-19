@@ -175,7 +175,7 @@
                     <i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i> Right-Side Blend Active
                   </span>
                 </div>
-                <div class="relative w-full h-44 rounded-lg overflow-hidden border border-slate-300 bg-[#031a36] group shadow-inner flex items-center justify-center">
+                <div class="relative w-full h-48 rounded-xl overflow-hidden border border-slate-700 bg-[#031a36] group shadow-lg flex items-center justify-center">
                   
                   <!-- If custom slide: Show right-side image + splash overlay + fixed left branding -->
                   <template v-if="isCustomSlide(slide.image)">
@@ -184,8 +184,8 @@
                       v-if="slide.image"
                       :src="resolvePreviewUrl(slide.image)" 
                       :alt="'Slide ' + (index + 1)" 
-                      class="absolute right-0 top-0 w-7/12 h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      style="mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 15%, black 45%); -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 15%, black 45%);"
+                      class="absolute right-0 top-0 w-3/5 h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      style="mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 18%, black 45%); -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 18%, black 45%);"
                       @error="handleImgError($event)"
                     />
                     <!-- Fixed splash overlay -->
@@ -196,6 +196,11 @@
                     />
                     <!-- Left solid navy scrim for text clarity -->
                     <div class="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-[#031a36] via-[#031a36] to-transparent pointer-events-none"></div>
+
+                    <!-- Right side badge label -->
+                    <div class="absolute top-2 right-2 bg-emerald-600/90 text-white text-[9px] font-bold px-2 py-0.5 rounded shadow z-10 flex items-center gap-1">
+                      <i class="fa-solid fa-check text-[8px]"></i> Uploaded Scene
+                    </div>
                   </template>
 
                   <!-- If default pre-composited slide -->
@@ -207,6 +212,9 @@
                       class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       @error="handleImgError($event)"
                     />
+                    <div class="absolute top-2 right-2 bg-slate-800/80 text-slate-300 text-[9px] font-medium px-2 py-0.5 rounded z-10">
+                      Original Theme Slide
+                    </div>
                   </template>
 
                   <div v-if="!slide.image" class="text-slate-400 text-center p-4">
@@ -215,16 +223,24 @@
                   </div>
 
                   <!-- Gradient Theme Mockup Overlay (identical to website) -->
-                  <div class="absolute inset-0 bg-gradient-to-b from-slate-900/30 to-slate-900/60 pointer-events-none"></div>
+                  <div class="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-transparent to-slate-950/60 pointer-events-none"></div>
 
-                  <!-- Mockup Text on Left Side -->
-                  <div class="absolute inset-0 p-4 flex flex-col justify-end pointer-events-none max-w-[60%]">
-                    <span class="text-[9px] font-extrabold tracking-wider text-red-400 uppercase">COLORING YOUR WORLD</span>
-                    <span class="text-xs font-black text-white leading-tight">Quality Paints.<br/><span class="text-red-400">Beautiful</span> Possibilities.</span>
+                  <!-- Mockup Text on Left Side with Fixed Badge -->
+                  <div class="absolute inset-0 p-4 flex flex-col justify-between pointer-events-none max-w-[62%] z-10">
+                    <span class="inline-block bg-slate-900/80 text-amber-400 text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded w-max tracking-wider border border-amber-400/30">
+                      Fixed Left Identity
+                    </span>
+                    <div>
+                      <span class="text-[9px] font-extrabold tracking-wider text-red-400 uppercase block mb-0.5">COLORING YOUR WORLD</span>
+                      <span class="text-xs font-black text-white leading-tight block">
+                        Quality Paints.<br/>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-amber-400 to-green-500">Beautiful</span> Possibilities.
+                      </span>
+                    </div>
                   </div>
 
-                  <!-- Slide Indicator Badge -->
-                  <div class="absolute top-2 right-2 bg-black/60 backdrop-blur-xs text-white text-[10px] font-mono px-2 py-0.5 rounded">
+                  <!-- Slide Indicator Badge (bottom right) -->
+                  <div class="absolute bottom-2 right-2 bg-black/70 backdrop-blur-xs text-white text-[10px] font-mono px-2 py-0.5 rounded z-10">
                     Slide {{ index + 1 }} / {{ heroSlides.length }}
                   </div>
                 </div>
