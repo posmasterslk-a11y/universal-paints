@@ -6,9 +6,19 @@
         v-for="(bg, index) in heroBackgrounds" 
         :key="index"
         class="hero-bg-layer"
-        :class="{ active: currentBgIndex === index }"
-        :style="{ backgroundImage: `url(${getHeroBgUrl(bg)})` }"
-      ></div>
+        :class="{ active: currentBgIndex === index, 'is-custom': isCustomSlide(bg) }"
+        :style="!isCustomSlide(bg) ? { backgroundImage: `url(${getHeroBgUrl(bg)})` } : {}"
+      >
+        <!-- Custom right-side image slide with fixed left brand theme -->
+        <template v-if="isCustomSlide(bg)">
+          <div 
+            class="hero-custom-right-img" 
+            :style="{ backgroundImage: `url(${getHeroBgUrl(bg)})` }"
+          ></div>
+          <div class="hero-custom-left-scrim"></div>
+          <div class="hero-custom-splash"></div>
+        </template>
+      </div>
       <div class="container hero-content">
         <div class="hero-text">
           <div class="section-subtitle">COLORING YOUR WORLD</div>
@@ -552,6 +562,16 @@ const getHeroBgUrl = (bg) => {
   return `${cleanApiBase.value}${bg}`
 }
 
+const isCustomSlide = (bg) => {
+  const url = typeof bg === 'string' ? bg : (bg?.image || '')
+  if (!url) return false
+  // Default pre-composited banner files have the full left dark wall + splash already built-in
+  if (url.includes('dark-hero-bg1') || url.includes('dark-hero-bg2') || url.includes('dark-hero-bg3')) {
+    return false
+  }
+  return true
+}
+
 const currentBgIndex = ref(0);
 let bgInterval;
 
@@ -645,6 +665,7 @@ onUnmounted(() => {
   padding-bottom: 120px;
   position: relative;
   overflow: hidden;
+  background-color: #031a36;
 }
 .hero-bg-layer {
   position: absolute;
@@ -671,6 +692,45 @@ onUnmounted(() => {
 }
 .hero-bg-layer.active {
   opacity: 1;
+}
+
+/* Custom right-side image slide with fixed left brand theme */
+.hero-bg-layer.is-custom {
+  background-color: #031a36;
+}
+.hero-custom-right-img {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 58%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 15%, black 45%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 15%, black 45%);
+}
+.hero-custom-left-scrim {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 52%;
+  height: 100%;
+  background: linear-gradient(90deg, #031a36 0%, #031a36 75%, transparent 100%);
+  pointer-events: none;
+}
+.hero-custom-splash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/images/home-page/header-paint-splash.webp');
+  background-size: cover;
+  background-position: center;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0.95;
 }
 .hero-content {
   display: grid;
@@ -1491,6 +1551,19 @@ onUnmounted(() => {
     padding-bottom: 70px; 
     min-height: auto;
     overflow: hidden;
+  }
+  .hero-custom-right-img {
+    width: 100%;
+    mask-image: none;
+    -webkit-mask-image: none;
+    opacity: 0.45;
+  }
+  .hero-custom-left-scrim {
+    width: 100%;
+    background: rgba(3, 26, 54, 0.7);
+  }
+  .hero-custom-splash {
+    opacity: 0.55;
   }
   .hero-content { 
     grid-template-columns: 1fr; 

@@ -80,10 +80,10 @@
           <div class="space-y-1">
             <h2 class="text-lg font-bold flex items-center gap-2">
               <i class="fa-solid fa-images text-red-400"></i>
-              Homepage Hero Background Slider
+              Homepage Hero Background Slider (Right-Side Scene)
             </h2>
             <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
-              These background images cycle smoothly behind the hero title on the homepage. The dark gradient overlay, typography, and theme styling remain perfectly consistent. Recommended resolution: <strong class="text-white">1920 × 1080 px</strong> (Landscape WebP / JPG).
+              These images cycle smoothly on the <strong>right side</strong> of the homepage hero slider. The left-side brand identity, deep navy background, paint splash arch, and typography remain permanently fixed for consistent branding.
             </p>
           </div>
 
@@ -169,26 +169,56 @@
               
               <!-- Live Preview Thumbnail with Mockup Overlay -->
               <div class="lg:col-span-5 space-y-1.5">
-                <label class="block text-xs font-bold text-slate-700">Live Appearance Preview</label>
-                <div class="relative w-full h-44 rounded-lg overflow-hidden border border-slate-300 bg-slate-900 group shadow-inner flex items-center justify-center">
-                  <!-- Background Image -->
-                  <img 
-                    v-if="slide.image" 
-                    :src="resolvePreviewUrl(slide.image)" 
-                    :alt="'Slide ' + (index + 1)"
-                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    @error="handleImgError($event)"
-                  />
-                  <div v-else class="text-slate-400 text-center p-4">
+                <div class="flex items-center justify-between">
+                  <label class="block text-xs font-bold text-slate-700">Live Appearance Preview</label>
+                  <span v-if="isCustomSlide(slide.image)" class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
+                    <i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i> Right-Side Blend Active
+                  </span>
+                </div>
+                <div class="relative w-full h-44 rounded-lg overflow-hidden border border-slate-300 bg-[#031a36] group shadow-inner flex items-center justify-center">
+                  
+                  <!-- If custom slide: Show right-side image + splash overlay + fixed left branding -->
+                  <template v-if="isCustomSlide(slide.image)">
+                    <!-- Right side uploaded photo -->
+                    <img 
+                      v-if="slide.image"
+                      :src="resolvePreviewUrl(slide.image)" 
+                      :alt="'Slide ' + (index + 1)" 
+                      class="absolute right-0 top-0 w-7/12 h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      style="mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 15%, black 45%); -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 15%, black 45%);"
+                      @error="handleImgError($event)"
+                    />
+                    <!-- Fixed splash overlay -->
+                    <img 
+                      src="/images/home-page/header-paint-splash.webp" 
+                      alt="Brand Splash" 
+                      class="absolute inset-0 w-full h-full object-cover mix-blend-screen pointer-events-none opacity-90"
+                    />
+                    <!-- Left solid navy scrim for text clarity -->
+                    <div class="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-[#031a36] via-[#031a36] to-transparent pointer-events-none"></div>
+                  </template>
+
+                  <!-- If default pre-composited slide -->
+                  <template v-else>
+                    <img 
+                      v-if="slide.image" 
+                      :src="resolvePreviewUrl(slide.image)" 
+                      :alt="'Slide ' + (index + 1)"
+                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      @error="handleImgError($event)"
+                    />
+                  </template>
+
+                  <div v-if="!slide.image" class="text-slate-400 text-center p-4">
                     <i class="fa-solid fa-image text-3xl mb-1 opacity-50"></i>
                     <p class="text-xs">No image uploaded yet</p>
                   </div>
 
                   <!-- Gradient Theme Mockup Overlay (identical to website) -->
-                  <div class="absolute inset-0 bg-gradient-to-b from-slate-900/40 to-slate-900/80 pointer-events-none"></div>
+                  <div class="absolute inset-0 bg-gradient-to-b from-slate-900/30 to-slate-900/60 pointer-events-none"></div>
 
-                  <!-- Mockup Text -->
-                  <div class="absolute inset-0 p-4 flex flex-col justify-end pointer-events-none">
+                  <!-- Mockup Text on Left Side -->
+                  <div class="absolute inset-0 p-4 flex flex-col justify-end pointer-events-none max-w-[60%]">
                     <span class="text-[9px] font-extrabold tracking-wider text-red-400 uppercase">COLORING YOUR WORLD</span>
                     <span class="text-xs font-black text-white leading-tight">Quality Paints.<br/><span class="text-red-400">Beautiful</span> Possibilities.</span>
                   </div>
@@ -246,7 +276,7 @@
                     </div>
                     
                     <p class="text-[11px] text-slate-500">
-                      Supports direct upload to Cloudflare R2 (auto-compressed to WebP) or pasting any valid public image URL.
+                      Uploads only replace the <strong>right-side scene</strong>. The left-side brand dark wall, paint splash, and typography remain permanently fixed.
                     </p>
                   </div>
                 </div>
@@ -326,6 +356,14 @@ const defaultSlides = [
 ]
 
 const heroSlides = ref([ ...defaultSlides ])
+
+const isCustomSlide = (url) => {
+  if (!url) return false
+  if (url.includes('dark-hero-bg1') || url.includes('dark-hero-bg2') || url.includes('dark-hero-bg3')) {
+    return false
+  }
+  return true
+}
 
 // Resolve image URL for admin preview
 const resolvePreviewUrl = (url) => {
