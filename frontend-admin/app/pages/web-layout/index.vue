@@ -177,7 +177,7 @@
                 </div>
                 <div class="relative w-full h-48 rounded-xl overflow-hidden border border-slate-700 bg-[#031a36] group shadow-lg flex items-center justify-center">
                   
-                  <!-- If custom slide: Show right-side image + splash overlay + fixed left branding -->
+                  <!-- If custom slide: Show right-side image + fixed left branding -->
                   <template v-if="isCustomSlide(slide.image)">
                     <!-- Right side uploaded photo -->
                     <img 
@@ -187,12 +187,6 @@
                       class="absolute right-0 top-0 w-3/5 h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       style="mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 18%, black 45%); -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 18%, black 45%);"
                       @error="handleImgError($event)"
-                    />
-                    <!-- Fixed splash overlay -->
-                    <img 
-                      src="/images/home-page/header-paint-splash.webp" 
-                      alt="Brand Splash" 
-                      class="absolute inset-0 w-full h-full object-cover mix-blend-screen pointer-events-none opacity-90"
                     />
                     <!-- Left solid navy scrim for text clarity -->
                     <div class="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-[#031a36] via-[#031a36] to-transparent pointer-events-none"></div>

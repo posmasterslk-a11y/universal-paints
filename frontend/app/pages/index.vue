@@ -16,7 +16,6 @@
             :style="{ backgroundImage: `url(${getHeroBgUrl(bg)})` }"
           ></div>
           <div class="hero-custom-left-scrim"></div>
-          <div class="hero-custom-splash"></div>
         </template>
       </div>
       <div class="container hero-content">
@@ -718,19 +717,6 @@ onUnmounted(() => {
   height: 100%;
   background: linear-gradient(90deg, #031a36 0%, #031a36 75%, transparent 100%);
   pointer-events: none;
-}
-.hero-custom-splash {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url('/images/home-page/header-paint-splash.webp');
-  background-size: cover;
-  background-position: center;
-  mix-blend-mode: screen;
-  pointer-events: none;
-  opacity: 0.95;
 }
 .hero-content {
   display: grid;
@@ -1561,9 +1547,6 @@ onUnmounted(() => {
   .hero-custom-left-scrim {
     width: 100%;
     background: rgba(3, 26, 54, 0.7);
-  }
-  .hero-custom-splash {
-    opacity: 0.55;
   }
   .hero-content { 
     grid-template-columns: 1fr; 
