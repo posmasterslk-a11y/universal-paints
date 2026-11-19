@@ -185,18 +185,18 @@
                       :src="resolvePreviewUrl(slide.image)" 
                       :alt="'Slide ' + (index + 1)" 
                       class="absolute right-0 top-0 w-3/5 h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      style="mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 18%, black 45%); -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 18%, black 45%);"
+                      style="mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 8%, black 22%); -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 8%, black 22%);"
                       @error="handleImgError($event)"
                     />
-                    <!-- Fixed splash overlay (conditionally rendered by tick) -->
+                    <!-- Rainbow Splash Arch Frame (conditionally rendered by tick) -->
                     <img 
                       v-if="slide.show_splash !== false"
-                      src="/images/home-page/header-paint-splash.webp" 
-                      alt="Brand Splash" 
-                      class="absolute inset-0 w-full h-full object-cover mix-blend-screen pointer-events-none opacity-90 transition-opacity duration-300"
+                      src="/images/home-page/rainbow-splash-frame.webp" 
+                      alt="Brand Splash Frame" 
+                      class="absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-300"
                     />
-                    <!-- Left solid navy scrim for text clarity -->
-                    <div class="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-[#031a36] via-[#031a36] to-transparent pointer-events-none"></div>
+                    <!-- Left solid navy scrim (when splash is turned off) -->
+                    <div v-else class="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-[#031a36] via-[#031a36] to-transparent pointer-events-none"></div>
 
                     <!-- Right side badge label -->
                     <div class="absolute top-2 right-2 bg-emerald-600/90 text-white text-[9px] font-bold px-2 py-0.5 rounded shadow z-10 flex items-center gap-1">

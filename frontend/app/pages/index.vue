@@ -15,10 +15,18 @@
             class="hero-custom-right-img" 
             :style="{ backgroundImage: `url(${getHeroBgUrl(slide.image)})` }"
           ></div>
-          <div class="hero-custom-left-scrim"></div>
-          
-          <!-- Optional Color Splash Arch (toggled via admin tick) -->
-          <div v-if="slide.show_splash" class="hero-custom-splash"></div>
+
+          <!-- Rainbow Paint Splash Arch Frame (when tick is ON) -->
+          <div 
+            v-if="slide.show_splash !== false" 
+            class="hero-rainbow-splash-frame"
+          ></div>
+
+          <!-- Clean soft dark scrim (when tick is OFF) -->
+          <div 
+            v-else 
+            class="hero-custom-left-scrim"
+          ></div>
         </template>
       </div>
       <div class="container hero-content">
@@ -729,8 +737,8 @@ onUnmounted(() => {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 15%, black 45%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 15%, black 45%);
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 8%, black 22%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 8%, black 22%);
 }
 .hero-custom-left-scrim {
   position: absolute;
@@ -741,18 +749,17 @@ onUnmounted(() => {
   background: linear-gradient(90deg, #031a36 0%, #031a36 75%, transparent 100%);
   pointer-events: none;
 }
-.hero-custom-splash {
+.hero-rainbow-splash-frame {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('/images/home-page/header-paint-splash.webp');
+  background-image: url('/images/home-page/rainbow-splash-frame.webp');
   background-size: cover;
   background-position: center;
-  mix-blend-mode: screen;
+  background-repeat: no-repeat;
   pointer-events: none;
-  opacity: 0.95;
 }
 .hero-content {
   display: grid;
