@@ -44,17 +44,20 @@ class WebLayoutController extends Controller
                     [
                         'id' => 1,
                         'image' => '/images/home-page/dark-hero-bg1.webp',
-                        'title' => 'Slide 1'
+                        'title' => 'Slide 1',
+                        'show_splash' => true
                     ],
                     [
                         'id' => 2,
                         'image' => '/images/home-page/dark-hero-bg2.webp',
-                        'title' => 'Slide 2'
+                        'title' => 'Slide 2',
+                        'show_splash' => true
                     ],
                     [
                         'id' => 3,
                         'image' => '/images/home-page/dark-hero-bg3.webp',
-                        'title' => 'Slide 3'
+                        'title' => 'Slide 3',
+                        'show_splash' => true
                     ]
                 ]
             ];
@@ -110,10 +113,15 @@ class WebLayoutController extends Controller
                 foreach ($slides as $idx => $slide) {
                     $img = is_array($slide) ? ($slide['image'] ?? '') : (is_string($slide) ? $slide : '');
                     if (!empty(trim((string)$img))) {
+                        $showSplash = true;
+                        if (is_array($slide) && array_key_exists('show_splash', $slide)) {
+                            $showSplash = filter_var($slide['show_splash'], FILTER_VALIDATE_BOOLEAN);
+                        }
                         $cleanedSlides[] = [
                             'id' => is_array($slide) ? ($slide['id'] ?? ($idx + 1)) : ($idx + 1),
                             'image' => trim((string)$img),
-                            'title' => is_array($slide) ? ($slide['title'] ?? ('Slide ' . ($idx + 1))) : ('Slide ' . ($idx + 1))
+                            'title' => is_array($slide) ? ($slide['title'] ?? ('Slide ' . ($idx + 1))) : ('Slide ' . ($idx + 1)),
+                            'show_splash' => $showSplash
                         ];
                     }
                 }

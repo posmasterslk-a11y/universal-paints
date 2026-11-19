@@ -188,6 +188,13 @@
                       style="mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 18%, black 45%); -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 18%, black 45%);"
                       @error="handleImgError($event)"
                     />
+                    <!-- Fixed splash overlay (conditionally rendered by tick) -->
+                    <img 
+                      v-if="slide.show_splash !== false"
+                      src="/images/home-page/header-paint-splash.webp" 
+                      alt="Brand Splash" 
+                      class="absolute inset-0 w-full h-full object-cover mix-blend-screen pointer-events-none opacity-90 transition-opacity duration-300"
+                    />
                     <!-- Left solid navy scrim for text clarity -->
                     <div class="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-[#031a36] via-[#031a36] to-transparent pointer-events-none"></div>
 
@@ -286,9 +293,36 @@
                     </div>
                     
                     <p class="text-[11px] text-slate-500">
-                      Uploads only replace the <strong>right-side scene</strong>. The left-side brand dark wall, paint splash, and typography remain permanently fixed.
+                      Uploads only replace the <strong>right-side scene</strong>. The left-side brand dark wall and typography remain permanently fixed.
                     </p>
                   </div>
+                </div>
+
+                <!-- Paint Splash Arch Checkbox Option (Tick to show/hide) -->
+                <div>
+                  <label class="flex items-start gap-3 p-3 rounded-lg border transition cursor-pointer select-none"
+                    :class="slide.show_splash !== false ? 'bg-amber-50/70 border-amber-300' : 'bg-slate-50 border-slate-200'"
+                  >
+                    <input 
+                      type="checkbox" 
+                      v-model="slide.show_splash" 
+                      class="mt-0.5 w-4 h-4 rounded text-red-600 focus:ring-red-500 border-slate-300 cursor-pointer"
+                    />
+                    <div class="flex-1 text-xs">
+                      <div class="flex items-center gap-2 font-bold" :class="slide.show_splash !== false ? 'text-amber-900' : 'text-slate-700'">
+                        <i class="fa-solid fa-paintbrush text-amber-500 text-xs"></i>
+                        <span>Center Rainbow Paint Splash Arch</span>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded uppercase font-bold"
+                          :class="slide.show_splash !== false ? 'bg-amber-200 text-amber-900' : 'bg-slate-200 text-slate-600'"
+                        >
+                          {{ slide.show_splash !== false ? 'With Splash (Active)' : 'Without Splash (Clean Photo)' }}
+                        </span>
+                      </div>
+                      <p class="text-[11px] text-slate-500 mt-0.5 leading-normal">
+                        Tick this box to include the signature rainbow paint splash arch in the center, or uncheck for a clean photo-only transition.
+                      </p>
+                    </div>
+                  </label>
                 </div>
 
               </div>
@@ -351,17 +385,20 @@ const defaultSlides = [
   {
     id: 1,
     image: '/images/home-page/dark-hero-bg1.webp',
-    title: 'Slide 1'
+    title: 'Slide 1',
+    show_splash: true
   },
   {
     id: 2,
     image: '/images/home-page/dark-hero-bg2.webp',
-    title: 'Slide 2'
+    title: 'Slide 2',
+    show_splash: true
   },
   {
     id: 3,
     image: '/images/home-page/dark-hero-bg3.webp',
-    title: 'Slide 3'
+    title: 'Slide 3',
+    show_splash: true
   }
 ]
 
@@ -407,7 +444,8 @@ const loadLayout = async () => {
       heroSlides.value = res.hero_slides.map((s, idx) => ({
         id: s.id || (idx + 1),
         image: typeof s === 'string' ? s : (s.image || ''),
-        title: typeof s === 'string' ? `Slide ${idx + 1}` : (s.title || `Slide ${idx + 1}`)
+        title: typeof s === 'string' ? `Slide ${idx + 1}` : (s.title || `Slide ${idx + 1}`),
+        show_splash: typeof s === 'object' && s !== null ? s.show_splash !== false : true
       }))
     } else {
       heroSlides.value = [ ...defaultSlides ]
@@ -480,7 +518,8 @@ const addSlide = () => {
   heroSlides.value.push({
     id: newId,
     image: '',
-    title: `Slide ${heroSlides.value.length + 1}`
+    title: `Slide ${heroSlides.value.length + 1}`,
+    show_splash: true
   })
 }
 

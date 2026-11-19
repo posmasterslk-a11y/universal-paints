@@ -3,19 +3,22 @@
     <!-- Hero Section -->
     <section class="hero">
       <div 
-        v-for="(bg, index) in heroBackgrounds" 
+        v-for="(slide, index) in heroSlidesList" 
         :key="index"
         class="hero-bg-layer"
-        :class="{ active: currentBgIndex === index, 'is-custom': isCustomSlide(bg) }"
-        :style="!isCustomSlide(bg) ? { backgroundImage: `url(${getHeroBgUrl(bg)})` } : {}"
+        :class="{ active: currentBgIndex === index, 'is-custom': isCustomSlide(slide.image) }"
+        :style="!isCustomSlide(slide.image) ? { backgroundImage: `url(${getHeroBgUrl(slide.image)})` } : {}"
       >
         <!-- Custom right-side image slide with fixed left brand theme -->
-        <template v-if="isCustomSlide(bg)">
+        <template v-if="isCustomSlide(slide.image)">
           <div 
             class="hero-custom-right-img" 
-            :style="{ backgroundImage: `url(${getHeroBgUrl(bg)})` }"
+            :style="{ backgroundImage: `url(${getHeroBgUrl(slide.image)})` }"
           ></div>
           <div class="hero-custom-left-scrim"></div>
+          
+          <!-- Optional Color Splash Arch (toggled via admin tick) -->
+          <div v-if="slide.show_splash" class="hero-custom-splash"></div>
         </template>
       </div>
       <div class="container hero-content">
@@ -44,9 +47,9 @@
       </div>
       
       <!-- Slider Navigation Dots -->
-      <div class="hero-slider-nav" v-if="heroBackgrounds && heroBackgrounds.length > 1">
+      <div class="hero-slider-nav" v-if="heroSlidesList && heroSlidesList.length > 1">
         <button 
-          v-for="(_, index) in heroBackgrounds" 
+          v-for="(_, index) in heroSlidesList" 
           :key="'dot-'+index"
           class="slider-dot"
           :class="{ active: currentBgIndex === index }"
@@ -542,16 +545,36 @@ const defaultHeroSlides = [
   '/images/home-page/dark-hero-bg3.webp'
 ]
 
-const heroBackgrounds = computed(() => {
+const heroSlidesList = computed(() => {
   const slides = homeLayout.value?.hero_slides
   if (Array.isArray(slides) && slides.length > 0) {
-    const urls = slides
-      .map(s => typeof s === 'string' ? s : s?.image)
-      .filter(img => Boolean(img && String(img).trim()))
-    if (urls.length > 0) return urls
+    const valid = slides
+      .filter(s => {
+        const img = typeof s === 'string' ? s : s?.image
+        return Boolean(img && String(img).trim())
+      })
+      .map((s, idx) => {
+        if (typeof s === 'string') {
+          return { id: idx + 1, image: s, title: `Slide ${idx + 1}`, show_splash: true }
+        }
+        return {
+          id: s.id || (idx + 1),
+          image: s.image,
+          title: s.title || `Slide ${idx + 1}`,
+          show_splash: s.show_splash !== false
+        }
+      })
+    if (valid.length > 0) return valid
   }
-  return defaultHeroSlides
+  return defaultHeroSlides.map((img, idx) => ({
+    id: idx + 1,
+    image: img,
+    title: `Slide ${idx + 1}`,
+    show_splash: true
+  }))
 })
+
+const heroBackgrounds = computed(() => heroSlidesList.value)
 
 const getHeroBgUrl = (bg) => {
   if (!bg) return '/images/home-page/dark-hero-bg1.webp'
@@ -717,6 +740,19 @@ onUnmounted(() => {
   height: 100%;
   background: linear-gradient(90deg, #031a36 0%, #031a36 75%, transparent 100%);
   pointer-events: none;
+}
+.hero-custom-splash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/images/home-page/header-paint-splash.webp');
+  background-size: cover;
+  background-position: center;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0.95;
 }
 .hero-content {
   display: grid;
