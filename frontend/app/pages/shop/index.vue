@@ -3,7 +3,7 @@
     <!-- Hero Section -->
     <section class="shop-hero">
       <div class="hero-image-full">
-        <img src="/images/shop page/shop_header.webp" alt="Shop Premium Paints" />
+        <img :src="heroBannerImage" alt="Shop Premium Paints" />
         <div class="hero-overlay"></div>
       </div>
       <div class="container hero-grid">
@@ -234,6 +234,9 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+
+const { getSubpageHeader } = useWebLayout()
+const heroBannerImage = computed(() => getSubpageHeader('shop', '/images/shop page/shop_header.webp'))
 
 const route = useRoute()
 const router = useRouter()

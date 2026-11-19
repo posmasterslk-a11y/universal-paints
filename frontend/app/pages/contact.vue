@@ -2,7 +2,7 @@
   <div class="contact-page">
     <section class="contact-hero">
       <div class="hero-image-full">
-        <img src="/images/contact-us-page/hero.webp" alt="Contact Us Banner" />
+        <img :src="heroBannerImage" alt="Contact Us Banner" />
         <div class="hero-overlay"></div>
       </div>
       <div class="container hero-grid">
@@ -201,6 +201,9 @@
 </template>
 
 <script setup>
+const { getSubpageHeader } = useWebLayout()
+const heroBannerImage = computed(() => getSubpageHeader('contact', '/images/contact-us-page/hero.webp'))
+
 useSeoMeta({
   title: 'Contact Us | Universal Paints Sri Lanka Head Office & Inquiries',
   ogTitle: 'Contact Us | Universal Paints Sri Lanka Head Office & Inquiries',

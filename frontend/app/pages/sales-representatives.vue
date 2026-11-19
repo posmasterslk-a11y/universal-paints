@@ -1,8 +1,9 @@
 <template>
   <div class="sales-reps-page">
     <!-- Hero Banner -->
-    <section class="reps-hero">
-      <div class="hero-pattern"></div>
+    <section class="reps-hero" :style="heroBannerImage ? { backgroundImage: `url(${heroBannerImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+      <div v-if="heroBannerImage" class="hero-image-overlay"></div>
+      <div v-else class="hero-pattern"></div>
       <div class="container hero-content">
         <span class="hero-badge">
           <i class="fa-solid fa-map-location-dot"></i> Island-wide Sales Network
@@ -310,6 +311,9 @@
 import { ref, computed, onMounted } from 'vue'
 import SriLankaMap from '~/components/SriLankaMap.vue'
 
+const { getSubpageHeader } = useWebLayout()
+const heroBannerImage = computed(() => getSubpageHeader('sales_reps', ''))
+
 const config = useRuntimeConfig()
 const cleanApiBase = computed(() => (config.public.apiBase || 'https://api.universalpaints.lk').replace(/\/api\/?$/, ''))
 const isQuotePopupOpen = useState('quotePopup', () => false)
@@ -530,6 +534,13 @@ useHead({
   opacity: 0.08;
   background-image: radial-gradient(#FFFFFF 1.5px, transparent 1.5px);
   background-size: 20px 20px;
+  pointer-events: none;
+}
+
+.hero-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(30, 41, 59, 0.85) 55%, rgba(69, 10, 10, 0.85) 100%);
   pointer-events: none;
 }
 

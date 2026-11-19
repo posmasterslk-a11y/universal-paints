@@ -3,7 +3,7 @@
     <!-- Hero Section -->
     <section class="about-hero">
       <div class="hero-bg">
-        <img src="/images/about-us-page/hero.webp" alt="Universal Paints Hero" />
+        <img :src="heroBannerImage" alt="Universal Paints Hero" />
         <div class="hero-overlay"></div>
       </div>
       <div class="container hero-content">
@@ -313,6 +313,9 @@
 </template>
 
 <script setup>
+const { getSubpageHeader } = useWebLayout()
+const heroBannerImage = computed(() => getSubpageHeader('about', '/images/about-us-page/hero.webp'))
+
 useSeoMeta({
   title: 'About Us | Pioneering Quality Coatings in Sri Lanka',
   ogTitle: 'About Universal Paints | Pioneering Quality Coatings in Sri Lanka',

@@ -4,7 +4,7 @@
     <section class="page-hero">
       <div class="page-hero-bg">
         <!-- We can use a default hero image for the blog -->
-        <img src="/images/about-us-page/hero.webp" alt="Blog" class="hero-bg-img" />
+        <img :src="heroBannerImage" alt="Blog" class="hero-bg-img" />
         <div class="hero-overlay"></div>
       </div>
       <div class="container relative z-10 text-center">
@@ -62,6 +62,8 @@
 
 <script setup>
 const config = useRuntimeConfig()
+const { getSubpageHeader } = useWebLayout()
+const heroBannerImage = computed(() => getSubpageHeader('blog', '/images/about-us-page/hero.webp'))
 
 const { data: blogs, pending, error } = await useFetch(`${config.public.apiBase}/api/blogs`)
 

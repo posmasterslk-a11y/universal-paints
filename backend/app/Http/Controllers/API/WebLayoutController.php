@@ -63,6 +63,48 @@ class WebLayoutController extends Controller
             ];
         }
 
+        if ($page === 'subpages' || $page === 'pages') {
+            return [
+                'subpage_headers' => [
+                    'about' => [
+                        'title' => 'About Us',
+                        'route' => '/about',
+                        'image' => '/images/about-us-page/hero.webp',
+                        'default_image' => '/images/about-us-page/hero.webp',
+                        'subtitle' => 'Our Journey & Story'
+                    ],
+                    'contact' => [
+                        'title' => 'Contact Us',
+                        'route' => '/contact',
+                        'image' => '/images/contact-us-page/hero.webp',
+                        'default_image' => '/images/contact-us-page/hero.webp',
+                        'subtitle' => 'Get in Touch'
+                    ],
+                    'shop' => [
+                        'title' => 'Shop / Products',
+                        'route' => '/shop',
+                        'image' => '/images/shop page/shop_header.webp',
+                        'default_image' => '/images/shop page/shop_header.webp',
+                        'subtitle' => 'Explore Our Range'
+                    ],
+                    'blog' => [
+                        'title' => 'Blog',
+                        'route' => '/blog',
+                        'image' => '/images/about-us-page/hero.webp',
+                        'default_image' => '/images/about-us-page/hero.webp',
+                        'subtitle' => 'News & Insights'
+                    ],
+                    'sales_reps' => [
+                        'title' => 'Sales Representatives',
+                        'route' => '/sales-representatives',
+                        'image' => '',
+                        'default_image' => '',
+                        'subtitle' => 'Island-wide Network'
+                    ]
+                ]
+            ];
+        }
+
         return [];
     }
 
@@ -126,6 +168,29 @@ class WebLayoutController extends Controller
                     }
                 }
                 $data['hero_slides'] = $cleanedSlides;
+            }
+        }
+
+        // If 'subpage_headers' is passed, validate and sanitize
+        if ($request->has('subpage_headers')) {
+            $headers = $request->input('subpage_headers');
+            if (is_array($headers)) {
+                $defaults = $this->getDefaults('subpages')['subpage_headers'] ?? [];
+                $cleanedHeaders = [];
+                foreach ($headers as $key => $headerData) {
+                    $keyStr = trim((string)$key);
+                    if (empty($keyStr)) continue;
+
+                    $defaultEntry = $defaults[$keyStr] ?? [];
+                    $cleanedHeaders[$keyStr] = [
+                        'title' => is_array($headerData) ? ($headerData['title'] ?? ($defaultEntry['title'] ?? ucfirst($keyStr))) : ucfirst($keyStr),
+                        'route' => is_array($headerData) ? ($headerData['route'] ?? ($defaultEntry['route'] ?? '')) : '',
+                        'image' => is_array($headerData) ? trim((string)($headerData['image'] ?? '')) : (is_string($headerData) ? trim($headerData) : ''),
+                        'default_image' => $defaultEntry['default_image'] ?? '',
+                        'subtitle' => is_array($headerData) ? ($headerData['subtitle'] ?? ($defaultEntry['subtitle'] ?? '')) : ''
+                    ];
+                }
+                $data['subpage_headers'] = $cleanedHeaders;
             }
         }
 
