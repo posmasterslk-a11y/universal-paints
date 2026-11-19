@@ -88,7 +88,10 @@ const getBlogImg = (b) => {
   if (!b?.image) return '/images/about-us-page/hero.webp'
   if (b.image.startsWith('http://') || b.image.startsWith('https://')) return b.image
   if (b.image.startsWith('/images/')) return b.image
-  return `${config.public.apiBase}${b.image}`
+  if (b.image.startsWith('images/')) return `/${b.image}`
+  const base = config.public.apiBase ? config.public.apiBase.replace(/\/+$/, '') : ''
+  const path = b.image.startsWith('/') ? b.image : `/${b.image}`
+  return `${base}${path}`
 }
 
 const getExcerpt = (html) => {

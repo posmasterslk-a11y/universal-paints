@@ -233,7 +233,10 @@ const getCoverImageUrl = (img) => {
   if (!img) return ''
   if (img.startsWith('http://') || img.startsWith('https://')) return img
   if (img.startsWith('/images/')) return img
-  return `${config.public.apiBase}${img}`
+  if (img.startsWith('images/')) return `/${img}`
+  const base = config.public.apiBase ? config.public.apiBase.replace(/\/+$/, '') : ''
+  const path = img.startsWith('/') ? img : `/${img}`
+  return `${base}${path}`
 }
 
 const handleImageUpload = async (e) => {

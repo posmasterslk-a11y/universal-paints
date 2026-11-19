@@ -1,15 +1,17 @@
 export const useAuth = () => {
+  const isSecure = process.client ? window.location.protocol === 'https:' : false
+
   const authCookie = useCookie('auth_token', {
     maxAge: 60 * 60 * 24 * 30, // 30-day session
     path: '/',
     sameSite: 'lax',
-    secure: true
+    secure: isSecure
   })
   const userCookie = useCookie('auth_user', {
     maxAge: 60 * 60 * 24 * 30,
     path: '/',
     sameSite: 'lax',
-    secure: true
+    secure: isSecure
   })
 
   const token = useState('auth_token', () => {

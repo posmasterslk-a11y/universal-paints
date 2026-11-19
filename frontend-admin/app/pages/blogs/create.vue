@@ -82,7 +82,7 @@
           <div class="space-y-2">
             <!-- Preview Box if image present -->
             <div v-if="form.image" class="relative w-32 h-20 rounded-lg border border-slate-200 overflow-hidden bg-slate-50 group">
-              <img :src="form.image" alt="Cover preview" class="w-full h-full object-cover" />
+              <img :src="getCoverImageUrl(form.image)" alt="Cover preview" class="w-full h-full object-cover" />
               <button 
                 type="button" 
                 @click="form.image = ''" 
@@ -218,6 +218,16 @@ const form = ref({
   image: '',
   content: ''
 })
+
+const getCoverImageUrl = (img) => {
+  if (!img) return ''
+  if (img.startsWith('http://') || img.startsWith('https://')) return img
+  if (img.startsWith('/images/')) return img
+  if (img.startsWith('images/')) return `/${img}`
+  const base = config.public.apiBase ? config.public.apiBase.replace(/\/+$/, '') : ''
+  const path = img.startsWith('/') ? img : `/${img}`
+  return `${base}${path}`
+}
 
 const handleImageUpload = async (e) => {
   const rawFile = e.target.files?.[0]
